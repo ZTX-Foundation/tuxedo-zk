@@ -41,7 +41,13 @@ contract DeployToZkSync is Script, Test {
         //zip001();
         //zip002();
         //zip003();
-        zip004();
+        //zip004();
+        //zip005();
+        //zip006();
+        //zip007();
+        //zip008();
+        //zip009();
+        zip010();
     }
 
     /// @dev Check if a string is empty
@@ -68,13 +74,13 @@ contract DeployToZkSync is Script, Test {
         vm.startBroadcast(deployerPrivateKey);
 
         /// @dev Token deployment
-        Token token = new Token(
-            string(abi.encodePacked(vm.envString("TOKEN_NAME"))),
-            string(abi.encodePacked(vm.envString("TOKEN_SYMBOL")))
-        );
+            Token token = new Token(
+                string(abi.encodePacked(vm.envString("TOKEN_NAME"))),
+                string(abi.encodePacked(vm.envString("TOKEN_SYMBOL")))
+            );
 
-        /// @dev Token transfer
-        IERC20(address(token)).transfer(vm.envAddress("TREASURY_WALLET_MULTISIG"), vm.envUint("MAX_SUPPLY"));
+            /// @dev Token transfer
+            IERC20(address(token)).transfer(vm.envAddress("TREASURY_WALLET_MULTISIG"), vm.envUint("MAX_SUPPLY"));
 
         console2.log("Token deployed at:", address(token));
         vm.stopBroadcast();
@@ -829,16 +835,474 @@ contract DeployToZkSync is Script, Test {
     }
 
     /// @dev zip005
+    /// @dev CORE
+    /// @dev ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES
+    function zip005() internal {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES") == address(0)
+        ) {
+            console2.log("zip005: missing environment variables");
+            return;
+        }
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        /// @dev Initialize placeables data
+        placeableTokenIDMaxSupplySettings = new TokenIDMaxSupplySettings[](0);
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(2, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(3, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(5, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(6, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(7, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(9, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(10, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(11, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(13, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(19, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(20, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(22, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(26, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(29, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(30, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(32, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(33, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(34, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(35, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(36, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(37, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(39, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(41, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(42, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(44, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(48, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(49, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(50, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(51, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(52, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(53, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(55, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(56, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(57, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(58, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(59, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(61, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(62, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(63, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(66, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(68, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(71, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(73, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(75, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(77, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(78, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(79, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(80, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(81, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(83, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(89, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(91, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(92, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(93, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(97, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(98, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(99, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(100, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(101, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(102, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(104, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(108, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(109, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(110, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(112, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(113, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(114, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(115, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(118, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(125, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(128, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(131, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(132, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(133, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(134, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(135, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(138, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(139, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(140, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(141, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(142, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(143, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(145, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(146, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(147, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(150, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(151, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(168, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(349, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(350, 6000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(352, 100000));
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(353, 100000));
+
+        /// @dev Sanity checks
+        assertEq(placeableTokenIDMaxSupplySettings.length, 92, "Invalid placeableTokenIDMaxSupplySettings length");
+
+        uint256 tokenIDTotal = 0;
+        uint256 maxSupplyTotal = 0;
+
+        for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
+            tokenIDTotal += placeableTokenIDMaxSupplySettings[i].tokenId;
+            maxSupplyTotal += placeableTokenIDMaxSupplySettings[i].maxSupply;
+        }
+
+        assertEq(tokenIDTotal, 8_227, "Invalid tokenIDTotal");
+        assertEq(maxSupplyTotal, 6_380_000, "Invalid maxSupplyTotal");
+
+        /// @dev Configure placeables
+        ERC1155MaxSupplyMintable placeables = ERC1155MaxSupplyMintable(
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES")
+        );
+
+        for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
+            placeables.setSupplyCap(
+                placeableTokenIDMaxSupplySettings[i].tokenId,
+                placeableTokenIDMaxSupplySettings[i].maxSupply
+            );
+        }
+
+        /// @dev Validation
+        for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
+            uint256 tokenId = placeableTokenIDMaxSupplySettings[i].tokenId;
+            uint256 maxSupply = placeableTokenIDMaxSupplySettings[i].maxSupply;
+
+            assertEq(placeables.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
+            assertEq(placeables.getMintAmountLeft(tokenId), maxSupply, "Invalid getMintAmountLeft for tokenId");
+        }
+
+        vm.stopBroadcast();
+    }
 
     /// @dev zip006
+    /// @dev CORE
+    /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
+    function zip006() internal {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
+        ) {
+            console2.log("zip006: missing environment variables");
+            return;
+        }
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        /// @dev Initialize wearables data
+        wearableTokenIDMaxSupplySettings = new TokenIDMaxSupplySettings[](0);
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(7, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(26, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(27, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(28, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(29, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(30, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(31, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(32, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(33, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(34, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(35, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(36, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(37, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(38, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(39, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(40, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(41, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(42, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(43, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(44, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(45, 6000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(46, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(47, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(48, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(49, 69));
+
+        /// @dev Sanity checks
+        assertEq(wearableTokenIDMaxSupplySettings.length, 25, "Invalid wearableTokenIDMaxSupplySettings length");
+
+        uint256 maxSupplyTotal = 0;
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            maxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
+        }
+
+        assertEq(maxSupplyTotal, 2_306_069, "Invalid maxSupplyTotal");
+
+        /// @dev Configure wearables
+        ERC1155MaxSupplyMintable wearables = ERC1155MaxSupplyMintable(
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")
+        );
+
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            wearables.setSupplyCap(
+                wearableTokenIDMaxSupplySettings[i].tokenId,
+                wearableTokenIDMaxSupplySettings[i].maxSupply
+            );
+        }
+
+        /// @dev Validation
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            uint256 tokenId = wearableTokenIDMaxSupplySettings[i].tokenId;
+            uint256 maxSupply = wearableTokenIDMaxSupplySettings[i].maxSupply;
+            uint256 currentSupply = wearables.totalSupply(tokenId);
+
+            assertEq(wearables.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
+            assertEq(
+                wearables.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+        }
+
+        vm.stopBroadcast();
+    }
 
     /// @dev zip007
+    /// @dev CORE
+    /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
+    function zip007() internal {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
+        ) {
+            console2.log("zip007: missing environment variables");
+            return;
+        }
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        /// @dev Initialize wearables data
+        wearableTokenIDMaxSupplySettings = new TokenIDMaxSupplySettings[](0);
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(50, 75));
+
+        /// @dev Sanity checks
+        assertEq(wearableTokenIDMaxSupplySettings.length, 1, "Invalid wearableTokenIDMaxSupplySettings length");
+
+        uint256 maxSupplyTotal = 0;
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            maxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
+        }
+
+        assertEq(maxSupplyTotal, 75, "Invalid maxSupplyTotal");
+
+        /// @dev Configure wearables
+        ERC1155MaxSupplyMintable wearables = ERC1155MaxSupplyMintable(
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")
+        );
+
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            wearables.setSupplyCap(
+                wearableTokenIDMaxSupplySettings[i].tokenId,
+                wearableTokenIDMaxSupplySettings[i].maxSupply
+            );
+        }
+
+        /// @dev Validation
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            uint256 tokenId = wearableTokenIDMaxSupplySettings[i].tokenId;
+            uint256 maxSupply = wearableTokenIDMaxSupplySettings[i].maxSupply;
+
+            assertEq(wearables.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
+            assertEq(wearables.getMintAmountLeft(tokenId), maxSupply, "Invalid getMintAmountLeft for tokenId");
+        }
+
+        vm.stopBroadcast();
+    }
 
     /// @dev zip008
+    /// @dev CORE
+    /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
+    function zip008() internal {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
+        ) {
+            console2.log("zip008: missing environment variables");
+            return;
+        }
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        /// @dev Initialize wearables data
+        wearableTokenIDMaxSupplySettings = new TokenIDMaxSupplySettings[](0);
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(51, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(52, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(53, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(54, 6000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(55, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(56, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(57, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(58, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(59, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(60, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(61, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(62, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(63, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(64, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(65, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(66, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(67, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(68, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(69, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(70, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(71, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(72, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(73, 100000));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(74, 100000));
+
+        /// @dev Sanity checks
+        assertEq(wearableTokenIDMaxSupplySettings.length, 24, "Invalid wearableTokenIDMaxSupplySettings length");
+
+        uint256 maxSupplyTotal = 0;
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            maxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
+        }
+
+        assertEq(maxSupplyTotal, 2_306_000, "Invalid maxSupplyTotal");
+
+        /// @dev Configure wearables
+        ERC1155MaxSupplyMintable wearables = ERC1155MaxSupplyMintable(
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")
+        );
+
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            wearables.setSupplyCap(
+                wearableTokenIDMaxSupplySettings[i].tokenId,
+                wearableTokenIDMaxSupplySettings[i].maxSupply
+            );
+        }
+
+        /// @dev Validation
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            uint256 tokenId = wearableTokenIDMaxSupplySettings[i].tokenId;
+            uint256 maxSupply = wearableTokenIDMaxSupplySettings[i].maxSupply;
+            uint256 currentSupply = wearables.totalSupply(tokenId);
+
+            assertEq(wearables.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
+            assertEq(
+                wearables.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+        }
+
+        vm.stopBroadcast();
+    }
 
     /// @dev zip009
+    /// @dev CORE
+    /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
+    function zip009() internal {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
+        ) {
+            console2.log("zip009: missing environment variables");
+            return;
+        }
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        /// @dev Initialize wearables data
+        wearableTokenIDMaxSupplySettings = new TokenIDMaxSupplySettings[](0);
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(75, 420));
+        wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(76, 100000));
+
+        /// @dev Sanity checks
+        assertEq(wearableTokenIDMaxSupplySettings.length, 2, "Invalid wearableTokenIDMaxSupplySettings length");
+
+        uint256 maxSupplyTotal = 0;
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            maxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
+        }
+
+        assertEq(maxSupplyTotal, 100_420, "Invalid maxSupplyTotal");
+
+        /// @dev Configure wearables
+        ERC1155MaxSupplyMintable wearables = ERC1155MaxSupplyMintable(
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")
+        );
+
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            wearables.setSupplyCap(
+                wearableTokenIDMaxSupplySettings[i].tokenId,
+                wearableTokenIDMaxSupplySettings[i].maxSupply
+            );
+        }
+
+        /// @dev Validation
+        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
+            uint256 tokenId = wearableTokenIDMaxSupplySettings[i].tokenId;
+            uint256 maxSupply = wearableTokenIDMaxSupplySettings[i].maxSupply;
+            uint256 currentSupply = wearables.totalSupply(tokenId);
+
+            assertEq(wearables.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
+            assertEq(
+                wearables.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+        }
+
+        vm.stopBroadcast();
+    }
 
     /// @dev zip010
+    /// @dev CORE
+    /// @dev ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES
+    function zip010() internal {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES") == address(0)
+        ) {
+            console2.log("zip010: missing environment variables");
+            return;
+        }
+
+        vm.startBroadcast(deployerPrivateKey);
+
+        /// @dev Initialize placeables datazgth, 1, "Invalid placeableTokenIDMaxSupplySettings length");
+
+        uint256 maxSupplyTotal = 0;
+        for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
+            maxSupplyTotal += placeableTokenIDMaxSupplySettings[i].maxSupply;
+        }
+
+        assertEq(maxSupplyTotal, 100_000, "Invalid maxSupplyTotal");
+
+        /// @dev Configure placeables
+        ERC1155MaxSupplyMintable placeables = ERC1155MaxSupplyMintable(
+            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES")
+        );
+
+        for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
+            placeables.setSupplyCap(
+                placeableTokenIDMaxSupplySettings[i].tokenId,
+                placeableTokenIDMaxSupplySettings[i].maxSupply
+            );
+        }
+
+        /// @dev Validation
+        for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
+            uint256 tokenId = placeableTokenIDMaxSupplySettings[i].tokenId;
+            uint256 maxSupply = placeableTokenIDMaxSupplySettings[i].maxSupply;
+            uint256 currentSupply = placeables.totalSupply(tokenId);
+
+            assertEq(placeables.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
+            assertEq(
+                placeables.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+        }
+
+        vm.stopBroadcast();
+    }
 
     /// @dev zip011
 
@@ -855,4 +1319,8 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip018
 
     /// @dev zip019
+
+    /// @dev zip020
+
+    /// @dev zip021
 }
