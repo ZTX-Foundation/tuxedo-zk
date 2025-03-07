@@ -1266,13 +1266,16 @@ contract DeployToZkSync is Script, Test {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        /// @dev Initialize placeables datazgth, 1, "Invalid placeableTokenIDMaxSupplySettings length");
+        /// @dev Initialize placeables data
+        placeableTokenIDMaxSupplySettings = new TokenIDMaxSupplySettings[](0);
+        placeableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(354, 100000));
 
         uint256 maxSupplyTotal = 0;
         for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
             maxSupplyTotal += placeableTokenIDMaxSupplySettings[i].maxSupply;
         }
 
+        /// @dev Sanity checks
         assertEq(maxSupplyTotal, 100_000, "Invalid maxSupplyTotal");
 
         /// @dev Configure placeables
