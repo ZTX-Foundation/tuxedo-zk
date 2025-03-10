@@ -84,13 +84,13 @@ contract DeployToZkSync is Script, Test {
         vm.startBroadcast(deployerPrivateKey);
 
         /// @dev Token deployment
-            Token token = new Token(
-                string(abi.encodePacked(vm.envString("TOKEN_NAME"))),
-                string(abi.encodePacked(vm.envString("TOKEN_SYMBOL")))
-            );
+        Token token = new Token(
+            string(abi.encodePacked(vm.envString("TOKEN_NAME"))),
+            string(abi.encodePacked(vm.envString("TOKEN_SYMBOL")))
+        );
 
-            /// @dev Token transfer
-            IERC20(address(token)).transfer(vm.envAddress("TREASURY_WALLET_MULTISIG"), vm.envUint("MAX_SUPPLY"));
+        /// @dev Token transfer
+        IERC20(address(token)).transfer(vm.envAddress("TREASURY_WALLET_MULTISIG"), vm.envUint("MAX_SUPPLY"));
 
         console2.log("Token deployed at:", address(token));
         vm.stopBroadcast();
@@ -228,54 +228,114 @@ contract DeployToZkSync is Script, Test {
     }
 
     /// @dev zip002
+    /// @dev ENVIRONMENT
     /// @dev CORE
     /// @dev ADMIN_MULTISIG
     function zip002() internal {
-        if (vm.envAddress("CORE") == address(0) || vm.envAddress("ADMIN_MULTISIG") == address(0)) {
+        if (
+            vm.envAddress("CORE") == address(0) ||
+            vm.envAddress("ADMIN_MULTISIG") == address(0)
+        ) {
             console2.log("zip002: missing environment variables");
             return;
         }
 
-        vm.startBroadcast(deployerPrivateKey);
+        /// @dev Check if the environment is mainnet
+        bool isMainnet = keccak256(bytes(vm.envString("ENVIRONMENT"))) == keccak256(bytes("mainnet"));
+        if (isMainnet) {
+            /// @dev generate call data for ADMIN_MULTISIG
+            Core _core = Core(vm.envAddress("CORE"));
+            address adminMultisig = vm.envAddress("ADMIN_MULTISIG");
+            
+            console2.log("=== MAINNET TRANSACTION PAYLOAD FOR ZIP002 ===");
+            
+            // 1. First, prepare for TimelockController deployment via zkSync ContractDeployer
+            address[] memory proposers = new address[](1);
+            proposers[0] = adminMultisig;
+            
+            address[] memory executors = new address[](1);
+            executors[0] = adminMultisig;
+            
+            bytes memory constructorArgs = abi.encode(
+                uint256(0), // zero delay
+                proposers,
+                executors,
+                address(0) // No admin required
+            );
+            
+            // zkSync ContractDeployer address
+            address zkSyncContractDeployer = address(0x0000000000000000000000000000000000008006);
+            
+            // Create a random salt for deployment (in production, you'd want a more deterministic approach)
+            bytes32 salt = keccak256(abi.encodePacked("TimelockController", block.timestamp));
+            
+            console2.log("TimelockController Deployment Transaction (zkSync):");
+            console2.log("To:", zkSyncContractDeployer);
+            console2.log("Value: 0");
+            console2.log("Salt:", vm.toString(salt));
+            console2.log("Constructor args:", vm.toString(constructorArgs));
+            console2.log("Note: The bytecodeHash must be precomputed and factoryDeps must be provided in the zkSync transaction");
+            
+            // 2. After deployment, assuming the TimelockController address is known
+            console2.log("\nAfter deployment, execute this transaction:");
+            console2.log("To:", address(_core));
+            
+            // Generate the calldata to grant ADMIN role to the TimelockController
+            bytes memory grantRoleCalldata = abi.encodeWithSelector(
+                _core.grantRole.selector,
+                Roles.ADMIN,
+                address(0) // Replace with actual TimelockController address after deployment
+            );
+            
+            console2.log("Grant ADMIN role calldata:");
+            console2.logBytes(grantRoleCalldata);
+            
+            console2.log("\nReplacement variables:");
+            console2.log("<timelock_controller_address> - Replace with the actual deployed TimelockController address");
+            console2.log("Note: For zkSync deployment, you'll need to use the 'create' or 'create2' method from the ContractDeployer");
+            console2.log("and provide the factory dependencies in your transaction.");
+        } else {
+            vm.startBroadcast(deployerPrivateKey);
 
-        Core _core = Core(vm.envAddress("CORE"));
+            Core _core = Core(vm.envAddress("CORE"));
 
-        address[] memory adminTimelockProposersExecutors = new address[](1);
+            address[] memory adminTimelockProposersExecutors = new address[](1);
 
-        adminTimelockProposersExecutors[0] = address(vm.envAddress("ADMIN_MULTISIG"));
-        TimelockController _adminTimelock = new TimelockController(
-            0, // zero delay
-            adminTimelockProposersExecutors,
-            adminTimelockProposersExecutors,
-            address(0) // No admin requried
-        );
-        console2.log("TimelockController deployed at:", address(_adminTimelock));
+            adminTimelockProposersExecutors[0] = address(vm.envAddress("ADMIN_MULTISIG"));
+            TimelockController _adminTimelock = new TimelockController(
+                0, // zero delay
+                adminTimelockProposersExecutors,
+                adminTimelockProposersExecutors,
+                address(0) // No admin requried
+            );
+            console2.log("TimelockController deployed at:", address(_adminTimelock));
 
-        _core.grantRole(Roles.ADMIN, address(_adminTimelock));
-        console2.log("Please give Roles.Admin to the ADMIN_TIMELOCK_CONTROLLER from the ADMIN_MULTISIG");
+            _core.grantRole(Roles.ADMIN, address(_adminTimelock));
+            console2.log("Please give Roles.Admin to the ADMIN_TIMELOCK_CONTROLLER from the ADMIN_MULTISIG");
 
-        vm.stopBroadcast();
+            vm.stopBroadcast();
 
-        /// @dev Check that the ADMIN_MULTISIG has the PROPOSER role
-        assertEq(
-            _adminTimelock.hasRole(_adminTimelock.PROPOSER_ROLE(), vm.envAddress("ADMIN_MULTISIG")),
-            true,
-            "ADMIN_MULTISIG does not have PROPOSER_ROLE"
-        );
+            /// @dev Check that the ADMIN_MULTISIG has the PROPOSER role
+            assertEq(
+                _adminTimelock.hasRole(_adminTimelock.PROPOSER_ROLE(), vm.envAddress("ADMIN_MULTISIG")),
+                true,
+                "ADMIN_MULTISIG does not have PROPOSER_ROLE"
+            );
 
-        /// @dev Check that the ADMIN_MULTISIG has the EXECUTOR role
-        assertEq(
-            _adminTimelock.hasRole(_adminTimelock.EXECUTOR_ROLE(), vm.envAddress("ADMIN_MULTISIG")),
-            true,
-            "ADMIN_MULTISIG does not have EXECUTOR_ROLE"
-        );
+            /// @dev Check that the ADMIN_MULTISIG has the EXECUTOR role
+            assertEq(
+                _adminTimelock.hasRole(_adminTimelock.EXECUTOR_ROLE(), vm.envAddress("ADMIN_MULTISIG")),
+                true,
+                "ADMIN_MULTISIG does not have EXECUTOR_ROLE"
+            );
 
-        /// @dev Check that the ADMIN_MULTISIG has the CANCELLER rol`e
-        assertEq(
-            _adminTimelock.hasRole(_adminTimelock.CANCELLER_ROLE(), vm.envAddress("ADMIN_MULTISIG")),
-            true,
-            "ADMIN_MULTISIG does not have CANCELLER_ROLE"
-        );
+            /// @dev Check that the ADMIN_MULTISIG has the CANCELLER rol`e
+            assertEq(
+                _adminTimelock.hasRole(_adminTimelock.CANCELLER_ROLE(), vm.envAddress("ADMIN_MULTISIG")),
+                true,
+                "ADMIN_MULTISIG does not have CANCELLER_ROLE"
+            );
+        }
     }
 
     /// @dev zip003
@@ -307,7 +367,11 @@ contract DeployToZkSync is Script, Test {
             return;
         }
 
-        vm.startBroadcast(deployerPrivateKey);
+        /// @dev Check if the environment is mainnet
+        bool isMainnet = keccak256(bytes(vm.envString("ENVIRONMENT"))) == keccak256(bytes("mainnet"));
+        if (isMainnet) {} else {
+            vm.startBroadcast(deployerPrivateKey);
+        }
 
         Core _core = Core(vm.envAddress("CORE"));
 
@@ -806,8 +870,16 @@ contract DeployToZkSync is Script, Test {
             uint256 placeableTokenId = placeableTokenIDMaxSupplySettings[i].tokenId;
             uint256 placeableMaxSupply = placeableTokenIDMaxSupplySettings[i].maxSupply;
 
-            assertEq(placeable.maxTokenSupply(placeableTokenId), placeableMaxSupply, "Invalid getMintAmountLeft for tokenId");
-            assertEq(placeable.getMintAmountLeft(placeableTokenId), placeableMaxSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(
+                placeable.maxTokenSupply(placeableTokenId),
+                placeableMaxSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+            assertEq(
+                placeable.getMintAmountLeft(placeableTokenId),
+                placeableMaxSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
         }
 
         /// @dev Verify Wearable
@@ -815,8 +887,16 @@ contract DeployToZkSync is Script, Test {
             uint256 wearableTokenId = wearableTokenIDMaxSupplySettings[i].tokenId;
             uint256 wearableMaxSupply = wearableTokenIDMaxSupplySettings[i].maxSupply;
 
-            assertEq(wearables.maxTokenSupply(wearableTokenId), wearableMaxSupply, "Invalid getMintAmountLeft for tokenId");
-            assertEq(wearables.getMintAmountLeft(wearableTokenId), wearableMaxSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(
+                wearables.maxTokenSupply(wearableTokenId),
+                wearableMaxSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+            assertEq(
+                wearables.getMintAmountLeft(wearableTokenId),
+                wearableMaxSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
         }
 
         /// @dev Verify Consumable
@@ -824,8 +904,16 @@ contract DeployToZkSync is Script, Test {
             uint256 consumableTokenId = consumableTokenIDMaxSupplySettings[i].tokenId;
             uint256 consumableMaxSupply = consumableTokenIDMaxSupplySettings[i].maxSupply;
 
-            assertEq(consumables.maxTokenSupply(consumableTokenId), consumableMaxSupply, "Invalid getMintAmountLeft for tokenId");
-            assertEq(consumables.getMintAmountLeft(consumableTokenId), consumableMaxSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(
+                consumables.maxTokenSupply(consumableTokenId),
+                consumableMaxSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
+            assertEq(
+                consumables.getMintAmountLeft(consumableTokenId),
+                consumableMaxSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
         }
 
         /// @dev Verify Season One
@@ -837,7 +925,11 @@ contract DeployToZkSync is Script, Test {
             uint256 seasonOneTokenId = tokenIdRewardAmounts[i].tokenId;
             uint256 seasonOneRewardAmount = tokenIdRewardAmounts[i].rewardAmount;
 
-            assertEq(seasonOne.tokenIdRewardAmount(seasonOneTokenId), seasonOneRewardAmount, "Invalid tokenIdRewardAmount");
+            assertEq(
+                seasonOne.tokenIdRewardAmount(seasonOneTokenId),
+                seasonOneRewardAmount,
+                "Invalid tokenIdRewardAmount"
+            );
             assertEq(seasonOne.tokenIdUsedAmount(seasonOneTokenId), 0, "Invalid tokenIdUsedAmount");
         }
 
@@ -847,9 +939,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip005
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES
     function zip005() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES") == address(0)) {
             console2.log("zip005: missing environment variables");
             return;
         }
@@ -992,9 +1082,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip006
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip006() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip006: missing environment variables");
             return;
         }
@@ -1071,9 +1159,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip007
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip007() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip007: missing environment variables");
             return;
         }
@@ -1121,9 +1207,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip008
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip008() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip008: missing environment variables");
             return;
         }
@@ -1199,9 +1283,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip009
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip009() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip009: missing environment variables");
             return;
         }
@@ -1255,9 +1337,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip010
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES
     function zip010() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES") == address(0)) {
             console2.log("zip010: missing environment variables");
             return;
         }
@@ -1308,9 +1388,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip011
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip011() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip011: missing environment variables");
             return;
         }
@@ -1376,8 +1454,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip012() internal {
         if (
-            vm.envAddress("CORE") == address(0) ||
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
+            vm.envAddress("CORE") == address(0) || vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
         ) {
             console2.log("zip012: missing environment variables");
             return;
@@ -1423,8 +1500,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip013() internal {
         if (
-            vm.envAddress("CORE") == address(0) ||
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
+            vm.envAddress("CORE") == address(0) || vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
         ) {
             console2.log("zip013: missing environment variables");
             return;
@@ -1479,9 +1555,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip014
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip014() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip014: missing environment variables");
             return;
         }
@@ -1524,9 +1598,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip016
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip016() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip016: missing environment variables");
             return;
         }
@@ -1569,9 +1641,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip017
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip017() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip017: missing environment variables");
             return;
         }
@@ -1762,9 +1832,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip019
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip019() internal {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip019: missing environment variables");
             return;
         }
@@ -2039,7 +2107,7 @@ contract DeployToZkSync is Script, Test {
         wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(175, 100));
         wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(176, 100));
         wearableTokenIDMaxSupplySettings.push(TokenIDMaxSupplySettings(177, 250000));
-        
+
         /// @notice sanity checks for placeables
         assertEq(placeableTokenIDMaxSupplySettings.length, 155, "Invalid placeableTokenIDMaxSupplySettings length");
 
@@ -2066,21 +2134,27 @@ contract DeployToZkSync is Script, Test {
         ERC1155MaxSupplyMintable placeable = ERC1155MaxSupplyMintable(
             vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES")
         );
-        
+
         ERC1155MaxSupplyMintable wearable = ERC1155MaxSupplyMintable(
             vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")
         );
 
-         /// @dev placeable config
+        /// @dev placeable config
         for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
-            placeable.setSupplyCap(placeableTokenIDMaxSupplySettings[i].tokenId, placeableTokenIDMaxSupplySettings[i].maxSupply);
+            placeable.setSupplyCap(
+                placeableTokenIDMaxSupplySettings[i].tokenId,
+                placeableTokenIDMaxSupplySettings[i].maxSupply
+            );
         }
 
         /// @dev wearable config
         for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
-            wearable.setSupplyCap(wearableTokenIDMaxSupplySettings[i].tokenId, wearableTokenIDMaxSupplySettings[i].maxSupply);
+            wearable.setSupplyCap(
+                wearableTokenIDMaxSupplySettings[i].tokenId,
+                wearableTokenIDMaxSupplySettings[i].maxSupply
+            );
         }
-        
+
         /// @dev verify placeables
         for (uint256 i = 0; i < placeableTokenIDMaxSupplySettings.length; i++) {
             uint256 tokenId = placeableTokenIDMaxSupplySettings[i].tokenId;
@@ -2088,7 +2162,11 @@ contract DeployToZkSync is Script, Test {
             uint256 currentSupply = placeable.totalSupply(tokenId);
 
             assertEq(placeable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
-            assertEq(placeable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(
+                placeable.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
         }
 
         /// @dev verify wearables
@@ -2098,7 +2176,11 @@ contract DeployToZkSync is Script, Test {
             uint256 currentSupply = wearable.totalSupply(tokenId);
 
             assertEq(wearable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
-            assertEq(wearable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(
+                wearable.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
         }
 
         vm.stopBroadcast();
@@ -2107,9 +2189,7 @@ contract DeployToZkSync is Script, Test {
     /// @dev zip021
     /// @dev ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES
     function zip021() public {
-        if (
-            vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)
-        ) {
+        if (vm.envAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES") == address(0)) {
             console2.log("zip020: missing environment variables");
             return;
         }
@@ -2168,7 +2248,10 @@ contract DeployToZkSync is Script, Test {
         );
 
         for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
-            wearable.setSupplyCap(wearableTokenIDMaxSupplySettings[i].tokenId, wearableTokenIDMaxSupplySettings[i].maxSupply);
+            wearable.setSupplyCap(
+                wearableTokenIDMaxSupplySettings[i].tokenId,
+                wearableTokenIDMaxSupplySettings[i].maxSupply
+            );
         }
 
         /// @dev Verify Wearable
@@ -2178,7 +2261,11 @@ contract DeployToZkSync is Script, Test {
             uint256 currentSupply = wearable.totalSupply(tokenId);
 
             assertEq(wearable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
-            assertEq(wearable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(
+                wearable.getMintAmountLeft(tokenId),
+                maxSupply - currentSupply,
+                "Invalid getMintAmountLeft for tokenId"
+            );
         }
 
         vm.stopBroadcast();
