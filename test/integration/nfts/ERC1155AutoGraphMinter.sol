@@ -1,4 +1,4 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {ERC1155AutoGraphMinterHelperLib as Helper} from "test/helpers/ERC1155AutoGraphMinterHelper.sol";
 
