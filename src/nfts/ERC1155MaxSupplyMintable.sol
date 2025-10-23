@@ -8,9 +8,24 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Roles} from "@protocol/core/Roles.sol";
 import {CoreRef} from "@protocol/refs/CoreRef.sol";
 
+/// @notice EIP-5633 interface for composable soulbound tokens
+interface IERC5633 {
+    event Soulbound(uint256 indexed id, bool bounded);
+
+    function isSoulbound(uint256 id) external view returns (bool);
+}
+
+/// @notice EIP-5192 interface for minimal soulbound NFTs
+interface IERC5192 {
+    event Locked(uint256 tokenId);
+    event Unlocked(uint256 tokenId);
+
+    function locked(uint256 tokenId) external view returns (bool);
+}
+
 /// Base ERC 1155 NFT with total supply
 /// Inherits CoreRef for roles and access
-contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef {
+contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC5192 {
     /// @notice contract name
     string private _name;
 
@@ -84,6 +99,14 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef {
         );
 
         nonTransferableTokens[tokenId] = isNonTransferable;
+
+        // Emit events for marketplace detection
+        emit Soulbound(tokenId, isNonTransferable);
+        if (isNonTransferable) {
+            emit Locked(tokenId);
+        } else {
+            emit Unlocked(tokenId);
+        }
     }
 
     /// @notice set the supply cap for a given token, cannot be less than current supply
@@ -158,6 +181,16 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef {
 
     /// ----------- VIEW ONLY API ------------
 
+    /// @notice returns whether a token is soulbound (EIP-5633)
+    function isSoulbound(uint256 id) external view override returns (bool) {
+        return nonTransferableTokens[id];
+    }
+
+    /// @notice returns whether a token is locked (EIP-5192 compatibility)
+    function locked(uint256 id) external view returns (bool) {
+        return nonTransferableTokens[id];
+    }
+
     /// @notice returns the amount of tokens left to mint from the max supply
     /// @param tokenId the id of the token to query
     function getMintAmountLeft(uint256 tokenId) public view returns (uint256) {
@@ -178,6 +211,14 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef {
     /// @param id the id of the token to query
     function exists(uint256 id) public view virtual returns (bool) {
         return totalSupply[id] > 0;
+    }
+
+    /// @notice EIP-165 interface detection
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155) returns (bool) {
+        return
+            interfaceId == type(IERC5633).interfaceId || // ERC5633 (composable soulbound ERC1155)
+            interfaceId == type(IERC5192).interfaceId || // ERC5192 (minimal soulbound NFTs)
+            super.supportsInterface(interfaceId);
     }
 
     /// ----------- INTERNAL OVERRIDES ------------

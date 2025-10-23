@@ -1,8 +1,15 @@
 pragma solidity 0.8.18;
 
+import {IERC5633, IERC5192} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
+
 import "test/BaseTest.sol";
 
 contract UnitTestERC1155MaxSupplyMintable is BaseTest {
+    // Events for testing
+    event Soulbound(uint256 indexed id, bool bounded);
+    event Locked(uint256 tokenId);
+    event Unlocked(uint256 tokenId);
+
     function setUp() public override {
         super.setUp();
     }
@@ -76,12 +83,19 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         uint256 newSupplyCap = 5000;
         bool isNonTransferable = true;
 
+        vm.expectEmit(true, false, false, true);
+        emit Soulbound(newTokenId, true);
+        vm.expectEmit(true, false, false, false);
+        emit Locked(newTokenId);
+
         vm.prank(addresses.adminAddress);
         nft.setSupplyCapAndNonTransferable(newTokenId, newSupplyCap, isNonTransferable);
 
         assertEq(nft.maxTokenSupply(newTokenId), newSupplyCap);
         assertEq(nft.getMintAmountLeft(newTokenId), newSupplyCap);
         assertEq(nft.nonTransferableTokens(newTokenId), isNonTransferable);
+        assertTrue(nft.isSoulbound(newTokenId));
+        assertTrue(nft.locked(newTokenId));
     }
 
     function testSetSupplyCapAndNonTransferableWithZeroMaxSupplyFails() public {
@@ -113,17 +127,31 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.prank(addresses.adminAddress);
         nft.setSupplyCap(newTokenId, newSupplyCap);
 
-        // Now set non-transferability
+        // Now set non-transferability and expect events
+        vm.expectEmit(true, false, false, true);
+        emit Soulbound(newTokenId, true);
+        vm.expectEmit(true, false, false, false);
+        emit Locked(newTokenId);
+
         vm.prank(addresses.adminAddress);
         nft.setNonTransferable(newTokenId, true);
 
         assertEq(nft.nonTransferableTokens(newTokenId), true);
+        assertTrue(nft.isSoulbound(newTokenId));
+        assertTrue(nft.locked(newTokenId));
 
-        // Test setting it back to false
+        // Test setting it back to false and expect Unlocked event
+        vm.expectEmit(true, false, false, true);
+        emit Soulbound(newTokenId, false);
+        vm.expectEmit(true, false, false, false);
+        emit Unlocked(newTokenId);
+
         vm.prank(addresses.adminAddress);
         nft.setNonTransferable(newTokenId, false);
 
         assertEq(nft.nonTransferableTokens(newTokenId), false);
+        assertFalse(nft.isSoulbound(newTokenId));
+        assertFalse(nft.locked(newTokenId));
     }
 
     function testTransferNonTransferableTokenFails() public {
@@ -177,6 +205,41 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         // Transfer should now fail
         vm.expectRevert("BaseERC1155NFT: token is non-transferable");
         nft.safeTransferFrom(address(this), recipient, newTokenId, 1, "");
+    }
+
+    function testBatchTransferMixedTransferabilityFails() public {
+        uint256 transferableTokenId = tokenId + 1;
+        uint256 soulboundTokenId = tokenId + 2;
+        uint256 newSupplyCap = 5000;
+        uint256 mintAmount = 100;
+        address recipient = address(0x123);
+
+        // Set up one transferable and one soulbound token
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(transferableTokenId, newSupplyCap, false);
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(soulboundTokenId, newSupplyCap, true);
+
+        // Mint both tokens
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), transferableTokenId, mintAmount);
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), soulboundTokenId, mintAmount);
+
+        // Attempt batch transfer and expect revert
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = transferableTokenId;
+        tokenIds[1] = soulboundTokenId;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 1;
+        amounts[1] = 1;
+
+        vm.expectRevert("BaseERC1155NFT: token is non-transferable");
+        nft.safeBatchTransferFrom(address(this), recipient, tokenIds, amounts, "");
     }
 
     function testNonTransferableTokenCanBeBurned() public {
@@ -372,5 +435,23 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.expectRevert("GlobalReentrancyLock: invalid lock level");
         vm.prank(addresses.minterAddress);
         nft.mintBatch(address(this), tokenIds, amounts);
+    }
+
+    /// EIP-165 Interface Support Tests
+
+    function testSupportsERC5633Interface() public view {
+        assertTrue(nft.supportsInterface(type(IERC5633).interfaceId));
+    }
+
+    function testSupportsERC5192Interface() public view {
+        assertTrue(nft.supportsInterface(type(IERC5192).interfaceId));
+    }
+
+    function testSupportsERC1155Interface() public view {
+        assertTrue(nft.supportsInterface(0xd9b67a26));
+    }
+
+    function testDoesNotSupportInvalidInterface() public view {
+        assertFalse(nft.supportsInterface(0xffffffff));
     }
 }
