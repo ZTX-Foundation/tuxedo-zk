@@ -1,0 +1,28 @@
+# Creator Testnet Private Keys
+
+**⚠️ WARNING: These are testnet private keys. Never use these on mainnet or share publicly if they hold real value.**
+
+## Chain ID: 4654
+
+| Key Name | Address | Private Key |
+|----------|---------|-------------|
+| TREASURY_WALLET_MULTISIG | 0xAEa46dB13966EF25c3117F14a8f61A4ec201A7CC | 0xcb1c34f5807db88879f51512bca968dfbc0b0695e8257c8b55c78ac070cd8594 |
+| GUARDIAN_MULTISIG | 0xCD6ee7a8A52Be203Bc702Adb9F10F91E19FbD10D | 0x49dba46082167fe12b6a622f9e6c415cd199eb7c1b45d0fc7406d1691947fb4a |
+| GAME_CONSUMER_PAYMENT_RECIPIENT | 0xec2723715Eee2B27Ca7166d2efA5aCDb1887288E | 0x2c1575b5a261e57bc99a1603167ee07334a71917b3d198f2683c8f73a186f31e |
+| REVENUE_WALLET_MULTISIG01 | 0x7339dcbB830d21dd494120aBA4f3aBcEe47fe4C8 | 0x08b53bbffd2dc71727e807e1adb0ab50325ed1e25368b9324beacbe81edd9ccf |
+| REVENUE_WALLET_MULTISIG02 | 0x7c83C1e51ef855C4634D69aeB7b1475250173244 | 0x304c0f5c4c70963c9adf2bcaf3795c923342a51b19118c051f70c1b53ab795e6 |
+| AUTOGRAPH_MINTER_PAYMENT_RECIPIENT | 0xf1B19eC40C9FdCA579699B61eA1037D6c05C404D | 0x06a7caed77e9b7ba006ced8969f8e075967cfff6f0185490df53142622944078 |
+| ADMIN_MULTISIG | 0xb31865DBd173549c6BdA0FEBfCCC4cB02B0E41B3 | 0xed0dcfec0a277b362440c9551379e13509e026de814947925e8ba201105ad1b8 |
+| DEPLOYER_EOA | 0x73bBdE7e45E26546f2ef0202865917E4D6CE2A01 | 0xa0a199277c1f29c775d1eb5a571136893a23862901f70bd0d1959662a587b85a |
+
+## Usage
+
+To import any of these private keys into a wallet:
+```bash
+cast wallet import <account-name> --private-key <PRIVATE_KEY>
+```
+
+To derive the address from a private key:
+```bash
+cast wallet address --private-key <PRIVATE_KEY>
+```

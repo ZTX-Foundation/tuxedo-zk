@@ -9,7 +9,6 @@ import {Token, MAX_SUPPLY} from "@protocol/token/Token.sol";
 import {ERC20HoldingDeposit} from "@protocol/finance/ERC20HoldingDeposit.sol";
 
 contract zip000 is MultisigProposal {
-
     // Returns the name of the proposal.
     function name() public pure override returns (string memory) {
         return "ZIP000";

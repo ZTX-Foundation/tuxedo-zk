@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(done)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $f ===\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
