@@ -18,3 +18,5 @@ build/
 .envrc
 .encryptedKey.json
 lcov.info
+zkout
+foundryup-zksync
