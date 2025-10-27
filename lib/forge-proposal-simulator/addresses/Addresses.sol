@@ -23,18 +23,6 @@ contract Addresses is IAddresses, Test {
     mapping(address addr => mapping(uint256 chainId => bool exist))
         public addressToChainId;
 
-    /// @notice json structure to read addresses into storage from file
-    struct SavedAddresses {
-        /// address to store
-        address addr;
-        /// chain id of network to store for
-        uint256 chainId;
-        /// whether the address is a contract
-        bool isContract;
-        /// name of contract to store
-        string name;
-    }
-
     /// @notice struct to record addresses deployed during a proposal
     struct RecordedAddress {
         string name;
@@ -53,28 +41,6 @@ contract Addresses is IAddresses, Test {
 
     // @notice array of addresses changed during a proposal
     ChangedAddress[] private changedAddresses;
-
-    constructor(string memory addressesPath) {
-        string memory addressesData = string(
-            abi.encodePacked(vm.readFile(addressesPath))
-        );
-
-        bytes memory parsedJson = vm.parseJson(addressesData);
-
-        SavedAddresses[] memory savedAddresses = abi.decode(
-            parsedJson,
-            (SavedAddresses[])
-        );
-
-        for (uint256 i = 0; i < savedAddresses.length; i++) {
-            _addAddress(
-                savedAddresses[i].name,
-                savedAddresses[i].addr,
-                savedAddresses[i].chainId,
-                savedAddresses[i].isContract
-            );
-        }
-    }
 
     /// @notice get an address for the current chainId
     /// @param name the name of the address
@@ -149,9 +115,7 @@ contract Addresses is IAddresses, Test {
                 abi.encodePacked(
                     "Address: ",
                     name,
-                    " doesn't exist on chain: ",
-                    vm.toString(chainId),
-                    ". Use addAddress instead"
+                    " doesn't exist. Use addAddress instead"
                 )
             )
         );
@@ -162,8 +126,7 @@ contract Addresses is IAddresses, Test {
                 abi.encodePacked(
                     "Address: ",
                     name,
-                    " already set to the same value on chain: ",
-                    vm.toString(chainId)
+                    " already set to the same value"
                 )
             )
         );
@@ -180,7 +143,6 @@ contract Addresses is IAddresses, Test {
 
         data.addr = _addr;
         data.isContract = isContract;
-        vm.label(_addr, name);
     }
 
     /// @notice change an address for the current chainId
@@ -350,8 +312,7 @@ contract Addresses is IAddresses, Test {
                 abi.encodePacked(
                     "Address with name: ",
                     name,
-                    " already set on chain: "
-                    // vm.toString(chainId)
+                    " already set on chain"
                 )
             )
         );
@@ -364,8 +325,7 @@ contract Addresses is IAddresses, Test {
                 abi.encodePacked(
                     "Address: ",
                     addressToString(addr),
-                    " already set on chain: "
-                    // vm.toString(chainId)
+                    " already set on chain"
                 )
             )
         );
@@ -376,8 +336,6 @@ contract Addresses is IAddresses, Test {
 
         currentAddress.addr = addr;
         currentAddress.isContract = isContract;
-
-        // vm.label(addr, name);
     }
 
     /// @notice get an address for a specific chainId
@@ -394,14 +352,7 @@ contract Addresses is IAddresses, Test {
 
         require(
             addr != address(0),
-            string(
-                abi.encodePacked(
-                    "Address: ",
-                    name,
-                    " not set on chain: ",
-                    vm.toString(chainId)
-                )
-            )
+            string(abi.encodePacked("Address: ", name, " not set on chain"))
         );
     }
 
@@ -424,8 +375,7 @@ contract Addresses is IAddresses, Test {
                         abi.encodePacked(
                             "Address: ",
                             name,
-                            " is not a contract on chain: ",
-                            vm.toString(chainId)
+                            " is not a contract"
                         )
                     )
                 );
@@ -433,12 +383,7 @@ contract Addresses is IAddresses, Test {
                 require(
                     _addr.code.length == 0,
                     string(
-                        abi.encodePacked(
-                            "Address: ",
-                            name,
-                            " is a contract on chain: ",
-                            vm.toString(chainId)
-                        )
+                        abi.encodePacked("Address: ", name, " is a contract")
                     )
                 );
             }

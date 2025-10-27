@@ -6,6 +6,7 @@ import {zip021 as zip} from "proposals/zips/zip021.sol";
 import {Script} from "@forge-std/Script.sol";
 import {Addresses} from "@forge-proposal-simulator/addresses/Addresses.sol";
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 /*
 How to use:
@@ -29,31 +30,43 @@ contract DeployProposal is Script {
     }
 
     function setUp() public {
-        // Step 1: Read data using REAL vm (works in setUp context)
-        string memory environment = vm.envOr("ENVIRONMENT", string("localnet"));
-        string memory addressPath = string(abi.encodePacked("proposals/Addresses/", environment, ".json"));
-        string memory addressesData = vm.readFile(addressPath);
+        EnvMock env = new EnvMock();
+        env.storeBool("DEBUG", vm.envOr("DEBUG", false));
+        env.storeBool("DO_DEPLOY", vm.envOr("DO_DEPLOY", true));
+        env.storeBool("DO_AFTER_DEPLOY_MOCK", vm.envOr("DO_AFTER_DEPLOY_MOCK", true));
+        env.storeBool("DO_BUILD", vm.envOr("DO_BUILD", true));
+        env.storeBool("DO_SIMULATE", vm.envOr("DO_SIMULATE", true));
+        env.storeBool("DO_VALIDATE", vm.envOr("DO_VALIDATE", true));
+        env.storeBool("DO_PRINT", vm.envOr("DO_PRINT", true));
+        env.storeString("ENVIRONMENT", vm.envOr("ENVIRONMENT", string("localnet")));
+
+        // warp on localnet so that timestamp is not 1 and timelock simulation works
+        if (block.chainid == 31337) {
+            vm.warp(block.timestamp + 100);
+        }
+
+        Addresses addresses = new Addresses();
+
+        string memory addressPath = string(
+            abi.encodePacked("proposals/Addresses/", vm.envOr("ENVIRONMENT", string("localnet")), ".json")
+        );
+        console.log(addressPath);
+
+        string memory addressesData = string(abi.encodePacked(vm.readFile(addressPath)));
+
         bytes memory parsedJson = vm.parseJson(addressesData);
 
-        // Step 3: Read MockVM bytecode from zkout artifact instead
-        string memory artifact = vm.readFile("zkout/MockVM.sol/MockVM.json");
-        bytes memory mockVmBytecode = vm.parseJsonBytes(artifact, ".bytecode.object");
-        console.log("Read MockVM bytecode from artifact, length:", mockVmBytecode.length);
+        SavedAddresses[] memory savedAddresses = abi.decode(parsedJson, (SavedAddresses[]));
 
-        // Step 4: Etch MockVM bytecode at VM_ADDRESS
-        vm.etch(VM_ADDRESS, mockVmBytecode);
-        // console.log("Etched MockVM at VM_ADDRESS:", VM_ADDRESS);
-
-        // MockVM(VM_ADDRESS).storeParsedJson(addressesData, parsedJson);
-        // MockVM(VM_ADDRESS).storeEnvString("ENVIRONMENT", environment);
-        // console.log("Stored data in MockVM");
-        //
-        // // Step 6: Now try creating Addresses - it should use mocked vm
-        // Addresses addresses = new Addresses(addressPath);
-        // console.log("Created Addresses contract successfully!");
-        //
-        // SavedAddresses[] memory savedAddresses = abi.decode(parsedJson, (SavedAddresses[]));
-        // console.log("Decoded", savedAddresses.length, "addresses");
+        for (uint256 i = 0; i < savedAddresses.length; i++) {
+            addresses.addAddress(
+                savedAddresses[i].name,
+                savedAddresses[i].addr,
+                savedAddresses[i].chainId,
+                savedAddresses[i].isContract
+            );
+        }
+        addresses.getAddress("DEPLOYER_EOA");
     }
 
     function run() public {

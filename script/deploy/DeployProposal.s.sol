@@ -6,6 +6,7 @@ import {zip021 as zip} from "proposals/zips/zip021.sol";
 import {Script} from "@forge-std/Script.sol";
 import {Addresses} from "@forge-proposal-simulator/addresses/Addresses.sol";
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 /*
 How to use:
@@ -24,6 +25,8 @@ contract DeployProposal is Script {
         string memory environment = vm.envOr("ENVIRONMENT", string("localnet"));
         string memory addressPath = string(abi.encodePacked("proposals/Addresses/", environment, ".json"));
         addresses = new Addresses(addressPath);
+
+        EnvMock env = new EnvMock();
 
         newProposal = new zip();
         newProposal.setAddresses(addresses);

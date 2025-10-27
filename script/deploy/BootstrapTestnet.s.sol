@@ -45,6 +45,18 @@ contract BootstrapTestnet is Script {
     Addresses addresses;
     Proposal[] public proposals;
 
+    /// @notice json structure to read addresses into storage from file
+    struct SavedAddresses {
+        /// address to store
+        address addr;
+        /// chain id of network to store for
+        uint256 chainId;
+        /// whether the address is a contract
+        bool isContract;
+        /// name of contract to store
+        string name;
+    }
+
     function setUp() public {
         EnvMock env = new EnvMock();
         env.storeBool("DEBUG", vm.envOr("DEBUG", false));
@@ -60,8 +72,28 @@ contract BootstrapTestnet is Script {
         if (block.chainid == 31337) {
             vm.warp(block.timestamp + 100);
         }
-        string memory addressPath = string(abi.encodePacked("proposals/Addresses/", vm.envOr("ENVIRONMENT", string("localnet")), ".json"));
-        addresses = new Addresses(addressPath);
+
+        addresses = new Addresses();
+
+        string memory addressPath = string(
+            abi.encodePacked("proposals/Addresses/", vm.envOr("ENVIRONMENT", string("localnet")), ".json")
+        );
+        console.log(addressPath);
+
+        string memory addressesData = string(abi.encodePacked(vm.readFile(addressPath)));
+
+        bytes memory parsedJson = vm.parseJson(addressesData);
+
+        SavedAddresses[] memory savedAddresses = abi.decode(parsedJson, (SavedAddresses[]));
+
+        for (uint256 i = 0; i < savedAddresses.length; i++) {
+            addresses.addAddress(
+                savedAddresses[i].name,
+                savedAddresses[i].addr,
+                savedAddresses[i].chainId,
+                savedAddresses[i].isContract
+            );
+        }
 
         // Load proposals
         proposals.push(Proposal(address(new zip000(env)))); /// Genesis token proposal
