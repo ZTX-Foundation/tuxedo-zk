@@ -11,10 +11,11 @@ import {ERC1155AdminMinter} from "@protocol/nfts/ERC1155AdminMinter.sol";
 import {GlobalReentrancyLock} from "@protocol/core/GlobalReentrancyLock.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
-import {Constants} from 'proposals/utils/Constants.sol';
+import {Constants} from "proposals/utils/Constants.sol";
 
 contract zip001 is MultisigProposal {
     constructor(EnvMock env) MultisigProposal(env) {}
+
     Core private _core;
 
     // Returns the name of the proposal.
@@ -39,7 +40,7 @@ contract zip001 is MultisigProposal {
         /// NTF contracts
         /// Setup metadata base uri
         string memory _metadataBaseUri = string(
-            abi.encodePacked("https://meta.", vm.envString("ENVIRONMENT"), ".", vm.envString("DOMAIN"), "/")
+            abi.encodePacked("https://meta.", env.envString("ENVIRONMENT"), ".", env.envString("DOMAIN"), "/")
         );
 
         /// Wearables NFT contract
@@ -69,101 +70,97 @@ contract zip001 is MultisigProposal {
         _core.grantRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER"));
 
         /// Revoke ADMIN role from deployer on mainnet
-        if (block.chainid == Constants.ARBITRUM_MAINNET) _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
+        if (block.chainid == Constants.ARBITRUM_MAINNET)
+            _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
     }
 
     function validate() public override {
         /// Check Roles
-        assertEq(_core.hasRole(Roles.ADMIN, addresses.getAddress("ADMIN_MULTISIG")), true, "incorrect admin role");
+        require(_core.hasRole(Roles.ADMIN, addresses.getAddress("ADMIN_MULTISIG")), "incorrect admin role");
 
         /// Verify all contracts are pointing to the correct core address
-        assertEq(
-            address(GlobalReentrancyLock(addresses.getAddress("GLOBAL_REENTRANCY_LOCK")).core()),
-            address(_core),
+        require(
+            address(GlobalReentrancyLock(addresses.getAddress("GLOBAL_REENTRANCY_LOCK")).core()) == address(_core),
             "incorrect core address global reentrancy lock"
         );
-        assertEq(
-            address(ERC1155AdminMinter(addresses.getAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER")).core()),
-            address(_core),
+        require(
+            address(ERC1155AdminMinter(addresses.getAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER")).core()) == address(_core),
             "incorrect core address admin minter"
         );
 
-        assertEq(
-            address(ERC1155MaxSupplyMintable(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")).core()),
-            address(_core),
+        require(
+            address(ERC1155MaxSupplyMintable(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")).core()) == address(_core),
             "incorrect core address erc1155 max supply mintable wearables"
         );
 
         /// Verifiy CoreRef
-        assertEq(
-            address(CoreRef(addresses.getAddress("GLOBAL_REENTRANCY_LOCK")).core()),
-            address(_core),
+        require(
+            address(CoreRef(addresses.getAddress("GLOBAL_REENTRANCY_LOCK")).core()) == address(_core),
             "incorrect core address global reentrancy lock"
         );
 
-        assertEq(
-            address(CoreRef(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")).core()),
-            address(_core),
+        require(
+            address(CoreRef(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")).core()) == address(_core),
             "incorrect core address erc1155 max supply mintable wearables"
         );
 
         /// Verify globlal lock has been set correctly
-        assertEq(address(_core.lock()), addresses.getAddress("GLOBAL_REENTRANCY_LOCK"), "incorrect global lock");
+        require(address(_core.lock()) == addresses.getAddress("GLOBAL_REENTRANCY_LOCK"), "incorrect global lock");
 
         /// Verify metadata URI
-        assertEq(
-            ERC1155MaxSupplyMintable(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")).uri(0),
-            string(
-                abi.encodePacked(
-                    "https://meta.",
-                    vm.envString("ENVIRONMENT"),
-                    ".",
-                    vm.envString("DOMAIN"),
-                    "/wearables/metadata/0"
-                )
-            ),
+        string memory expectedUri = string(
+            abi.encodePacked(
+                "https://meta.",
+                env.envString("ENVIRONMENT"),
+                ".",
+                env.envString("DOMAIN"),
+                "/wearables/metadata/0"
+            )
+        );
+        require(
+            keccak256(bytes(ERC1155MaxSupplyMintable(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")).uri(0))) == keccak256(bytes(expectedUri)),
             "incorrect metadata URI"
         );
 
         /// Verify all roles have been assigned correcly
         /// Verify LOCKER role
-        assertTrue(
+        require(
             _core.hasRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")),
             "incorrect locker wearables"
         );
-        assertTrue(
+        require(
             _core.hasRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER")),
             "incorrect locker admin minter"
         );
 
         /// Verify MINTER role
-        assertTrue(
+        require(
             _core.hasRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")),
             "incorrect minter wearables"
         );
-        assertTrue(
+        require(
             _core.hasRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER")),
             "incorrect minter admin minter"
         );
 
         // Sum of Role counts to date
-        assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 2, "incorrect locker count");
-        assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 2, "incorrect minter count");
+        require(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE) == 2, "incorrect locker count");
+        require(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE) == 2, "incorrect minter count");
 
         // Verify ADMIN count
         if (block.chainid == Constants.ARBITRUM_MAINNET) {
-            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 1, "incorrect admin count");
-        }
-        else {
-            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 2, "incorrect admin count");
+            require(_core.getRoleMemberCount(Roles.ADMIN) == 1, "incorrect admin count");
+        } else {
+            require(_core.getRoleMemberCount(Roles.ADMIN) == 2, "incorrect admin count");
         }
 
         // Verify ADMIN role has been revoked from deployer on mainnet
-        if (block.chainid == Constants.ARBITRUM_MAINNET)
-            assertFalse(
-                _core.hasRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA")),
+        if (block.chainid == Constants.ARBITRUM_MAINNET) {
+            require(
+                !_core.hasRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA")),
                 "deployer should not have admin role"
             );
+        }
     }
 
     function run() public override {

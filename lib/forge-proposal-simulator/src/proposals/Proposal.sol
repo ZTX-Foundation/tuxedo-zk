@@ -81,17 +81,17 @@ abstract contract Proposal is Test, Script, IProposal {
             /// use cast wallet to unlock the account
             address deployer = addresses.getAddress("DEPLOYER_EOA");
 
-            vm.startBroadcast(deployer);
+            // vm.startBroadcast(deployer);
             deploy();
             addresses.printJSONChanges();
-            vm.stopBroadcast();
+            // vm.stopBroadcast();
         }
 
-        if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();
-        if (DO_BUILD) build();
-        if (DO_SIMULATE) simulate();
+        // if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();
+        // if (DO_BUILD) build();
+        // if (DO_SIMULATE) simulate();
         if (DO_VALIDATE) validate();
-        if (DO_PRINT) print();
+        // if (DO_PRINT) print();
     }
 
     /// @notice return proposal calldata.

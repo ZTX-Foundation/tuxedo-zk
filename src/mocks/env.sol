@@ -55,4 +55,11 @@ contract EnvMock {
         }
         return defaultValue;
     }
+
+    /// @notice Gets the environment variable `name` as `string`.
+    /// Reverts if the variable was not found.
+    function envString(string calldata name) external view returns (string memory value) {
+        require(stringExists[name], "EnvMock: string variable not found");
+        return stringValues[name];
+    }
 }

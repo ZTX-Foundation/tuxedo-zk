@@ -8,9 +8,11 @@ import {EnvMock} from "src/mocks/env.sol";
 
 import {Token, MAX_SUPPLY} from "@protocol/token/Token.sol";
 import {ERC20HoldingDeposit} from "@protocol/finance/ERC20HoldingDeposit.sol";
+import {console} from "@forge-std/console.sol";
 
 contract zip000 is MultisigProposal {
     constructor(EnvMock env) MultisigProposal(env) {}
+
     // Returns the name of the proposal.
     function name() public pure override returns (string memory) {
         return "ZIP000";
@@ -24,10 +26,7 @@ contract zip000 is MultisigProposal {
     function deploy() public override {
         /// Token deployment
         {
-            Token token = new Token(
-                string(abi.encodePacked(vm.envString("TOKEN_NAME"))),
-                string(abi.encodePacked(vm.envString("TOKEN_SYMBOL")))
-            );
+            Token token = new Token(env.envString("TOKEN_NAME"), env.envString("TOKEN_SYMBOL"));
             addresses.addAddress("TOKEN", address(token), true);
         }
 
@@ -37,10 +36,8 @@ contract zip000 is MultisigProposal {
 
     function validate() public override {
         /// Check Treasury balance
-        assertEq(
-            IERC20(addresses.getAddress("TOKEN")).balanceOf(addresses.getAddress("TREASURY_WALLET_MULTISIG")),
-            10_000_000_000e18 // hardcoded to Verify all code is working
-        );
+        uint256 balance = IERC20(addresses.getAddress("TOKEN")).balanceOf(addresses.getAddress("TREASURY_WALLET_MULTISIG"));
+        require(balance == 10_000_000_000e18, "Treasury balance incorrect");
     }
 
     function run() public override {
