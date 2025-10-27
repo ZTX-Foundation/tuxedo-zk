@@ -1,16 +1,31 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.18;
 
-import {ERC1155, ERC1155Supply} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 import {Roles} from "@protocol/core/Roles.sol";
 import {CoreRef} from "@protocol/refs/CoreRef.sol";
 
+/// @notice EIP-5633 interface for composable soulbound tokens
+interface IERC5633 {
+    event Soulbound(uint256 indexed id, bool bounded);
+
+    function isSoulbound(uint256 id) external view returns (bool);
+}
+
+/// @notice EIP-5192 interface for minimal soulbound NFTs
+interface IERC5192 {
+    event Locked(uint256 tokenId);
+    event Unlocked(uint256 tokenId);
+
+    function locked(uint256 tokenId) external view returns (bool);
+}
+
 /// Base ERC 1155 NFT with total supply
 /// Inherits CoreRef for roles and access
-contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
+contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC5192 {
     /// @notice contract name
     string private _name;
 
@@ -35,6 +50,12 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
     /// @notice the maximum supply of a given token
     mapping(uint256 tokenId => uint256 tokenMaxSupply) public maxTokenSupply;
 
+    /// @notice the total supply of tokens minted for a given token id, does not decrease on burn
+    mapping(uint256 => uint256) public totalSupply;
+
+    /// @notice mapping to track non-transferable tokens, tokens initially are transferable and require disabling
+    mapping(uint256 tokenId => bool isNonTransferable) public nonTransferableTokens;
+
     /// @notice construct the ERC1155 with total supply and CoreRef
     constructor(
         address _core,
@@ -44,6 +65,48 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
     ) CoreRef(_core) ERC1155(_uri) {
         _name = name_;
         _symbol = symbol_;
+    }
+
+    /// @notice set the supply cap and non-transferability for a given token, cannot be less than current supply
+    /// @param tokenId the id of the token to update
+    /// @param maxSupply the new max supply of the token
+    /// @param isNonTransferable whether the token should be non-transferable
+    /// callable by admin
+    function setSupplyCapAndNonTransferable(
+        uint256 tokenId,
+        uint256 maxSupply,
+        bool isNonTransferable
+    ) external onlyRole(Roles.ADMIN) {
+        _setSupplyCap(tokenId, maxSupply);
+        _setNonTransferable(tokenId, isNonTransferable);
+    }
+
+    /// @notice set the non-transferability for a given token
+    /// @param tokenId the id of the token to update
+    /// @param isNonTransferable whether the token should be non-transferable
+    /// callable by admin
+    function setNonTransferable(uint256 tokenId, bool isNonTransferable) external onlyRole(Roles.ADMIN) {
+        _setNonTransferable(tokenId, isNonTransferable);
+    }
+
+    /// @dev internal function to set the non-transferability for a given token
+    /// @param tokenId the id of the token to update
+    /// @param isNonTransferable whether the token should be non-transferable
+    function _setNonTransferable(uint256 tokenId, bool isNonTransferable) internal {
+        require(
+            maxTokenSupply[tokenId] > 0,
+            "BaseERC1155NFT: token must have a max supply greater than 0 to set the transferability"
+        );
+
+        nonTransferableTokens[tokenId] = isNonTransferable;
+
+        // Emit events for marketplace detection
+        emit Soulbound(tokenId, isNonTransferable);
+        if (isNonTransferable) {
+            emit Locked(tokenId);
+        } else {
+            emit Unlocked(tokenId);
+        }
     }
 
     /// @notice set the supply cap for a given token, cannot be less than current supply
@@ -57,7 +120,7 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
     /// @param tokenId the id of the token to update
     /// @param maxSupply the new max supply of the token
     function _setSupplyCap(uint256 tokenId, uint256 maxSupply) internal {
-        require(maxSupply >= totalSupply(tokenId), "BaseERC1155NFT: maxSupply cannot be less than current supply");
+        require(maxSupply >= totalSupply[tokenId], "BaseERC1155NFT: maxSupply cannot be less than current supply");
 
         uint256 oldSupplyCap = maxTokenSupply[tokenId];
         maxTokenSupply[tokenId] = maxSupply;
@@ -86,13 +149,13 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
         uint256 tokenId,
         uint256 amount
     ) external onlyRole(Roles.MINTER_PROTOCOL_ROLE) whenNotPaused globalLock(2) {
-        require(totalSupply(tokenId) + amount <= maxTokenSupply[tokenId], "BaseERC1155NFT: supply exceeded");
+        require(totalSupply[tokenId] + amount <= maxTokenSupply[tokenId], "BaseERC1155NFT: supply exceeded");
 
         /// no bytes passed on mint
         _mint(recipient, tokenId, amount, "");
 
         /// check for SMT solver and echidna
-        assert(totalSupply(tokenId) <= maxTokenSupply[tokenId]);
+        assert(totalSupply[tokenId] <= maxTokenSupply[tokenId]);
 
         emit TokenMinted(recipient, tokenId, amount);
     }
@@ -110,7 +173,7 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
         _mintBatch(recipient, tokenIds, amounts, "");
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            require(totalSupply(tokenIds[i]) <= maxTokenSupply[tokenIds[i]], "BaseERC1155NFT: supply exceeded");
+            require(totalSupply[tokenIds[i]] <= maxTokenSupply[tokenIds[i]], "BaseERC1155NFT: supply exceeded");
         }
 
         emit BatchMinted(recipient, tokenIds, amounts);
@@ -118,10 +181,20 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
 
     /// ----------- VIEW ONLY API ------------
 
+    /// @notice returns whether a token is soulbound (EIP-5633)
+    function isSoulbound(uint256 id) external view override returns (bool) {
+        return nonTransferableTokens[id];
+    }
+
+    /// @notice returns whether a token is locked (EIP-5192 compatibility)
+    function locked(uint256 id) external view returns (bool) {
+        return nonTransferableTokens[id];
+    }
+
     /// @notice returns the amount of tokens left to mint from the max supply
     /// @param tokenId the id of the token to query
     function getMintAmountLeft(uint256 tokenId) public view returns (uint256) {
-        return maxTokenSupply[tokenId] - totalSupply(tokenId);
+        return maxTokenSupply[tokenId] - totalSupply[tokenId];
     }
 
     /// @notice returns the name of the token
@@ -134,17 +207,47 @@ contract ERC1155MaxSupplyMintable is ERC1155Supply, ERC1155Burnable, CoreRef {
         return _symbol;
     }
 
+    /// @notice indicates whether any token exist with a given id, or not
+    /// @param id the id of the token to query
+    function exists(uint256 id) public view virtual returns (bool) {
+        return totalSupply[id] > 0;
+    }
+
+    /// @notice EIP-165 interface detection
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155) returns (bool) {
+        return
+            interfaceId == type(IERC5633).interfaceId || // ERC5633 (composable soulbound ERC1155)
+            interfaceId == type(IERC5192).interfaceId || // ERC5192 (minimal soulbound NFTs)
+            super.supportsInterface(interfaceId);
+    }
+
     /// ----------- INTERNAL OVERRIDES ------------
 
+    /// @dev override of ERC1155 _beforeTokenTransfer hook to track total supply and enforce non-transferability
+    /// @notice only increases total supply on mints, does not decrease on burns
+    /// this ensures that burned tokens still count towards the max supply cap
+    /// @notice also blocks transfers of non-transferable tokens (mints and burns are still allowed)
     function _beforeTokenTransfer(
-        address operator,
+        address,
         address from,
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory
-    ) internal override(ERC1155, ERC1155Supply) {
-        ERC1155Supply._beforeTokenTransfer(operator, from, to, ids, amounts, "");
+    ) internal override {
+        // Block transfers of non-transferable tokens (but allow mints and burns)
+        if (from != address(0) && to != address(0)) {
+            for (uint256 i = 0; i < ids.length; ++i) {
+                require(!nonTransferableTokens[ids[i]], "BaseERC1155NFT: token is non-transferable");
+            }
+        }
+
+        // Only increase the total supply on mints
+        if (from == address(0)) {
+            for (uint256 i = 0; i < ids.length; ++i) {
+                totalSupply[ids[i]] += amounts[i];
+            }
+        }
     }
 
     // Needed for openSea with ERC1155

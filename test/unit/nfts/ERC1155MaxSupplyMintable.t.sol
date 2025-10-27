@@ -1,8 +1,15 @@
 pragma solidity 0.8.18;
 
+import {IERC5633, IERC5192} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
+
 import "test/BaseTest.sol";
 
 contract UnitTestERC1155MaxSupplyMintable is BaseTest {
+    // Events for testing
+    event Soulbound(uint256 indexed id, bool bounded);
+    event Locked(uint256 tokenId);
+    event Unlocked(uint256 tokenId);
+
     function setUp() public override {
         super.setUp();
     }
@@ -64,6 +71,202 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.expectRevert("BaseERC1155NFT: maxSupply cannot be less than current supply");
         vm.prank(addresses.adminAddress);
         nft.setSupplyCap(tokenId, supplyCap - 1);
+    }
+
+    function testSetSupplyCapAndNonTransferableWithoutRoleFails() public {
+        vm.expectRevert("CoreRef: no role on core");
+        nft.setSupplyCapAndNonTransferable(tokenId, supplyCap, true);
+    }
+
+    function testSetSupplyCapAndNonTransferableWithRoleSucceeds() public {
+        uint256 newTokenId = tokenId + 1;
+        uint256 newSupplyCap = 5000;
+        bool isNonTransferable = true;
+
+        vm.expectEmit(true, false, false, true);
+        emit Soulbound(newTokenId, true);
+        vm.expectEmit(true, false, false, false);
+        emit Locked(newTokenId);
+
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(newTokenId, newSupplyCap, isNonTransferable);
+
+        assertEq(nft.maxTokenSupply(newTokenId), newSupplyCap);
+        assertEq(nft.getMintAmountLeft(newTokenId), newSupplyCap);
+        assertEq(nft.nonTransferableTokens(newTokenId), isNonTransferable);
+        assertTrue(nft.isSoulbound(newTokenId));
+        assertTrue(nft.locked(newTokenId));
+    }
+
+    function testSetSupplyCapAndNonTransferableWithZeroMaxSupplyFails() public {
+        uint256 newTokenId = tokenId + 1;
+
+        vm.expectRevert("BaseERC1155NFT: token must have a max supply greater than 0 to set the transferability");
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(newTokenId, 0, true);
+    }
+
+    function testSetNonTransferableWithoutRoleFails() public {
+        vm.expectRevert("CoreRef: no role on core");
+        nft.setNonTransferable(tokenId, true);
+    }
+
+    function testSetNonTransferableForUninitializedTokenFails() public {
+        uint256 uninitializedTokenId = tokenId + 100;
+
+        vm.expectRevert("BaseERC1155NFT: token must have a max supply greater than 0 to set the transferability");
+        vm.prank(addresses.adminAddress);
+        nft.setNonTransferable(uninitializedTokenId, true);
+    }
+
+    function testSetNonTransferableWithRoleSucceeds() public {
+        uint256 newTokenId = tokenId + 1;
+        uint256 newSupplyCap = 5000;
+
+        // First set the supply cap to initialize the token
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCap(newTokenId, newSupplyCap);
+
+        // Now set non-transferability and expect events
+        vm.expectEmit(true, false, false, true);
+        emit Soulbound(newTokenId, true);
+        vm.expectEmit(true, false, false, false);
+        emit Locked(newTokenId);
+
+        vm.prank(addresses.adminAddress);
+        nft.setNonTransferable(newTokenId, true);
+
+        assertEq(nft.nonTransferableTokens(newTokenId), true);
+        assertTrue(nft.isSoulbound(newTokenId));
+        assertTrue(nft.locked(newTokenId));
+
+        // Test setting it back to false and expect Unlocked event
+        vm.expectEmit(true, false, false, true);
+        emit Soulbound(newTokenId, false);
+        vm.expectEmit(true, false, false, false);
+        emit Unlocked(newTokenId);
+
+        vm.prank(addresses.adminAddress);
+        nft.setNonTransferable(newTokenId, false);
+
+        assertEq(nft.nonTransferableTokens(newTokenId), false);
+        assertFalse(nft.isSoulbound(newTokenId));
+        assertFalse(nft.locked(newTokenId));
+    }
+
+    function testTransferNonTransferableTokenFails() public {
+        uint256 newTokenId = tokenId + 1;
+        uint256 newSupplyCap = 5000;
+        uint256 mintAmount = 100;
+        address recipient = address(0x123);
+
+        // Set up a non-transferable token
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(newTokenId, newSupplyCap, true);
+
+        // Mint some tokens
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), newTokenId, mintAmount);
+
+        // Try to transfer and expect revert
+        vm.expectRevert("BaseERC1155NFT: token is non-transferable");
+        nft.safeTransferFrom(address(this), recipient, newTokenId, 1, "");
+    }
+
+    function testTransferableTokenCanBeTransferredUntilDisabled() public {
+        uint256 newTokenId = tokenId + 1;
+        uint256 newSupplyCap = 5000;
+        uint256 mintAmount = 100;
+        address recipient = address(0x123);
+
+        // Set up a transferable token (isNonTransferable = false)
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(newTokenId, newSupplyCap, false);
+
+        // Mint some tokens
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), newTokenId, mintAmount);
+
+        // Transfer should succeed
+        nft.safeTransferFrom(address(this), recipient, newTokenId, 1, "");
+        assertEq(nft.balanceOf(recipient, newTokenId), 1);
+        assertEq(nft.balanceOf(address(this), newTokenId), mintAmount - 1);
+
+        // Now disable transferability
+        vm.prank(addresses.adminAddress);
+        nft.setNonTransferable(newTokenId, true);
+
+        // Transfer should now fail
+        vm.expectRevert("BaseERC1155NFT: token is non-transferable");
+        nft.safeTransferFrom(address(this), recipient, newTokenId, 1, "");
+    }
+
+    function testBatchTransferMixedTransferabilityFails() public {
+        uint256 transferableTokenId = tokenId + 1;
+        uint256 soulboundTokenId = tokenId + 2;
+        uint256 newSupplyCap = 5000;
+        uint256 mintAmount = 100;
+        address recipient = address(0x123);
+
+        // Set up one transferable and one soulbound token
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(transferableTokenId, newSupplyCap, false);
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(soulboundTokenId, newSupplyCap, true);
+
+        // Mint both tokens
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), transferableTokenId, mintAmount);
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), soulboundTokenId, mintAmount);
+
+        // Attempt batch transfer and expect revert
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = transferableTokenId;
+        tokenIds[1] = soulboundTokenId;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 1;
+        amounts[1] = 1;
+
+        vm.expectRevert("BaseERC1155NFT: token is non-transferable");
+        nft.safeBatchTransferFrom(address(this), recipient, tokenIds, amounts, "");
+    }
+
+    function testNonTransferableTokenCanBeBurned() public {
+        uint256 newTokenId = tokenId + 1;
+        uint256 newSupplyCap = 5000;
+        uint256 mintAmount = 100;
+        uint256 burnAmount = 50;
+
+        // Set up a non-transferable token
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferable(newTokenId, newSupplyCap, true);
+
+        // Mint some tokens
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), newTokenId, mintAmount);
+
+        assertEq(nft.balanceOf(address(this), newTokenId), mintAmount);
+
+        // Burn should succeed even though token is non-transferable
+        nft.burn(address(this), newTokenId, burnAmount);
+
+        assertEq(nft.balanceOf(address(this), newTokenId), mintAmount - burnAmount);
+        // Total supply should remain unchanged (burns don't decrease total supply)
+        assertEq(nft.totalSupply(newTokenId), mintAmount);
     }
 
     function testPauseWithoutRoleFails() public {
@@ -172,21 +375,22 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         nft.mint(address(this), tokenId, amount);
     }
 
-    function testBurnDecreasesSupply() public {
+    function testBurnUnchangedSupply() public {
         testMintBatchSucceedsMinter();
+        uint256 amount = 100;
 
         nft.burn(address(this), tokenId, nft.balanceOf(address(this), tokenId));
         nft.burn(address(this), tokenId + 1, nft.balanceOf(address(this), tokenId + 1));
 
         assertEq(nft.balanceOf(address(this), tokenId), 0);
         assertEq(nft.balanceOf(address(this), tokenId + 1), 0);
-        assertEq(nft.totalSupply(tokenId), 0);
-        assertEq(nft.totalSupply(tokenId + 1), 0);
-        assertEq(nft.getMintAmountLeft(tokenId), supplyCap);
-        assertEq(nft.getMintAmountLeft(tokenId + 1), supplyCap);
+        assertEq(nft.totalSupply(tokenId), amount);
+        assertEq(nft.totalSupply(tokenId + 1), amount);
+        assertEq(nft.getMintAmountLeft(tokenId), supplyCap - amount);
+        assertEq(nft.getMintAmountLeft(tokenId + 1), supplyCap - amount);
     }
 
-    function testBurnBatchDecreasesSupply() public {
+    function testBurnBatchUnchangedSupply() public {
         testMintBatchSucceedsMinter();
         uint256 amount = 100;
 
@@ -202,10 +406,10 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
 
         assertEq(nft.balanceOf(address(this), tokenId), 0);
         assertEq(nft.balanceOf(address(this), tokenId + 1), 0);
-        assertEq(nft.totalSupply(tokenId), 0);
-        assertEq(nft.totalSupply(tokenId + 1), 0);
-        assertEq(nft.getMintAmountLeft(tokenId), supplyCap);
-        assertEq(nft.getMintAmountLeft(tokenId + 1), supplyCap);
+        assertEq(nft.totalSupply(tokenId), amount);
+        assertEq(nft.totalSupply(tokenId + 1), amount);
+        assertEq(nft.getMintAmountLeft(tokenId), supplyCap - amount);
+        assertEq(nft.getMintAmountLeft(tokenId + 1), supplyCap - amount);
     }
 
     function testSendTokensToContractFails() public {
@@ -231,5 +435,23 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.expectRevert("GlobalReentrancyLock: invalid lock level");
         vm.prank(addresses.minterAddress);
         nft.mintBatch(address(this), tokenIds, amounts);
+    }
+
+    /// EIP-165 Interface Support Tests
+
+    function testSupportsERC5633Interface() public view {
+        assertTrue(nft.supportsInterface(type(IERC5633).interfaceId));
+    }
+
+    function testSupportsERC5192Interface() public view {
+        assertTrue(nft.supportsInterface(type(IERC5192).interfaceId));
+    }
+
+    function testSupportsERC1155Interface() public view {
+        assertTrue(nft.supportsInterface(0xd9b67a26));
+    }
+
+    function testDoesNotSupportInvalidInterface() public view {
+        assertFalse(nft.supportsInterface(0xffffffff));
     }
 }
