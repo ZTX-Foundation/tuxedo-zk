@@ -10,6 +10,8 @@ import {Addresses} from "@addresses/Addresses.sol";
 import {EnvMock} from "../../../../src/mocks/env.sol";
 
 abstract contract Proposal is Test, Script, IProposal {
+    EnvMock immutable env;
+
     struct Action {
         address target;
         uint256 value;
@@ -49,7 +51,9 @@ abstract contract Proposal is Test, Script, IProposal {
         _endBuild(toPrank);
     }
 
-    constructor(EnvMock env) {
+    constructor(EnvMock _env) {
+        env = _env;
+
         DEBUG = env.envOr("DEBUG", false);
 
         DO_DEPLOY = env.envOr("DO_DEPLOY", true);
