@@ -5,6 +5,7 @@ import {console} from "@forge-std/console.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
 import {MultisigProposal} from "@forge-proposal-simulator/src/proposals/MultisigProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
@@ -14,6 +15,7 @@ import {ERC20HoldingDeposit} from "@protocol/finance/ERC20HoldingDeposit.sol";
 import {Constants} from 'proposals/utils/Constants.sol';
 
 contract zip002 is MultisigProposal {
+    constructor(EnvMock env) MultisigProposal(env) {}
     TimelockController private _adminTimelock;
     Core private _core;
 

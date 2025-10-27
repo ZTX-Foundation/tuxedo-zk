@@ -5,6 +5,7 @@ import {console} from "@forge-std/console.sol";
 import {Script} from "@forge-std/Script.sol";
 import {Addresses} from "@forge-proposal-simulator/addresses/Addresses.sol";
 import {Proposal} from "@forge-proposal-simulator/src/proposals/Proposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {zip000} from "proposals/zips/zip000.sol";
 import {zip001} from "proposals/zips/zip001.sol";
@@ -45,36 +46,45 @@ contract BootstrapTestnet is Script {
     Proposal[] public proposals;
 
     function setUp() public {
-        string memory environment = vm.envOr("ENVIRONMENT", string("localnet"));
+        EnvMock env = new EnvMock();
+        env.storeBool("DEBUG", vm.envOr("DEBUG", false));
+        env.storeBool("DO_DEPLOY", vm.envOr("DO_DEPLOY", true));
+        env.storeBool("DO_AFTER_DEPLOY_MOCK", vm.envOr("DO_AFTER_DEPLOY_MOCK", true));
+        env.storeBool("DO_BUILD", vm.envOr("DO_BUILD", true));
+        env.storeBool("DO_SIMULATE", vm.envOr("DO_SIMULATE", true));
+        env.storeBool("DO_VALIDATE", vm.envOr("DO_VALIDATE", true));
+        env.storeBool("DO_PRINT", vm.envOr("DO_PRINT", true));
+        env.storeString("ENVIRONMENT", vm.envOr("ENVIRONMENT", string("localnet")));
+
         // warp on localnet so that timestamp is not 1 and timelock simulation works
         if (block.chainid == 31337) {
             vm.warp(block.timestamp + 100);
         }
-        string memory addressPath = string(abi.encodePacked("proposals/Addresses/", environment, ".json"));
+        string memory addressPath = string(abi.encodePacked("proposals/Addresses/", vm.envOr("ENVIRONMENT", string("localnet")), ".json"));
         addresses = new Addresses(addressPath);
 
         // Load proposals
-        proposals.push(Proposal(address(new zip000()))); /// Genesis token proposal
-        proposals.push(Proposal(address(new zip001()))); /// Wearables, Core, ADMIN_MULTISIG proposal
-        proposals.push(Proposal(address(new zip002()))); /// Timelock proposal
-        proposals.push(Proposal(address(new zip003()))); /// CGv1 proposal
-        proposals.push(Proposal(address(new zip004()))); /// TokenIds, MaxSupply and Capsule settings proposal
-        proposals.push(Proposal(address(new zip005()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip006()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip007()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip008()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip009()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip010()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip011()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip012()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip013()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip014()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip016()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip017()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip018()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip019()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip020()))); /// MaxSupply settings proposal
-        proposals.push(Proposal(address(new zip021()))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip000(env)))); /// Genesis token proposal
+        proposals.push(Proposal(address(new zip001(env)))); /// Wearables, Core, ADMIN_MULTISIG proposal
+        proposals.push(Proposal(address(new zip002(env)))); /// Timelock proposal
+        proposals.push(Proposal(address(new zip003(env)))); /// CGv1 proposal
+        proposals.push(Proposal(address(new zip004(env)))); /// TokenIds, MaxSupply and Capsule settings proposal
+        proposals.push(Proposal(address(new zip005(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip006(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip007(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip008(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip009(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip010(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip011(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip012(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip013(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip014(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip016(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip017(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip018(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip019(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip020(env)))); /// MaxSupply settings proposal
+        proposals.push(Proposal(address(new zip021(env)))); /// MaxSupply settings proposal
 
         for (uint256 i = 0; i < proposals.length; i++) {
             proposals[i].setAddresses(addresses);

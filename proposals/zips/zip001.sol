@@ -2,6 +2,7 @@
 pragma solidity 0.8.18;
 
 import {MultisigProposal} from "@forge-proposal-simulator/src/proposals/MultisigProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
@@ -13,6 +14,7 @@ import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.
 import {Constants} from 'proposals/utils/Constants.sol';
 
 contract zip001 is MultisigProposal {
+    constructor(EnvMock env) MultisigProposal(env) {}
     Core private _core;
 
     // Returns the name of the proposal.

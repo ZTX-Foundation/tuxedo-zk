@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20Splitter} from "@protocol/finance/ERC20Splitter.sol";
 
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
@@ -16,6 +17,7 @@ import {SeasonsTokenIdRegistry} from "@protocol/nfts/seasons/SeasonsTokenIdRegis
 import {ERC1155SeasonOne} from "@protocol/nfts/seasons/ERC1155SeasonOne.sol";
 
 contract zip003 is TimelockProposal {
+    constructor(EnvMock env) TimelockProposal(env) {}
     Core private _core;
 
     // Returns the name of the proposal.

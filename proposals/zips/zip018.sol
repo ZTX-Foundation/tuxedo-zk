@@ -2,10 +2,12 @@
 pragma solidity ^0.8.18;
 
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
 contract zip018 is TimelockProposal {
+    constructor(EnvMock env) TimelockProposal(env) {}
 
     struct TokenIDMaxSupplySettings {
         uint256 maxSupply;

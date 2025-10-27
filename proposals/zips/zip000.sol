@@ -4,11 +4,13 @@ pragma solidity 0.8.18;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {MultisigProposal} from "@forge-proposal-simulator/src/proposals/MultisigProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {Token, MAX_SUPPLY} from "@protocol/token/Token.sol";
 import {ERC20HoldingDeposit} from "@protocol/finance/ERC20HoldingDeposit.sol";
 
 contract zip000 is MultisigProposal {
+    constructor(EnvMock env) MultisigProposal(env) {}
     // Returns the name of the proposal.
     function name() public pure override returns (string memory) {
         return "ZIP000";

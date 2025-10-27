@@ -3,7 +3,13 @@
     "allow": [
       "Bash(done)",
       "Bash(for:*)",
-      "Bash(do echo \"=== $f ===\")"
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(do [ -f \"$f\" ])",
+      "Bash(do:*)",
+      "Bash(if ! grep -q \"constructor.*EnvMock\" \"$f\")",
+      "Bash(then)",
+      "Bash(perl -i -pe:*)",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

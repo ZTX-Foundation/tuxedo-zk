@@ -3,12 +3,14 @@ pragma solidity 0.8.18;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 import {ERC1155SeasonOne} from "@protocol/nfts/seasons/ERC1155SeasonOne.sol";
 import {TokenIdRewardAmount} from "@protocol/nfts/seasons/SeasonsBase.sol";
 
 contract zip004 is TimelockProposal {
+    constructor(EnvMock env) TimelockProposal(env) {}
 
     struct TokenIDMaxSupplySettings {
         uint256 tokenId;
