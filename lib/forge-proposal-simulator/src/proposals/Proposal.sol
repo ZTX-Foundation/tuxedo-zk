@@ -74,6 +74,7 @@ abstract contract Proposal is Test, Script, IProposal {
         DO_SIMULATE = vm.envOr("DO_SIMULATE", true);
         DO_VALIDATE = vm.envOr("DO_VALIDATE", true);
         DO_PRINT = vm.envOr("DO_PRINT", true);
+        DO_BUILD = vm.envOr("DO_BUILD", true);
 
         // Load addresses from JSON
         string memory environment = vm.envOr("ENVIRONMENT", string("localnet"));
@@ -100,7 +101,10 @@ abstract contract Proposal is Test, Script, IProposal {
                 abi.encodePacked(vm.readFile(runFilePath))
             );
 
-            bytes memory parsedRun = vm.parseJson(runData, ".deployedAddresses");
+            bytes memory parsedRun = vm.parseJson(
+                runData,
+                ".deployedAddresses"
+            );
             SavedAddresses[] memory runAddresses = abi.decode(
                 parsedRun,
                 (SavedAddresses[])
@@ -258,7 +262,7 @@ abstract contract Proposal is Test, Script, IProposal {
             }
         }
 
-        if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();
+        // if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();
         if (DO_BUILD) build();
         if (DO_SIMULATE) simulate();
         if (DO_VALIDATE) validate();

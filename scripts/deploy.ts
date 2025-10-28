@@ -1,19 +1,10 @@
 #!/usr/bin/env node
 
-import {
-    intro,
-    outro,
-    select,
-    multiselect,
-    text,
-    confirm,
-    spinner,
-} from "@clack/prompts";
+import { intro, outro, select, text, confirm, spinner } from "@clack/prompts";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { RunManager } from "./RunManager";
-import { DeployedAddress } from "./types";
 
 // Network configuration with chain IDs
 const NETWORKS = {
@@ -101,7 +92,7 @@ async function main() {
             options: runs.map((run) => ({
                 value: run.runId,
                 label: `${run.formattedDate} - Last completed: zip${run.lastCompletedProposal.toString().padStart(3, "0")}`,
-                hint: `${run.lastCompletedProposal + 1} proposals remaining`,
+                hint: `${run.lastCompletedProposal + 1} proposals completed`,
             })),
         });
 
@@ -185,7 +176,7 @@ async function main() {
     // Execute deployments
     const s = spinner();
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < proposalsToDeploy.length; i++) {
         const proposal = proposalsToDeploy[i];
         const proposalIndex = startProposalIndex + i;
         const proposalPath = path.join(PROPOSALS_DIR, `${proposal}.sol`);
