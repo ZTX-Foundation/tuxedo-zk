@@ -1,0 +1,62 @@
+[
+    {
+        "name": "WETH",
+        "chainid": 4654,
+        "addr": "0x34AF38Ec07708dBC01C5A814fc418D3840448fce",
+        "isContract": true
+    },
+    {
+        "name": "TREASURY_WALLET_MULTISIG",
+        "chainid": 4654,
+        "addr": "0xAEa46dB13966EF25c3117F14a8f61A4ec201A7CC",
+        "isContract": false
+    },
+    {
+        "name": "GUARDIAN_MULTISIG",
+        "chainid": 4654,
+        "addr": "0xCD6ee7a8A52Be203Bc702Adb9F10F91E19FbD10D",
+        "isContract": false
+    },
+    {
+        "name": "GAME_CONSUMER_PAYMENT_RECIPIENT",
+        "chainid": 4654,
+        "addr": "0xec2723715Eee2B27Ca7166d2efA5aCDb1887288E",
+        "isContract": false
+    },
+    {
+        "name": "REVENUE_WALLET_MULTISIG01",
+        "chainid": 4654,
+        "addr": "0x7339dcbB830d21dd494120aBA4f3aBcEe47fe4C8",
+        "isContract": false
+    },
+    {
+        "name": "REVENUE_WALLET_MULTISIG02",
+        "chainid": 4654,
+        "addr": "0x7c83C1e51ef855C4634D69aeB7b1475250173244",
+        "isContract": false
+    },
+    {
+        "name": "AUTOGRAPH_MINTER_PAYMENT_RECIPIENT",
+        "chainid": 4654,
+        "addr": "0xf1B19eC40C9FdCA579699B61eA1037D6c05C404D",
+        "isContract": false
+    },
+    {
+        "name": "AUTOGRAPH_SERVICE_KMS_WALLET",
+        "addr": "0x2526550d7c61559df4f55fbce69935c2d536f75e",
+        "chainid": 4654,
+        "isContract": false
+    },
+    {
+        "name": "DEPLOYER_EOA",
+        "chainid": 4654,
+        "addr": "0x73bBdE7e45E26546f2ef0202865917E4D6CE2A01",
+        "isContract": false
+    },
+    {
+        "name": "ADMIN_MULTISIG",
+        "chainid": 4654,
+        "addr": "0xb31865DBd173549c6BdA0FEBfCCC4cB02B0E41B3",
+        "isContract": false
+    }
+]
