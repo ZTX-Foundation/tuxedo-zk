@@ -108,16 +108,11 @@ contract zip003 is TimelockProposal {
             address(seasonsTokenIdRegistry)
         );
         addresses.addAddress("ERC1155_SEASON_ONE", address(erc1155SeasonOne), true);
-    }
 
-    function build()
-        public
-        override
-        buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER")) 
-    {
+        /// Grant roles directly in deploy for testnet deployments
         /// Grant the GUARDIAN role to the GUARDIAN_MULTISIG
         _core.grantRole(Roles.GUARDIAN, addresses.getAddress("GUARDIAN_MULTISIG"));
-        
+
         /// grant protocol Locker role
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES"));
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES"));
@@ -138,18 +133,11 @@ contract zip003 is TimelockProposal {
 
     function run() public override {
         setTimelock(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER"));
-        
+
         /// Get Core Address
         _core = Core(addresses.getAddress("CORE"));
 
         super.run();
-    }
-
-    function simulate() public override {
-        address multisig = addresses.getAddress("ADMIN_MULTISIG");
-
-        /// Multisig is proposer and executor
-        _simulateActions(multisig, multisig);
     }
 
     function validate() public override {

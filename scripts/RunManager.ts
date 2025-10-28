@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { format } from "date-fns";
-import { DeployedAddress, DeploymentRun, LatestRun } from "./types";
+import { DeploymentRun } from "./types";
 
 export class RunManager {
     private chainId: number;
@@ -50,20 +50,6 @@ export class RunManager {
         fs.writeFileSync(
             this.runFilePath,
             JSON.stringify(run, null, 2),
-            "utf-8"
-        );
-
-        this.updateLatestRun();
-    }
-
-    private updateLatestRun() {
-        const latestRunPath = path.join(this.runDir, "deployment-latest.json");
-        const latestRun: LatestRun = {
-            runId: this.runId,
-        };
-        fs.writeFileSync(
-            latestRunPath,
-            JSON.stringify(latestRun, null, 2),
             "utf-8"
         );
     }
@@ -116,9 +102,7 @@ export class RunManager {
             .readdirSync(runDir)
             .filter(
                 (file) =>
-                    file.startsWith("deployment-") &&
-                    file.endsWith(".json") &&
-                    file !== "deployment-latest.json"
+                    file.startsWith("deployment-") && file.endsWith(".json")
             );
 
         const runs = files.map((file) => {
@@ -140,22 +124,5 @@ export class RunManager {
 
         // Sort by creation date descending (newest first)
         return runs.sort((a, b) => b.createdAt - a.createdAt);
-    }
-
-    static getLatestRunId(chainId: number): string | null {
-        const latestRunPath = path.join(
-            "deployments",
-            chainId.toString(),
-            "deployment-latest.json"
-        );
-
-        if (!fs.existsSync(latestRunPath)) {
-            return null;
-        }
-
-        const latestRun: LatestRun = JSON.parse(
-            fs.readFileSync(latestRunPath, "utf-8")
-        );
-        return latestRun.runId;
     }
 }

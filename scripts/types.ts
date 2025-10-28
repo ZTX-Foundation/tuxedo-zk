@@ -10,7 +10,3 @@ export interface DeploymentRun {
     lastCompletedProposal: number; // 0-21, -1 means none completed yet
     deployedAddresses: DeployedAddress[];
 }
-
-export interface LatestRun {
-    runId: string;
-}
