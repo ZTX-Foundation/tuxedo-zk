@@ -65,11 +65,12 @@ abstract contract Proposal is Test, Script, IProposal {
     /// @notice setUp function to initialize the proposal
     /// @dev this should be called before running the proposal standalone
     function setUp() public virtual {
+        addresses = new Addresses("");
+
         DEBUG = vm.envOr("DEBUG", false);
 
         DO_DEPLOY = vm.envOr("DO_DEPLOY", true);
         DO_AFTER_DEPLOY_MOCK = vm.envOr("DO_AFTER_DEPLOY_MOCK", true);
-        DO_BUILD = vm.envOr("DO_BUILD", true);
         DO_SIMULATE = vm.envOr("DO_SIMULATE", true);
         DO_VALIDATE = vm.envOr("DO_VALIDATE", true);
         DO_PRINT = vm.envOr("DO_PRINT", true);
@@ -90,8 +91,34 @@ abstract contract Proposal is Test, Script, IProposal {
             (SavedAddresses[])
         );
 
-        addresses = new Addresses(addressPath);
+        _loadRunAddresses(savedAddresses);
 
+        // Load addresses from run file if RUN_FILE_PATH is set
+        string memory runFilePath = vm.envOr("RUN_FILE_PATH", string(""));
+        if (bytes(runFilePath).length > 0) {
+            string memory runData = string(
+                abi.encodePacked(vm.readFile(runFilePath))
+            );
+
+            bytes memory parsedRun = vm.parseJson(runData, ".deployedAddresses");
+            SavedAddresses[] memory runAddresses = abi.decode(
+                parsedRun,
+                (SavedAddresses[])
+            );
+            _loadRunAddresses(runAddresses);
+        }
+
+        // Reset recording so only NEW addresses from this proposal are tracked
+        addresses.resetRecordingAddresses();
+
+        // Warp on localnet so that timestamp is not 1 and timelock simulation works
+        if (block.chainid == 31337) {
+            vm.warp(block.timestamp + 100);
+        }
+    }
+
+    /// @notice Load addresses from run file
+    function _loadRunAddresses(SavedAddresses[] memory savedAddresses) private {
         for (uint256 i = 0; i < savedAddresses.length; i++) {
             addresses.addAddress(
                 savedAddresses[i].name,
@@ -100,11 +127,106 @@ abstract contract Proposal is Test, Script, IProposal {
                 savedAddresses[i].isContract
             );
         }
+    }
 
-        // Warp on localnet so that timestamp is not 1 and timelock simulation works
-        if (block.chainid == 31337) {
-            vm.warp(block.timestamp + 100);
+    /// @notice Save newly deployed addresses to run file
+    function _saveAddressesToRunFile(string memory runFilePath) private {
+        // Get newly recorded addresses
+        (
+            string[] memory names,
+            uint256[] memory chainIds,
+            address[] memory addrs
+        ) = addresses.getRecordedAddresses();
+
+        if (names.length == 0) return; // Nothing new to save
+
+        // Read existing run file
+        string memory runData = string(
+            abi.encodePacked(vm.readFile(runFilePath))
+        );
+
+        // Parse existing deployed addresses
+        bytes memory existingParsed = vm.parseJson(
+            runData,
+            ".deployedAddresses"
+        );
+        SavedAddresses[] memory existingAddresses = abi.decode(
+            existingParsed,
+            (SavedAddresses[])
+        );
+
+        // Parse other fields
+        uint256 createdAt = abi.decode(
+            vm.parseJson(runData, ".createdAt"),
+            (uint256)
+        );
+        int256 lastCompleted = abi.decode(
+            vm.parseJson(runData, ".lastCompletedProposal"),
+            (int256)
+        );
+
+        // Build new JSON
+        string memory json = "{";
+        json = string(
+            abi.encodePacked(json, '"createdAt":', vm.toString(createdAt), ",")
+        );
+        json = string(
+            abi.encodePacked(
+                json,
+                '"lastCompletedProposal":',
+                vm.toString(uint256(lastCompleted)),
+                ","
+            )
+        );
+        json = string(abi.encodePacked(json, '"deployedAddresses":['));
+
+        // Add existing addresses
+        for (uint256 i = 0; i < existingAddresses.length; i++) {
+            if (i > 0) json = string(abi.encodePacked(json, ","));
+            json = string(
+                abi.encodePacked(
+                    json,
+                    '{"addr":"',
+                    vm.toString(existingAddresses[i].addr),
+                    '",',
+                    '"name":"',
+                    existingAddresses[i].name,
+                    '",',
+                    '"chainId":',
+                    vm.toString(existingAddresses[i].chainId),
+                    ",",
+                    '"isContract":',
+                    existingAddresses[i].isContract ? "true" : "false",
+                    "}"
+                )
+            );
         }
+
+        // Add new addresses
+        for (uint256 i = 0; i < names.length; i++) {
+            if (existingAddresses.length > 0 || i > 0)
+                json = string(abi.encodePacked(json, ","));
+            json = string(
+                abi.encodePacked(
+                    json,
+                    '{"addr":"',
+                    vm.toString(addrs[i]),
+                    '",',
+                    '"name":"',
+                    names[i],
+                    '",',
+                    '"chainId":',
+                    vm.toString(chainIds[i]),
+                    ",",
+                    '"isContract":true}'
+                )
+            );
+        }
+
+        json = string(abi.encodePacked(json, "]}"));
+
+        // Write back to file
+        vm.writeFile(runFilePath, json);
     }
 
     /// @notice proposal name, e.g. "BIP15".
@@ -128,6 +250,12 @@ abstract contract Proposal is Test, Script, IProposal {
             deploy();
             addresses.printJSONChanges();
             vm.stopBroadcast();
+
+            // Save newly deployed addresses to run file
+            string memory runFilePath = vm.envOr("RUN_FILE_PATH", string(""));
+            if (bytes(runFilePath).length > 0) {
+                _saveAddressesToRunFile(runFilePath);
+            }
         }
 
         if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();

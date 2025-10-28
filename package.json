@@ -9,6 +9,7 @@
         "test": "test"
     },
     "scripts": {
+        "deploy": "tsx scripts/deploy.ts",
         "coverage": "forge coverage",
         "coverage:lcov:unit": "forge coverage --report lcov --match-contract UnitTest",
         "coverage:lcov:integration": "forge coverage --report lcov --match-contract IntegrationTest",
@@ -76,14 +77,17 @@
         "prettier-plugin-solidity": "^1.3.1",
         "solhint": "^4.5.4",
         "ts-node": "^10.9.2",
+        "tsx": "^4.19.2",
         "typescript": "^5.4.5"
     },
     "dependencies": {
+        "@clack/prompts": "^0.7.0",
         "@ethersproject/keccak256": "^5.7.0",
         "@moralisweb3/common-evm-utils": "^2.27.0",
         "@openzeppelin/merkle-tree": "^1.0.6",
         "axios": "^1.7.2",
         "commander": "^12.1.0",
+        "date-fns": "^4.1.0",
         "ethers": "^5.7.0",
         "husky": "^9.0.11",
         "jose": "^5.6.3",
