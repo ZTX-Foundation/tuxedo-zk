@@ -38,6 +38,18 @@ abstract contract Proposal is Test, Script, IProposal {
     /// @notice primary fork id
     uint256 public primaryForkId;
 
+    /// @notice json structure to read addresses into storage from file
+    struct SavedAddresses {
+        /// address to store
+        address addr;
+        /// chain id of network to store for
+        uint256 chainId;
+        /// whether the address is a contract
+        bool isContract;
+        /// name of contract to store
+        string name;
+    }
+
     /// @notice buildModifier to be used by the build function to populate the
     /// actions array
     /// @param toPrank the address that will be used as the caller for the
@@ -48,7 +60,11 @@ abstract contract Proposal is Test, Script, IProposal {
         _endBuild(toPrank);
     }
 
-    constructor() {
+    constructor() {}
+
+    /// @notice setUp function to initialize the proposal
+    /// @dev this should be called before running the proposal standalone
+    function setUp() public virtual {
         DEBUG = vm.envOr("DEBUG", false);
 
         DO_DEPLOY = vm.envOr("DO_DEPLOY", true);
@@ -57,6 +73,38 @@ abstract contract Proposal is Test, Script, IProposal {
         DO_SIMULATE = vm.envOr("DO_SIMULATE", true);
         DO_VALIDATE = vm.envOr("DO_VALIDATE", true);
         DO_PRINT = vm.envOr("DO_PRINT", true);
+
+        // Load addresses from JSON
+        string memory environment = vm.envOr("ENVIRONMENT", string("localnet"));
+        string memory addressPath = string(
+            abi.encodePacked("proposals/Addresses/", environment, ".json")
+        );
+        string memory addressesData = string(
+            abi.encodePacked(vm.readFile(addressPath))
+        );
+
+        bytes memory parsedJson = vm.parseJson(addressesData);
+
+        SavedAddresses[] memory savedAddresses = abi.decode(
+            parsedJson,
+            (SavedAddresses[])
+        );
+
+        addresses = new Addresses(addressPath);
+
+        for (uint256 i = 0; i < savedAddresses.length; i++) {
+            addresses.addAddress(
+                savedAddresses[i].name,
+                savedAddresses[i].addr,
+                savedAddresses[i].chainId,
+                savedAddresses[i].isContract
+            );
+        }
+
+        // Warp on localnet so that timestamp is not 1 and timelock simulation works
+        if (block.chainid == 31337) {
+            vm.warp(block.timestamp + 100);
+        }
     }
 
     /// @notice proposal name, e.g. "BIP15".
