@@ -262,7 +262,7 @@ abstract contract Proposal is Test, Script, IProposal {
             }
         }
 
-        // if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();
+        if (DO_AFTER_DEPLOY_MOCK) afterDeployMock();
         if (DO_BUILD) build();
         if (DO_SIMULATE) simulate();
         if (DO_VALIDATE) validate();

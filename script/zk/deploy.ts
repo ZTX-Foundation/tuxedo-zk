@@ -4,7 +4,17 @@ import { intro, outro, select, text, confirm, spinner } from "@clack/prompts";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import * as dotenv from "dotenv";
 import { RunManager } from "./RunManager";
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Handle Ctrl+C gracefully
+process.on("SIGINT", () => {
+    console.log("\n\n👋 Deployment interrupted by user");
+    process.exit(130); // Standard exit code for SIGINT
+});
 
 // Network configuration with chain IDs
 const NETWORKS = {
@@ -117,38 +127,44 @@ async function main() {
 
     const proposalsToDeploy = availableProposals.slice(startProposalIndex);
 
-    // Step 3: Optional private key
-    const usePrivateKey = await confirm({
-        message: "Do you want to provide a private key? (enables broadcasting)",
+    // Step 3: Broadcast or simulate
+    const mode = await select({
+        message: "Deploy mode",
+        options: [
+            {
+                value: "simulate",
+                label: "Simulate (dry run)",
+                hint: "Test without broadcasting transactions",
+            },
+            {
+                value: "broadcast",
+                label: "Broadcast (live deployment)",
+                hint: "Deploy to network using DEPLOYER_PRIVATE_KEY from .env",
+            },
+        ],
     });
 
-    let privateKey: string | undefined;
-
-    if (usePrivateKey) {
-        privateKey = (await text({
-            message: "Enter private key",
-            placeholder: "0x...",
-            validate: (value) => {
-                if (!value || value.length === 0) {
-                    return "Private key is required";
-                }
-                if (!value.startsWith("0x") || value.length !== 66) {
-                    return "Invalid private key format (must be 0x followed by 64 hex characters)";
-                }
-                return undefined;
-            },
-        })) as string;
-
-        if (!privateKey) {
-            outro("Deployment cancelled");
-            process.exit(0);
-        }
+    if (!mode) {
+        outro("Deployment cancelled");
+        process.exit(0);
     }
 
     // Build command arguments
     const baseArgs = ["--rpc-url", networkConfig.rpcUrl, "--zksync", "-vvvv"];
 
-    if (privateKey) {
+    if (mode === "broadcast") {
+        const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
+
+        if (!privateKey) {
+            outro("❌ DEPLOYER_PRIVATE_KEY not found in environment variables");
+            process.exit(1);
+        }
+
+        if (!privateKey.startsWith("0x") || privateKey.length !== 66) {
+            outro("❌ Invalid DEPLOYER_PRIVATE_KEY format in .env file");
+            process.exit(1);
+        }
+
         baseArgs.push("--broadcast", "--private-key", privateKey);
     }
 
@@ -161,7 +177,9 @@ async function main() {
     console.log(
         `  Proposals: ${proposalsToDeploy.length} (starting from ${proposalsToDeploy[0]})`
     );
-    console.log(`  Broadcasting: ${privateKey ? "Yes" : "No"}`);
+    console.log(
+        `  Mode: ${mode === "broadcast" ? "🔴 BROADCAST (live)" : "🟡 SIMULATE (dry run)"}`
+    );
     console.log("");
 
     const proceed = await confirm({

@@ -48,7 +48,7 @@ All `build()` functions use `buildModifier(ADMIN_TIMELOCK_CONTROLLER)` to prank 
 
 ---
 
-### ⬜ zip003.sol - REQUIRES MIGRATION
+### ✅ zip003.sol - REQUIRES MIGRATION
 - **Status:** ⬜ Pending
 - **Complexity:** Medium
 - **Items to migrate:** 8 role grants
@@ -99,7 +99,7 @@ _core.grantRole(Roles.GAME_CONSUMER_NOTARY_PROTOCOL_ROLE, addresses.getAddress("
 **Dependencies:** ❗ MUST complete zip003 migration first
 
 **Decision needed:**
-- [ ] Migrate all setSupplyCap calls to deploy()
+- [x] Migrate all setSupplyCap calls to deploy()
 - [ ] Skip this proposal for testnet (unnecessary configuration)
 - [ ] Other (specify): _______________
 

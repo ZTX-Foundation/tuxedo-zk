@@ -9,7 +9,7 @@
         "test": "test"
     },
     "scripts": {
-        "deploy": "tsx scripts/deploy.ts",
+        "deploy": "tsx script/zk/deploy.ts",
         "coverage": "forge coverage",
         "coverage:lcov:unit": "forge coverage --report lcov --match-contract UnitTest",
         "coverage:lcov:integration": "forge coverage --report lcov --match-contract IntegrationTest",

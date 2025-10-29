@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20Splitter} from "@protocol/finance/ERC20Splitter.sol";
 
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
+import {EnvMock} from "src/mocks/env.sol";
 
 import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
@@ -108,8 +109,9 @@ contract zip003 is TimelockProposal {
             address(seasonsTokenIdRegistry)
         );
         addresses.addAddress("ERC1155_SEASON_ONE", address(erc1155SeasonOne), true);
+    }
 
-        /// Grant roles directly in deploy for testnet deployments
+    function build() public override buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER")) {
         /// Grant the GUARDIAN role to the GUARDIAN_MULTISIG
         _core.grantRole(Roles.GUARDIAN, addresses.getAddress("GUARDIAN_MULTISIG"));
 
@@ -138,6 +140,13 @@ contract zip003 is TimelockProposal {
         _core = Core(addresses.getAddress("CORE"));
 
         super.run();
+    }
+
+    function simulate() public override {
+        address multisig = addresses.getAddress("ADMIN_MULTISIG");
+
+        /// Multisig is proposer and executor
+        _simulateActions(multisig, multisig);
     }
 
     function validate() public override {
