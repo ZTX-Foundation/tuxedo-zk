@@ -77,23 +77,6 @@ Resume deployments after:
 - Deployment failures
 - Interruptions (Ctrl+C)
 
-## Commands
-
-Deploy phase:
-```bash
-forge script proposals/zips/{proposal}.sol \
-  --rpc-url {rpcUrl} \
-  -vvvv \
-  [--broadcast --private-key {privateKey}]
-```
-
-// TODO: UPdate these docs
-Build phase (governance calldata):
-```bash
-forge script proposals/zips/{proposal}.sol \
-  --rpc-url {rpcUrl}
-```
-
 ## Network Configuration
 
 Edit `script/zk/deploy.ts`:
@@ -155,6 +138,36 @@ Fix:
 1. Check if addresses were actually deployed on-chain
 2. If deployed: Manually increment `lastCompletedProposal` in the run file
 3. If not deployed: Remove the addresses from `deployedAddresses` array in run file, or start a new run
+
+## Local zkSync Node Testing
+
+To test deployments against a local zkSync node:
+
+**1. Start the zkSync node**
+
+```bash
+npx zksync-cli dev start
+```
+
+**2. Fund your deployer wallet**
+
+```bash
+cast send {address} \
+    --value 100ether \
+    --private-key {private_key} \
+    --rpc-url http://127.0.0.1:8011
+```
+
+Replace `{address}` with your deployer address and `{private_key}` with a funded account from the zkSync node.
+
+**3. Run the CLI**
+
+```bash
+npm run deploy
+# Select: localnet-zk
+```
+
+The zkSync local node runs on port 8011 by default with chain ID 260.
 
 ## Architecture
 

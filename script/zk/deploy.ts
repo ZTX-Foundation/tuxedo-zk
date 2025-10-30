@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { intro, outro, select, text, confirm, spinner } from "@clack/prompts";
+import { intro, outro, select, confirm, spinner } from "@clack/prompts";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
@@ -23,20 +23,10 @@ const NETWORKS = {
         rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
         chainId: 4654,
     },
-    localnet: {
-        name: "Local Network",
-        rpcUrl: "http://127.0.0.1:8545",
-        chainId: 31337,
-    },
-    mainnet: {
-        name: "Mainnet",
-        rpcUrl: "https://arb1.arbitrum.io/rpc",
-        chainId: 42161,
-    },
-    qa: {
-        name: "QA Network",
-        rpcUrl: "https://qa.rpc.caldera.xyz/http",
-        chainId: 99999, // Update with actual chain ID
+    "localnet-zk": {
+        name: "Local Network ZK",
+        rpcUrl: "http://127.0.0.1:8011",
+        chainId: 260,
     },
 } as const;
 
@@ -149,46 +139,29 @@ async function main() {
 
     const proposalsToDeploy = availableProposals.slice(startProposalIndex);
 
-    // Step 3: Broadcast or simulate
-    const mode = await select({
-        message: "Deploy mode",
-        options: [
-            {
-                value: "simulate",
-                label: "Simulate (dry run)",
-                hint: "Test without broadcasting transactions",
-            },
-            {
-                value: "broadcast",
-                label: "Broadcast (live deployment)",
-                hint: "Deploy to network using DEPLOYER_PRIVATE_KEY from .env",
-            },
-        ],
-    });
+    // Validate DEPLOYER_PRIVATE_KEY
+    const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
 
-    if (!mode) {
-        outro("Deployment cancelled");
-        process.exit(0);
+    if (!privateKey) {
+        outro("❌ DEPLOYER_PRIVATE_KEY not found in environment variables");
+        process.exit(1);
     }
 
-    // Build command arguments
-    const baseArgs = ["--rpc-url", networkConfig.rpcUrl, "--zksync", "-vvvv"];
-
-    if (mode === "broadcast") {
-        const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
-
-        if (!privateKey) {
-            outro("❌ DEPLOYER_PRIVATE_KEY not found in environment variables");
-            process.exit(1);
-        }
-
-        if (!privateKey.startsWith("0x") || privateKey.length !== 66) {
-            outro("❌ Invalid DEPLOYER_PRIVATE_KEY format in .env file");
-            process.exit(1);
-        }
-
-        baseArgs.push("--broadcast", "--private-key", privateKey);
+    if (!privateKey.startsWith("0x") || privateKey.length !== 66) {
+        outro("❌ Invalid DEPLOYER_PRIVATE_KEY format in .env file");
+        process.exit(1);
     }
+
+    // Build command arguments with broadcast enabled
+    const baseArgs = [
+        "--rpc-url",
+        networkConfig.rpcUrl,
+        "--zksync",
+        "-vvvv",
+        "--broadcast",
+        "--private-key",
+        privateKey,
+    ];
 
     // Summary
     console.log("\n📋 Deployment Summary:");
@@ -199,9 +172,7 @@ async function main() {
     console.log(
         `  Proposals: ${proposalsToDeploy.length} (starting from ${proposalsToDeploy[0]})`
     );
-    console.log(
-        `  Mode: ${mode === "broadcast" ? "🔴 BROADCAST (live)" : "🟡 SIMULATE (dry run)"}`
-    );
+    console.log(`  Mode: Broadcasting live`);
     console.log("");
 
     const proceed = await confirm({
@@ -238,8 +209,6 @@ async function main() {
                     RUN_ID: runManager.getRunId(),
                     RUN_FILE_PATH: runManager.getRunFilePath(),
                     ENVIRONMENT: network,
-                    DO_BUILD: "false", // Only run deploy(), not build()
-                    DO_SIMULATE: "false",
                 },
             });
 
@@ -250,64 +219,12 @@ async function main() {
                 console.log(
                     `\n📋 ${proposal} has governance actions that need to be submitted\n`
                 );
-
-                // Run build to generate calldata
-                s.start(`Generating governance calldata for ${proposal}`);
-
-                const buildCommand = [
-                    "forge",
-                    "script",
-                    proposalPath,
-                    "--rpc-url",
-                    networkConfig.rpcUrl,
-                    "--zksync",
-                ].join(" ");
-
-                try {
-                    const calldataOutput = execSync(buildCommand, {
-                        cwd: process.cwd(),
-                        env: {
-                            ...process.env,
-                            RUN_ID: runManager.getRunId(),
-                            RUN_FILE_PATH: runManager.getRunFilePath(),
-                            ENVIRONMENT: network,
-                            DO_DEPLOY: "false", // Don't deploy again
-                            DO_BUILD: "true", // Generate actions
-                            DO_SIMULATE: "false",
-                            DO_VALIDATE: "false",
-                            DO_PRINT: "true", // Print calldata
-                        },
-                        encoding: "utf-8",
-                    });
-
-                    s.stop(`Calldata generated for ${proposal}`);
-
-                    // Display calldata
-                    console.log("\n" + "=".repeat(80));
-                    console.log("📝 GOVERNANCE CALLDATA OUTPUT:");
-                    console.log("=".repeat(80));
-                    console.log(calldataOutput);
-                    console.log("=".repeat(80) + "\n");
-                } catch (buildError) {
-                    s.stop(`⚠️  Failed to generate calldata for ${proposal}`);
-                    console.warn(
-                        "Could not generate calldata, but deploy() succeeded"
-                    );
-                }
-
-                // Pause for user to submit governance actions
                 console.log(
-                    `\n⏸️  Please submit the above governance calldata to the TimelockController:`
+                    `Please scroll up to find the "Schedule Calldata" and "Execute Calldata" sections.`
                 );
-                console.log(`   1. Copy the "Schedule Calldata" from above`);
                 console.log(
-                    `   2. Call scheduleBatch() on TimelockController from ADMIN_MULTISIG`
+                    `Copy those transactions and submit them via the multisig to the TimelockController.\n`
                 );
-                console.log(`   3. Wait for delay period (if any)`);
-                console.log(
-                    `   4. Call executeBatch() on TimelockController from ADMIN_MULTISIG`
-                );
-                console.log("");
 
                 const governanceSubmitted = await confirm({
                     message: `Have you submitted and executed the governance actions for ${proposal}?`,

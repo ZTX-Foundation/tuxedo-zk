@@ -58,6 +58,22 @@ and the integration tests:
 npm run test:integration
 ```
 
+## Testing Deploy Scripts
+
+Create a `.env` file in the root directory. Refer to `.env.example` for required variables.
+
+**EVM Node Testing**
+
+Run all proposals against a standard EVM node:
+
+```bash
+forge script script/deploy/DeployProposal.s.sol:DeployProposal -vvvv
+```
+
+**zkSync Node Testing**
+
+For testing against a local zkSync node, see the [zkSync deployment testing section](./script/zk/README.md#local-zksync-node-testing) in the deployment CLI documentation.
+
 ## Linter
 
 To run the linter:

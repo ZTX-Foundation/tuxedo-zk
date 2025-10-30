@@ -19,7 +19,9 @@ Create a proposal file. For reference, there are previously executed zips in [zi
 
 3. Import new zip in TestProposals.
 
-4. If zip is already executed on the network, add it in `if` block and now you can run integration tests. If zip is not executed on mainnet, replace zipTest with the new zip contract and run integration tests to test the zip. 'localnet' represents anvil test network and all the zips are simulated when running integration tests against it.
+4. If the proposal has any governance contract calls that will be logged and submitted with a multisig wallet, add the proposal name to the `PROPOSALS_WITH_BUILD` array in script/zk/deploy.ts
+
+5. If zip is already executed on the network, add it in `if` block and now you can run integration tests. If zip is not executed on mainnet, replace zipTest with the new zip contract and run integration tests to test the zip. 'localnet' represents anvil test network and all the zips are simulated when running integration tests against it.
 Run:
 ```bash
 ENVIRONMENT=mainnet npm run test:integration
