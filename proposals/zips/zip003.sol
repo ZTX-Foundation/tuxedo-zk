@@ -108,9 +108,9 @@ contract zip003 is TimelockProposal {
             address(seasonsTokenIdRegistry)
         );
         addresses.addAddress("ERC1155_SEASON_ONE", address(erc1155SeasonOne), true);
-    }
-
-    function build() public override buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER")) {
+        // }
+        //
+        // function build() public override buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER")) {
         /// Grant the GUARDIAN role to the GUARDIAN_MULTISIG
         _core.grantRole(Roles.GUARDIAN, addresses.getAddress("GUARDIAN_MULTISIG"));
 

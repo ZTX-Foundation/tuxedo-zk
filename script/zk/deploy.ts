@@ -50,6 +50,28 @@ const availableProposals = fs
     .map((file) => file.replace(".sol", ""))
     .sort();
 
+// Proposals with build() functions that require governance submission
+const PROPOSALS_WITH_BUILD = [
+    "zip003",
+    "zip004",
+    "zip005",
+    "zip006",
+    "zip007",
+    "zip008",
+    "zip009",
+    "zip010",
+    "zip011",
+    "zip012",
+    "zip013",
+    "zip014",
+    "zip016",
+    "zip017",
+    "zip018",
+    "zip019",
+    "zip020",
+    "zip021",
+];
+
 async function main() {
     console.clear();
 
@@ -216,13 +238,95 @@ async function main() {
                     RUN_ID: runManager.getRunId(),
                     RUN_FILE_PATH: runManager.getRunFilePath(),
                     ENVIRONMENT: network,
+                    DO_BUILD: "false", // Only run deploy(), not build()
+                    DO_SIMULATE: "false",
                 },
             });
 
+            s.stop(`✅ ${proposal} deploy() completed`);
+
+            // Check if this proposal has governance actions
+            if (PROPOSALS_WITH_BUILD.includes(proposal)) {
+                console.log(
+                    `\n📋 ${proposal} has governance actions that need to be submitted\n`
+                );
+
+                // Run build to generate calldata
+                s.start(`Generating governance calldata for ${proposal}`);
+
+                const buildCommand = [
+                    "forge",
+                    "script",
+                    proposalPath,
+                    "--rpc-url",
+                    networkConfig.rpcUrl,
+                    "--zksync",
+                ].join(" ");
+
+                try {
+                    const calldataOutput = execSync(buildCommand, {
+                        cwd: process.cwd(),
+                        env: {
+                            ...process.env,
+                            RUN_ID: runManager.getRunId(),
+                            RUN_FILE_PATH: runManager.getRunFilePath(),
+                            ENVIRONMENT: network,
+                            DO_DEPLOY: "false", // Don't deploy again
+                            DO_BUILD: "true", // Generate actions
+                            DO_SIMULATE: "false",
+                            DO_VALIDATE: "false",
+                            DO_PRINT: "true", // Print calldata
+                        },
+                        encoding: "utf-8",
+                    });
+
+                    s.stop(`Calldata generated for ${proposal}`);
+
+                    // Display calldata
+                    console.log("\n" + "=".repeat(80));
+                    console.log("📝 GOVERNANCE CALLDATA OUTPUT:");
+                    console.log("=".repeat(80));
+                    console.log(calldataOutput);
+                    console.log("=".repeat(80) + "\n");
+                } catch (buildError) {
+                    s.stop(`⚠️  Failed to generate calldata for ${proposal}`);
+                    console.warn(
+                        "Could not generate calldata, but deploy() succeeded"
+                    );
+                }
+
+                // Pause for user to submit governance actions
+                console.log(
+                    `\n⏸️  Please submit the above governance calldata to the TimelockController:`
+                );
+                console.log(`   1. Copy the "Schedule Calldata" from above`);
+                console.log(
+                    `   2. Call scheduleBatch() on TimelockController from ADMIN_MULTISIG`
+                );
+                console.log(`   3. Wait for delay period (if any)`);
+                console.log(
+                    `   4. Call executeBatch() on TimelockController from ADMIN_MULTISIG`
+                );
+                console.log("");
+
+                const governanceSubmitted = await confirm({
+                    message: `Have you submitted and executed the governance actions for ${proposal}?`,
+                });
+
+                if (!governanceSubmitted) {
+                    console.log(
+                        `\n⚠️  Deployment paused. You can resume this deployment later.`
+                    );
+                    console.log(
+                        `   When ready, run the deploy script again and select "Resume run"\n`
+                    );
+                    outro("Deployment paused for governance submission");
+                    process.exit(0);
+                }
+            }
+
             // Mark proposal as completed
             runManager.markProposalCompleted(proposalIndex);
-
-            s.stop(`✅ ${proposal} deployed successfully`);
         } catch (error) {
             s.stop(`❌ ${proposal} deployment failed`);
             console.error(`Error deploying ${proposal}:`, error);

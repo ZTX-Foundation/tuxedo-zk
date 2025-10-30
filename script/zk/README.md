@@ -1,145 +1,169 @@
-# Deployment CLI Tool
+# Deployment CLI
 
-Interactive CLI tool for deploying ZTX contracts using Clack prompts.
+Interactive CLI for deploying ZTX contracts with run tracking and governance workflow support.
 
-## Installation
+## Setup
 
-First, install the dependencies:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-## Usage
+Create a `.env` file with your deployer private key, refer to [the env example](../../.env.example)
 
-Run the deployment CLI:
+```bash
+DEPLOYER_PRIVATE_KEY=0x...
+```
+
+Private key must start with `0x` and be 66 characters long.
+
+## Usage
 
 ```bash
 npm run deploy
 ```
 
-## Interactive Steps
-
-The CLI will guide you through the following steps:
+## Workflow
 
 ### 1. Select Network
 
-Choose from available networks:
-- **Creator Testnet** - `https://creator-testnet.rpc.caldera.xyz/http`
-- **Local Network** - `http://127.0.0.1:8545`
-- **Mainnet** - `https://arb1.arbitrum.io/rpc`
-- **QA Network** - `https://qa.rpc.caldera.xyz/http`
+- Creator Testnet (Chain ID: 4654)
+- Local Network (Chain ID: 31337)
+- Mainnet (Chain ID: 42161)
+- QA Network (Chain ID: 99999)
 
-Networks are automatically detected from the `proposals/Addresses/` directory.
+### 2. Choose Run Type
 
-### 2. Select Proposals
+Start a new deployment or resume a previous one. When resuming, select from available runs showing the last completed proposal.
 
-Choose which proposals to deploy:
-- **All proposals** - Deploy all available zip files
-- **Select specific proposals** - Choose individual proposals (zip000, zip001, etc.)
+### 3. Deploy Mode
 
-### 3. Optional Private Key
+- **Simulate** - Dry run without broadcasting
+- **Broadcast** - Live deployment using `DEPLOYER_PRIVATE_KEY`
 
-If you want to broadcast transactions:
-- Provide a private key (must start with `0x` and be 66 characters)
-- This will add `--broadcast` and `--private-key` flags to the forge command
+### 4. Governance Workflow
 
-If you skip this step, the deployment will simulate only (no broadcasting).
+Proposals zip003-zip021 (excluding zip015) require governance submission. For these proposals, the CLI will:
 
-### 4. Deployment Summary & Confirmation
+1. Deploy contracts via `deploy()`
+2. Generate governance calldata via `build()`
+3. Display calldata with submission instructions
+4. Pause for manual submission confirmation
 
-Review the deployment configuration:
-- Network name and RPC URL
-- Selected proposals
-- Broadcasting status
+To submit governance actions:
+1. Copy the Schedule Calldata
+2. Call `scheduleBatch()` on TimelockController from ADMIN_MULTISIG
+3. Wait for timelock delay
+4. Call `executeBatch()` on TimelockController
+5. Confirm in CLI to continue
 
-Confirm to proceed with deployment.
+Deployments can be paused at governance checkpoints and resumed later.
 
-## Command Structure
+## Run Files
 
-The CLI builds and executes forge script commands with the following structure:
+Deployment state is tracked in `deployments/{chainId}/{timestamp}-{nanoid}.json`:
 
+```json
+{
+  "createdAt": 1706627130000,
+  "lastCompletedProposal": 3,
+  "deployedAddresses": [...]
+}
+```
+
+Resume deployments after:
+- Manual governance submission
+- Deployment failures
+- Interruptions (Ctrl+C)
+
+## Commands
+
+Deploy phase:
 ```bash
 forge script proposals/zips/{proposal}.sol \
   --rpc-url {rpcUrl} \
-  --zksync \
   -vvvv \
   [--broadcast --private-key {privateKey}]
 ```
 
-## Features
-
-- ✅ Interactive network selection with RPC URL hints
-- ✅ Multi-select proposals or deploy all
-- ✅ Optional private key for broadcasting
-- ✅ Deployment progress tracking with spinners
-- ✅ Error handling with option to continue on failure
-- ✅ Clear deployment summary before execution
-- ✅ Automatically detects available proposals from filesystem
+// TODO: UPdate these docs
+Build phase (governance calldata):
+```bash
+forge script proposals/zips/{proposal}.sol \
+  --rpc-url {rpcUrl}
+```
 
 ## Network Configuration
 
-Networks are configured in `scripts/deploy.ts`:
+Edit `script/zk/deploy.ts`:
 
 ```typescript
 const NETWORKS = {
   'creator-testnet': {
     name: 'Creator Testnet',
     rpcUrl: 'https://creator-testnet.rpc.caldera.xyz/http',
+    chainId: 4654,
   },
-  // ... other networks
 }
 ```
 
-To add a new network:
-1. Add the network configuration to the `NETWORKS` object
-2. Create a corresponding JSON file in `proposals/Addresses/`
+Add new networks:
+1. Update `NETWORKS` in `script/zk/deploy.ts`
+2. Create `proposals/Addresses/{network-name}.json`
 
 ## Examples
 
-### Deploy all proposals to Creator Testnet (simulation only)
-
+Simulate deployment:
 ```bash
 npm run deploy
-# Select: Creator Testnet
-# Select: All proposals
-# Select: No (for private key)
+# Creator Testnet -> New run -> Simulate
 ```
 
-### Deploy specific proposals with broadcasting
-
+Live deployment with governance:
 ```bash
 npm run deploy
-# Select: Creator Testnet
-# Select: Select specific proposals
-# Choose: zip000, zip001, zip002
-# Select: Yes (for private key)
-# Enter: 0x...
+# Creator Testnet -> New run -> Broadcast
+# Submit governance actions when prompted
+```
+
+Resume paused deployment:
+```bash
+npm run deploy
+# Creator Testnet -> Resume run -> Select run -> Broadcast
 ```
 
 ## Troubleshooting
 
-### Missing dependencies
+**Missing DEPLOYER_PRIVATE_KEY**
 
-If you see import errors, install dependencies:
+Create `.env` with `DEPLOYER_PRIVATE_KEY=0x...` (66 characters).
 
-```bash
-npm install
-```
+**Ctrl+C during forge execution**
 
-### Command not found
+SIGINT handler exits gracefully but cannot interrupt forge mid-execution.
 
-Make sure you're running from the project root:
+**Run file not found**
 
-```bash
-cd /path/to/creator-chain
-npm run deploy
-```
+Check `deployments/{chainId}/` exists. Start new run if data is lost.
 
-### Forge errors
+## Architecture
 
-Ensure Foundry is installed and up to date:
+**Two-Phase Deployment**
 
-```bash
-foundryup
-```
+Phase 1: Deploy contracts
+- Executes `deploy()` methods
+- Broadcasts to network
+- Tracks deployed addresses
+
+Phase 2: Governance actions
+- Generates calldata via `build()`
+- Pauses for manual TimelockController submission
+- Resumes after confirmation
+
+This ensures contracts deploy immediately while governance actions go through proper timelock.
+
+## Related Documentation
+
+- [Proposals README](../../proposals/README.md)
+- [Proposal Governance Analysis](../../PROPOSAL_GOVERNANCE_ANALYSIS.md)
