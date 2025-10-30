@@ -1,5 +1,9 @@
 # Proposals
 
+## Documentation
+
+For detailed analysis of proposal dependencies, governance actions, and execution workflow, see [Proposal Governance Analysis](../PROPOSAL_GOVERNANCE_ANALYSIS.md).
+
 ## How to use Proposals simulator
 
 ### Integration Tests

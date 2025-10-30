@@ -12,6 +12,8 @@ Solidity smart contracts for ZTX.
 
 For further details, see the [docs](./doc/contracts).
 
+For deployment and governance proposal information, see the [proposals README](./proposals/README.md).
+
 ## Setup
 
 ```console
