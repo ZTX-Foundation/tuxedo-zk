@@ -62,11 +62,7 @@ abstract contract Proposal is Test, Script, IProposal {
 
     constructor() {}
 
-    /// @notice setUp function to initialize the proposal
-    /// @dev this should be called before running the proposal standalone
-    function setUp() public virtual {
-        addresses = new Addresses("");
-
+    function registerEnvVars() public {
         DEBUG = vm.envOr("DEBUG", false);
 
         DO_DEPLOY = vm.envOr("DO_DEPLOY", true);
@@ -75,6 +71,15 @@ abstract contract Proposal is Test, Script, IProposal {
         DO_VALIDATE = vm.envOr("DO_VALIDATE", true);
         DO_PRINT = vm.envOr("DO_PRINT", true);
         DO_BUILD = vm.envOr("DO_BUILD", true);
+    }
+
+    /// @notice setUp function to initialize the proposal
+    /// @dev This is used in when compiling the contracts for a zk environment, all cheatcodes have to be in
+    /// the setup function
+    function setUp() public virtual {
+        registerEnvVars();
+
+        addresses = new Addresses("");
 
         // Load addresses from JSON
         string memory environment = vm.envOr("ENVIRONMENT", string("localnet"));

@@ -1,12 +1,1 @@
-{
-  "createdAt": 1761787962228,
-  "lastCompletedProposal": 0,
-  "deployedAddresses": [
-    {
-      "addr": "0x34bbA2da31B4DC6E1A89A78a165B6793ae22cf7B",
-      "name": "TOKEN",
-      "chainId": 4654,
-      "isContract": true
-    }
-  ]
-}
+{"createdAt":1761787962228,"lastCompletedProposal":2,"deployedAddresses":[{"addr":"0x34bbA2da31B4DC6E1A89A78a165B6793ae22cf7B","name":"TOKEN","chainId":4654,"isContract":true},{"addr":"0x4C4Ede9aEF2dA5824109C39564032B458765B2dA","name":"CORE","chainId":4654,"isContract":true},{"addr":"0xa2700f0A7e5d7d2480eB7e8769181033dA5c507F","name":"GLOBAL_REENTRANCY_LOCK","chainId":4654,"isContract":true},{"addr":"0x637196C2E7c89ACe7c2dA534f334E00D1441Ce95","name":"ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES","chainId":4654,"isContract":true},{"addr":"0x70997a70895F576Eb5f54B57ba080B0126bc8365","name":"ERC1155_MAX_SUPPLY_ADMIN_MINTER","chainId":4654,"isContract":true},{"addr":"0x01Bdcc9cD85E150dAbCb4E5F87D827A93E193f81","name":"ADMIN_TIMELOCK_CONTROLLER","chainId":4654,"isContract":true},{"addr":"0x66d37B5cBA7A83008D561826843f5b55FABB2071","name":"ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES","chainId":4654,"isContract":true},{"addr":"0x3FB39882F5f0ec75c7866cF27ef722853C856f95","name":"ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES","chainId":4654,"isContract":true},{"addr":"0x46e071baB3fB3eE2E1Aa1E7C09d60c5fc6d87bc1","name":"CONSUMABLE_SPLITTER","chainId":4654,"isContract":true},{"addr":"0x4a6476C913fA7F1095CcFba831cb3749899fD615","name":"ERC1155_AUTO_GRAPH_MINTER","chainId":4654,"isContract":true},{"addr":"0x0cC13EB02D07146FD0607bBE04dae04e9cAB3596","name":"GAME_CONSUMABLE","chainId":4654,"isContract":true},{"addr":"0x8Ac8B26289f422C3fFc5D57Db4dB70A58C3f2862","name":"SEASONS_TOKEN_ID_REGISTRY","chainId":4654,"isContract":true},{"addr":"0xe1F0528dAA17825f25280D2216890aB8e95Dd17e","name":"ERC1155_SEASON_ONE","chainId":4654,"isContract":true}]}

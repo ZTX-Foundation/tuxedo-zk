@@ -147,6 +147,15 @@ SIGINT handler exits gracefully but cannot interrupt forge mid-execution.
 
 Check `deployments/{chainId}/` exists. Start new run if data is lost.
 
+**Script logs "Script ran successfully" but transactions fail**
+
+Addresses are saved to the run file before transactions broadcast. If broadcast fails after address logging, the run file contains addresses but `lastCompletedProposal` doesn't increment. Re-running attempts to deploy the same contracts, causing address conflicts.
+
+Fix:
+1. Check if addresses were actually deployed on-chain
+2. If deployed: Manually increment `lastCompletedProposal` in the run file
+3. If not deployed: Remove the addresses from `deployedAddresses` array in run file, or start a new run
+
 ## Architecture
 
 **Two-Phase Deployment**

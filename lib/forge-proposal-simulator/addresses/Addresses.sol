@@ -54,7 +54,31 @@ contract Addresses is IAddresses, Test {
     // @notice array of addresses changed during a proposal
     ChangedAddress[] private changedAddresses;
 
-    constructor(string memory addressesPath) {}
+    constructor(string memory addressesPath) {
+        // An address path may be an empty string
+        // This is if we are compiling for zk and need to load the data in a setup function
+        if (bytes(addressesPath).length > 0) {
+            string memory addressesData = string(
+                abi.encodePacked(vm.readFile(addressesPath))
+            );
+
+            bytes memory parsedJson = vm.parseJson(addressesData);
+
+            SavedAddresses[] memory savedAddresses = abi.decode(
+                parsedJson,
+                (SavedAddresses[])
+            );
+
+            for (uint256 i = 0; i < savedAddresses.length; i++) {
+                addAddress(
+                    savedAddresses[i].name,
+                    savedAddresses[i].addr,
+                    savedAddresses[i].chainId,
+                    savedAddresses[i].isContract
+                );
+            }
+        }
+    }
 
     /// @notice get an address for the current chainId
     /// @param name the name of the address

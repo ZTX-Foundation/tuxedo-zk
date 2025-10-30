@@ -51,6 +51,7 @@ contract BootstrapTestnet is Script {
             vm.warp(block.timestamp + 100);
         }
         string memory addressPath = string(abi.encodePacked("proposals/Addresses/", environment, ".json"));
+
         addresses = new Addresses(addressPath);
 
         // Load proposals
@@ -77,6 +78,7 @@ contract BootstrapTestnet is Script {
         proposals.push(Proposal(address(new zip021()))); /// MaxSupply settings proposal
 
         for (uint256 i = 0; i < proposals.length; i++) {
+            proposals[i].registerEnvVars();
             proposals[i].setAddresses(addresses);
         }
     }
