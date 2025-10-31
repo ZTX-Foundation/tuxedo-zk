@@ -67,7 +67,7 @@ Create a `.env` file in the root directory. Refer to `.env.example` for required
 Run all proposals against a standard EVM node:
 
 ```bash
-forge script script/deploy/DeployProposal.s.sol:DeployProposal -vvvv
+forge script script/deploy/BootstrapTestnet.s.sol -vvvv
 ```
 
 **zkSync Node Testing**

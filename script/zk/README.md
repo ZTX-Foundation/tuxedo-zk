@@ -29,40 +29,32 @@ npm run deploy
 ### 1. Select Network
 
 - Creator Testnet (Chain ID: 4654)
-- Local Network (Chain ID: 31337)
-- Mainnet (Chain ID: 42161)
-- QA Network (Chain ID: 99999)
+- Local Network ZK (Chain ID: 260)
 
 ### 2. Choose Run Type
 
 Start a new deployment or resume a previous one. When resuming, select from available runs showing the last completed proposal.
 
-### 3. Deploy Mode
+### 3. Governance Workflow
 
-- **Simulate** - Dry run without broadcasting
-- **Broadcast** - Live deployment using `DEPLOYER_PRIVATE_KEY`
+Certain proposals require governance submission (see PROPOSALS_WITH_BUILD in deploy.ts). For these proposals, the CLI will:
 
-### 4. Governance Workflow
-
-Proposals zip003-zip021 (excluding zip015) require governance submission. For these proposals, the CLI will:
-
-1. Deploy contracts via `deploy()`
+1. Deploy contracts and execute `deploy()`
 2. Generate governance calldata via `build()`
-3. Display calldata with submission instructions
-4. Pause for manual submission confirmation
+3. Display "Schedule Calldata" and "Execute Calldata" sections
+4. Pause and prompt for confirmation
 
 To submit governance actions:
-1. Copy the Schedule Calldata
-2. Call `scheduleBatch()` on TimelockController from ADMIN_MULTISIG
-3. Wait for timelock delay
-4. Call `executeBatch()` on TimelockController
-5. Confirm in CLI to continue
+1. Scroll up to find the Schedule Calldata and Execute Calldata sections
+2. Copy the transactions and submit them via the multisig to the TimelockController
+3. Wait for timelock delay and execute the batch
+4. Confirm in CLI to continue
 
 Deployments can be paused at governance checkpoints and resumed later.
 
 ## Run Files
 
-Deployment state is tracked in `deployments/{chainId}/{timestamp}-{nanoid}.json`:
+Deployment state is tracked in `deployments/{chainId}/deployment-{timestamp}.json`:
 
 ```json
 {
@@ -88,6 +80,11 @@ const NETWORKS = {
     rpcUrl: 'https://creator-testnet.rpc.caldera.xyz/http',
     chainId: 4654,
   },
+  'localnet-zk': {
+    name: 'Local Network ZK',
+    rpcUrl: 'http://127.0.0.1:8011',
+    chainId: 260,
+  },
 }
 ```
 
@@ -97,23 +94,23 @@ Add new networks:
 
 ## Examples
 
-Simulate deployment:
+Start new deployment:
 ```bash
 npm run deploy
-# Creator Testnet -> New run -> Simulate
-```
-
-Live deployment with governance:
-```bash
-npm run deploy
-# Creator Testnet -> New run -> Broadcast
+# Creator Testnet -> New run
 # Submit governance actions when prompted
 ```
 
 Resume paused deployment:
 ```bash
 npm run deploy
-# Creator Testnet -> Resume run -> Select run -> Broadcast
+# Creator Testnet -> Resume run -> Select run
+```
+
+Deploy to local zkSync node:
+```bash
+npm run deploy
+# Local Network ZK -> New run
 ```
 
 ## Troubleshooting
@@ -130,9 +127,9 @@ SIGINT handler exits gracefully but cannot interrupt forge mid-execution.
 
 Check `deployments/{chainId}/` exists. Start new run if data is lost.
 
-**Script logs "Script ran successfully" but transactions fail**
+**Deployment fails but addresses are saved**
 
-Addresses are saved to the run file before transactions broadcast. If broadcast fails after address logging, the run file contains addresses but `lastCompletedProposal` doesn't increment. Re-running attempts to deploy the same contracts, causing address conflicts.
+Addresses may be saved to the run file before transactions complete. If the deployment fails after addresses are logged, the run file contains addresses but `lastCompletedProposal` doesn't increment. Re-running attempts to deploy the same contracts, causing address conflicts.
 
 Fix:
 1. Check if addresses were actually deployed on-chain
@@ -171,19 +168,20 @@ The zkSync local node runs on port 8011 by default with chain ID 260.
 
 ## Architecture
 
-**Two-Phase Deployment**
+The deployment process consists of two phases:
 
-Phase 1: Deploy contracts
-- Executes `deploy()` methods
-- Broadcasts to network
-- Tracks deployed addresses
+**Phase 1: Deploy contracts**
+- Executes `deploy()` methods from each proposal script
+- Broadcasts transactions to the network using `forge script --broadcast`
+- Tracks deployed addresses in the run file
 
-Phase 2: Governance actions
-- Generates calldata via `build()`
-- Pauses for manual TimelockController submission
-- Resumes after confirmation
+**Phase 2: Governance actions (for applicable proposals)**
+- Automatically generates governance calldata via `build()`
+- Displays Schedule and Execute calldata for TimelockController
+- Pauses for manual multisig submission and confirmation
+- Resumes after user confirms execution
 
-This ensures contracts deploy immediately while governance actions go through proper timelock.
+This ensures contracts deploy immediately while governance actions go through proper timelock procedures.
 
 ## Related Documentation
 
