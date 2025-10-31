@@ -20,3 +20,4 @@ build/
 lcov.info
 zkout
 foundryup-zksync
+dist

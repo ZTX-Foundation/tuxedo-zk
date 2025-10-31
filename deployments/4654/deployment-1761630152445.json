@@ -1,0 +1,12 @@
+{
+  "createdAt": 1761630152445,
+  "lastCompletedProposal": 0,
+  "deployedAddresses": [
+    {
+      "addr": "0x2EB304a4718a4e8cd61F7Bce5D130b219E1a6F43",
+      "name": "TOKEN",
+      "chainId": 4654,
+      "isContract": true
+    }
+  ]
+}

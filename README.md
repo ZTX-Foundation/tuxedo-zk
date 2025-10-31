@@ -12,6 +12,9 @@ Solidity smart contracts for ZTX.
 
 For further details, see the [docs](./doc/contracts).
 
+For deployment and governance proposal information, see the [proposals README](./proposals/README.md).
+And for information on the zk deployment cli see the [run manager docs](./script/zk/README.md).
+
 ## Setup
 
 ```console
@@ -54,6 +57,22 @@ and the integration tests:
 ```console
 npm run test:integration
 ```
+
+## Testing Deploy Scripts
+
+Create a `.env` file in the root directory. Refer to `.env.example` for required variables.
+
+**EVM Node Testing**
+
+Run all proposals against a standard EVM node:
+
+```bash
+forge script script/deploy/BootstrapTestnet.s.sol -vvvv
+```
+
+**zkSync Node Testing**
+
+For testing against a local zkSync node, see the [zkSync deployment testing section](./script/zk/README.md#local-zksync-node-testing) in the deployment CLI documentation.
 
 ## Linter
 

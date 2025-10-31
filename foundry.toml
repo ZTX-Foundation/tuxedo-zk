@@ -1,6 +1,8 @@
 [profile.default]
 src = 'src'
-fs_permissions = [{ access = "read", path = "./"}]
+fs_permissions = [
+    { access = "read-write", path = "./" }
+]
 out = 'out'
 libs = ['lib']
 auto_detect_solc = true

@@ -1,0 +1,84 @@
+{
+  "createdAt": 1761630886577,
+  "lastCompletedProposal": 3,
+  "deployedAddresses": [
+    {
+      "addr": "0x2EB304a4718a4e8cd61F7Bce5D130b219E1a6F43",
+      "name": "TOKEN",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xBCb65E8C79E7953FD4927B12178C4088b45999DA",
+      "name": "CORE",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xE6FB70a8E0819C1Ed891E4cCA4da6C732d78FE64",
+      "name": "GLOBAL_REENTRANCY_LOCK",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x405960cD2dCC55F730972905fdec3a272358E54c",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xD27813f6C476C8c18dFa87C64c2805e0d623603f",
+      "name": "ERC1155_MAX_SUPPLY_ADMIN_MINTER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x4f9de84371A196a901F869848303580FDcFfA815",
+      "name": "ADMIN_TIMELOCK_CONTROLLER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xc6bf3609C14d381A6eFfDC875076442B2C316Da2",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xB8B929087cCE0C01abdd4Df4cE4c32a8195DcAe7",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x3e2445626cccd0058628b4919B711bd34acEECB2",
+      "name": "CONSUMABLE_SPLITTER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x30f70a5ea5aD0ada4e27535b0E22CEb67cB29452",
+      "name": "ERC1155_AUTO_GRAPH_MINTER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x2FA814827B1185640233F68a6d6d1CF8C15da077",
+      "name": "GAME_CONSUMABLE",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x6Bd0B8aE015337eA32f8bB1670253A8cFf16E220",
+      "name": "SEASONS_TOKEN_ID_REGISTRY",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x8f3feFcf983aDc325Ca6825ca28278aAaF8474E1",
+      "name": "ERC1155_SEASON_ONE",
+      "chainId": 4654,
+      "isContract": true
+    }
+  ]
+}
