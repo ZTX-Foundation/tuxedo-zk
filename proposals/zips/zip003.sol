@@ -12,8 +12,6 @@ import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.
 import {ERC1155AutoGraphMinter} from "@protocol/nfts/ERC1155AutoGraphMinter.sol";
 import {GameConsumer} from "@protocol/game/GameConsumer.sol";
 import {CoreRef} from "@protocol/refs/CoreRef.sol";
-import {SeasonsTokenIdRegistry} from "@protocol/nfts/seasons/SeasonsTokenIdRegistry.sol";
-import {ERC1155SeasonOne} from "@protocol/nfts/seasons/ERC1155SeasonOne.sol";
 
 contract zip003 is TimelockProposal {
     Core private _core;
@@ -25,7 +23,7 @@ contract zip003 is TimelockProposal {
 
     // Provides a brief description of the proposal.
     function description() public pure override returns (string memory) {
-        return "ZTX CGv1 contracts proposal";
+        return "ZTX Mobile contracts proposal";
     }
 
     function deploy() public override {
@@ -56,6 +54,15 @@ contract zip003 is TimelockProposal {
         );
         addresses.addAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES", address(erc1155Placeables), true);
 
+        /// Enhanceables NFT contract
+        ERC1155MaxSupplyMintable erc1155Enhanceables = new ERC1155MaxSupplyMintable(
+            address(_core),
+            string(abi.encodePacked(_metadataBaseUri, "enhanceables/metadata/")),
+            "ZTX Enhanceables",
+            "ZTXE"
+        );
+        addresses.addAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES", address(erc1155Enhanceables), true);
+
         /// ERC20Splitter allocation settings
         ERC20Splitter.Allocation[] memory allocations = new ERC20Splitter.Allocation[](2);
         allocations[0].deposit = addresses.getAddress("REVENUE_WALLET_MULTISIG01");
@@ -72,10 +79,11 @@ contract zip003 is TimelockProposal {
         addresses.addAddress("CONSUMABLE_SPLITTER", address(consumableSplitter), true);
 
         /// AutoGraphMinter contract
-        address[] memory nftContractAddresses = new address[](3);
+        address[] memory nftContractAddresses = new address[](4);
         nftContractAddresses[0] = address(erc1155Consumables);
         nftContractAddresses[1] = address(erc1155Placeables);
-        nftContractAddresses[2] = addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES");
+        nftContractAddresses[2] = address(erc1155Enhanceables);
+        nftContractAddresses[3] = addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES");
 
         ERC1155AutoGraphMinter erc1155AutoGraphMinter = new ERC1155AutoGraphMinter(
             address(_core),
@@ -94,20 +102,7 @@ contract zip003 is TimelockProposal {
             addresses.getAddress("CONSUMABLE_SPLITTER"),
             addresses.getAddress("WETH")
         );
-        addresses.addAddress("GAME_CONSUMABLE", address(gameConsumer), true);
-
-        /// SeasonsTokenIdRegistry contract
-        SeasonsTokenIdRegistry seasonsTokenIdRegistry = new SeasonsTokenIdRegistry(address(_core));
-        addresses.addAddress("SEASONS_TOKEN_ID_REGISTRY", address(seasonsTokenIdRegistry), true);
-
-        /// Season contracts (Season 1)
-        ERC1155SeasonOne erc1155SeasonOne = new ERC1155SeasonOne(
-            address(_core),
-            address(erc1155Consumables),
-            address(addresses.getAddress("TOKEN")),
-            address(seasonsTokenIdRegistry)
-        );
-        addresses.addAddress("ERC1155_SEASON_ONE", address(erc1155SeasonOne), true);
+        addresses.addAddress("GAME_CONSUMER", address(gameConsumer), true);
     }
 
     function build() public override buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER")) {
@@ -117,13 +112,11 @@ contract zip003 is TimelockProposal {
         /// grant protocol Locker role
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES"));
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES"));
+        _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES"));
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER"));
 
         /// grant protocol minter role
         _core.grantRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER"));
-
-        /// grant registry operator role
-        _core.grantRole(Roles.REGISTRY_OPERATOR_PROTOCOL_ROLE, addresses.getAddress("ERC1155_SEASON_ONE"));
 
         /// grant minter notary role
         _core.grantRole(Roles.MINTER_NOTARY_PROTOCOL_ROLE, addresses.getAddress("AUTOGRAPH_SERVICE_KMS_WALLET"));
@@ -166,14 +159,21 @@ contract zip003 is TimelockProposal {
                 "Verify ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES is pointing to the correct core address"
             );
             assertEq(
+                address(
+                    ERC1155MaxSupplyMintable(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES")).core()
+                ),
+                address(_core),
+                "Verify ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES is pointing to the correct core address"
+            );
+            assertEq(
                 address(ERC1155AutoGraphMinter(addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER")).core()),
                 address(_core),
                 "Verify ERC1155_AUTO_GRAPH_MINTER is pointing to the correct core address"
             );
             assertEq(
-                address(CoreRef(addresses.getAddress("GAME_CONSUMABLE")).core()),
+                address(CoreRef(addresses.getAddress("GAME_CONSUMER")).core()),
                 address(_core),
-                "Verify GAME_CONSUMABLE is pointing to the correct core address"
+                "Verify GAME_CONSUMER is pointing to the correct core address"
             );
         }
 
@@ -197,6 +197,14 @@ contract zip003 is TimelockProposal {
                 "Verifying ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES has LOCKER role"
             );
             assertEq(
+                _core.hasRole(
+                    Roles.LOCKER_PROTOCOL_ROLE,
+                    addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES")
+                ),
+                true,
+                "Verifying ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES has LOCKER role"
+            );
+            assertEq(
                 _core.hasRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER")),
                 true,
                 "Verifying ERC1155_AUTO_GRAPH_MINTER has LOCKER role"
@@ -210,19 +218,10 @@ contract zip003 is TimelockProposal {
             );
         }
 
-        /// Verify REGISTRY_OPERATOR role
-        {
-            assertEq(
-                _core.hasRole(Roles.REGISTRY_OPERATOR_PROTOCOL_ROLE, addresses.getAddress("ERC1155_SEASON_ONE")),
-                true,
-                "Verifying ERC1155_SEASON_ONE has REGISTRY_OPERATOR role"
-            );
-        }
-
         /// Sum of Role counts to date
         {
-            assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 5, "Locker role count is not 5");
-            assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 3, "Minter role count is not 5");
+            assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 6, "Locker role count is not 6");
+            assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 3, "Minter role count is not 3");
         }
 
         /// Verify MULTISIGS have the correct roles
@@ -281,6 +280,11 @@ contract zip003 is TimelockProposal {
                 minter.isWhitelistedAddress(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES")),
                 true,
                 "Verify ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES is whitelisted"
+            );
+            assertEq(
+                minter.isWhitelistedAddress(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES")),
+                true,
+                "Verify ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES is whitelisted"
             );
 
             /// Verify Game consumable
