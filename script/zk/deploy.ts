@@ -23,6 +23,11 @@ const NETWORKS = {
         rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
         chainId: 4654,
     },
+    "qa": {
+        name: "Creator Testnet (QA)",
+        rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
+        chainId: 4654,
+    },
     "localnet-zk": {
         name: "Local Network ZK",
         rpcUrl: "http://127.0.0.1:8011",
