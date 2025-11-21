@@ -1,0 +1,720 @@
+{
+  "wearables": [
+    {
+      "maxSupply": 100000,
+      "tokenId": 1
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 2
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 3
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 4
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 5
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 6
+    },
+    {
+      "maxSupply": 500,
+      "tokenId": 8
+    },
+    {
+      "maxSupply": 500,
+      "tokenId": 9
+    },
+    {
+      "maxSupply": 500,
+      "tokenId": 10
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 11
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 12
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 7
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 26
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 27
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 28
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 29
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 30
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 31
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 32
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 33
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 34
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 35
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 36
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 37
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 38
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 39
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 40
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 41
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 42
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 43
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 44
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 45
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 46
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 47
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 48
+    },
+    {
+      "maxSupply": 69,
+      "tokenId": 49
+    },
+    {
+      "maxSupply": 75,
+      "tokenId": 50
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 51
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 52
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 53
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 54
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 55
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 56
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 57
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 58
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 59
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 60
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 61
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 62
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 63
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 64
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 65
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 66
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 67
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 68
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 69
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 70
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 71
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 72
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 73
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 74
+    },
+    {
+      "maxSupply": 420,
+      "tokenId": 75
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 76
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 77
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 78
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 79
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 80
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 81
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 82
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 83
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 84
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 85
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 86
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 87
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 88
+    },
+    {
+      "maxSupply": 120,
+      "tokenId": 89
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 90
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 91
+    },
+    {
+      "maxSupply": 420,
+      "tokenId": 92
+    },
+    {
+      "maxSupply": 42,
+      "tokenId": 93
+    },
+    {
+      "maxSupply": 69,
+      "tokenId": 94
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 95
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 96
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 97
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 98
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 99
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 100
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 101
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 102
+    },
+    {
+      "maxSupply": 1000,
+      "tokenId": 103
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 104
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 105
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 106
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 107
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 108
+    },
+    {
+      "maxSupply": 100,
+      "tokenId": 109
+    },
+    {
+      "maxSupply": 100,
+      "tokenId": 110
+    },
+    {
+      "maxSupply": 66,
+      "tokenId": 111
+    },
+    {
+      "maxSupply": 1,
+      "tokenId": 112
+    },
+    {
+      "maxSupply": 1,
+      "tokenId": 113
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 114
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 115
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 116
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 117
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 118
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 119
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 120
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 121
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 122
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 123
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 124
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 125
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 126
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 127
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 128
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 129
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 130
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 131
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 132
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 133
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 134
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 135
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 136
+    },
+    {
+      "maxSupply": 2500,
+      "tokenId": 137
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 138
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 139
+    },
+    {
+      "maxSupply": 200,
+      "tokenId": 140
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 155
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 156
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 157
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 158
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 159
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 160
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 161
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 162
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 163
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 164
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 165
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 166
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 167
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 168
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 169
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 170
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 171
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 172
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 173
+    },
+    {
+      "maxSupply": 4000,
+      "tokenId": 174
+    },
+    {
+      "maxSupply": 100,
+      "tokenId": 175
+    },
+    {
+      "maxSupply": 100,
+      "tokenId": 176
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 177
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 178
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 179
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 224
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 225
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 226
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 227
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 228
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 229
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 230
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 231
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 232
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 233
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 180
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 181
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 182
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 183
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 184
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 185
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 186
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 187
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 188
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 189
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 190
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 191
+    },
+    {
+      "maxSupply": 250000,
+      "tokenId": 202
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 153
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 154
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 143
+    },
+    {
+      "maxSupply": 6000,
+      "tokenId": 144
+    }
+  ]
+}
