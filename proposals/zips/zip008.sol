@@ -23,18 +23,18 @@ contract zip004 is TimelockProposal {
 
     // Returns the name of the proposal.
     function name() public pure override returns (string memory) {
-        return "ZIP004";
+        return "ZIP008";
     }
 
     // Provides a brief description of the proposal.
     function description() public pure override returns (string memory) {
-        return "ZTX Wearables tokenIds and MaxSupply config proposal - consolidates all historical wearable supplies - part 1";
+        return "ZTX Wearables tokenIds and MaxSupply config proposal - consolidates all historical wearable supplies - part 5";
     }
 
     function _setAndConfirmData() private {
         // Wearable and placeable data
         string memory data = string(
-            abi.encodePacked(vm.readFile("./proposals/zips/zip004.json"))
+            abi.encodePacked(vm.readFile("./proposals/zips/zip008.json"))
         );
 
         bytes memory parsedJson = vm.parseJson(data);
@@ -62,7 +62,7 @@ contract zip004 is TimelockProposal {
             wearableMaxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
         }
 
-        assertEq(wearableMaxSupplyTotal, 2231500, "Invalid maxSupplyTotal for wearables");
+        assertEq(wearableMaxSupplyTotal, 5764900, "Invalid maxSupplyTotal for wearables");
     }
 
     function build()

@@ -22,11 +22,13 @@ const NETWORKS = {
         name: "Creator Testnet",
         rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
         chainId: 4654,
+        verifierUrl: "https://creator-testnet.explorer.caldera.xyz/api",
     },
     "qa": {
         name: "Creator Testnet (QA)",
         rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
         chainId: 4654,
+        verifierUrl: "https://creator-testnet.explorer.caldera.xyz/api",
     },
     "localnet-zk": {
         name: "Local Network ZK",
@@ -166,7 +168,14 @@ async function main() {
         "--broadcast",
         "--private-key",
         privateKey,
+        "--gas-limit",
+        "3000000000",
     ];
+
+    // Add verification flags if verifierUrl is specified
+    if (networkConfig.verifierUrl) {
+        baseArgs.push("--verify", "--verifier", "zksync", "--verifier-url", networkConfig.verifierUrl);
+    }
 
     // Summary
     console.log("\n📋 Deployment Summary:");
@@ -197,9 +206,70 @@ async function main() {
         const proposalIndex = startProposalIndex + i;
         const proposalPath = path.join(PROPOSALS_DIR, `${proposal}.sol`);
 
-        s.start(`Deploying ${proposal} (${i + 1}/${proposalsToDeploy.length})`);
+        // Step 1: Dry run
+        s.start(`Dry-run ${proposal} (${i + 1}/${proposalsToDeploy.length})`);
 
         try {
+            // Build dry-run args (without --broadcast)
+            const dryRunArgs = [
+                "--rpc-url",
+                networkConfig.rpcUrl,
+                "--zksync",
+                "-vvvv",
+                "--gas-limit",
+                "30000000",
+            ];
+
+            const dryRunCommand = ["forge", "script", proposalPath, ...dryRunArgs].join(
+                " "
+            );
+
+            console.log(`\n$ ${dryRunCommand}\n`);
+
+            // Create a simulated copy of the deployment file for dry-run
+            const realDeploymentPath = runManager.getRunFilePath();
+            // Always use the real path as base, not any existing simulated path
+            const basePath = realDeploymentPath.replace(/-simulated\.json$/, '.json');
+            const simulatedDeploymentPath = basePath.replace('.json', '-simulated.json');
+
+            if (fs.existsSync(realDeploymentPath)) {
+                fs.copyFileSync(realDeploymentPath, simulatedDeploymentPath);
+            }
+
+            execSync(dryRunCommand, {
+                stdio: "inherit",
+                cwd: process.cwd(),
+                env: {
+                    ...process.env,
+                    RUN_ID: runManager.getRunId(),
+                    RUN_FILE_PATH: simulatedDeploymentPath,  // Use simulated file for dry-run
+                    ENVIRONMENT: network,
+                },
+            });
+
+            // Delete the simulated file after dry-run
+            if (fs.existsSync(simulatedDeploymentPath)) {
+                fs.unlinkSync(simulatedDeploymentPath);
+            }
+
+            s.stop(`✅ ${proposal} dry-run completed`);
+
+            // Ask user to proceed with broadcast
+            const proceedWithBroadcast = await confirm({
+                message: `Proceed with broadcast for ${proposal}?`,
+            });
+
+            if (!proceedWithBroadcast) {
+                console.log(`\n⚠️  Skipping broadcast for ${proposal}`);
+                continue;
+            }
+
+            // Step 2: Broadcast
+            s.start(`Broadcasting ${proposal} (${i + 1}/${proposalsToDeploy.length})`);
+
+            // Ensure we use the real deployment file, not the simulated one
+            const realDeploymentPathForBroadcast = runManager.getRunFilePath().replace(/-simulated\.json$/, '.json');
+
             const command = ["forge", "script", proposalPath, ...baseArgs].join(
                 " "
             );
@@ -212,12 +282,12 @@ async function main() {
                 env: {
                     ...process.env,
                     RUN_ID: runManager.getRunId(),
-                    RUN_FILE_PATH: runManager.getRunFilePath(),
+                    RUN_FILE_PATH: realDeploymentPathForBroadcast,
                     ENVIRONMENT: network,
                 },
             });
 
-            s.stop(`✅ ${proposal} deploy() completed`);
+            s.stop(`✅ ${proposal} broadcast completed`);
 
             // Check if this proposal has governance actions
             if (PROPOSALS_WITH_BUILD.includes(proposal)) {

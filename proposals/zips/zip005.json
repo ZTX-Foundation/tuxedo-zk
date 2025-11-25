@@ -2,123 +2,123 @@
   "wearables": [
     {
       "maxSupply": 100000,
-      "tokenId": 1
+      "tokenId": 44
     },
     {
       "maxSupply": 6000,
-      "tokenId": 2
+      "tokenId": 45
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 46
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 47
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 48
+    },
+    {
+      "maxSupply": 69,
+      "tokenId": 49
+    },
+    {
+      "maxSupply": 75,
+      "tokenId": 50
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 51
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 52
+    },
+    {
+      "maxSupply": 100000,
+      "tokenId": 53
     },
     {
       "maxSupply": 6000,
-      "tokenId": 3
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 4
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 5
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 6
-    },
-    {
-      "maxSupply": 500,
-      "tokenId": 8
-    },
-    {
-      "maxSupply": 500,
-      "tokenId": 9
-    },
-    {
-      "maxSupply": 500,
-      "tokenId": 10
+      "tokenId": 54
     },
     {
       "maxSupply": 100000,
-      "tokenId": 11
+      "tokenId": 55
     },
     {
       "maxSupply": 100000,
-      "tokenId": 12
+      "tokenId": 56
     },
     {
       "maxSupply": 100000,
-      "tokenId": 7
+      "tokenId": 57
     },
     {
       "maxSupply": 100000,
-      "tokenId": 26
+      "tokenId": 58
     },
     {
       "maxSupply": 100000,
-      "tokenId": 27
+      "tokenId": 59
     },
     {
       "maxSupply": 100000,
-      "tokenId": 28
+      "tokenId": 60
     },
     {
       "maxSupply": 100000,
-      "tokenId": 29
+      "tokenId": 61
     },
     {
       "maxSupply": 100000,
-      "tokenId": 30
+      "tokenId": 62
     },
     {
       "maxSupply": 100000,
-      "tokenId": 31
+      "tokenId": 63
     },
     {
       "maxSupply": 100000,
-      "tokenId": 32
+      "tokenId": 64
     },
     {
       "maxSupply": 100000,
-      "tokenId": 33
+      "tokenId": 65
     },
     {
       "maxSupply": 100000,
-      "tokenId": 34
+      "tokenId": 66
     },
     {
       "maxSupply": 100000,
-      "tokenId": 35
+      "tokenId": 67
     },
     {
       "maxSupply": 100000,
-      "tokenId": 36
+      "tokenId": 68
     },
     {
       "maxSupply": 100000,
-      "tokenId": 37
+      "tokenId": 69
     },
     {
       "maxSupply": 100000,
-      "tokenId": 38
+      "tokenId": 70
     },
     {
       "maxSupply": 100000,
-      "tokenId": 39
+      "tokenId": 71
     },
     {
       "maxSupply": 100000,
-      "tokenId": 40
+      "tokenId": 72
     },
     {
       "maxSupply": 100000,
-      "tokenId": 41
-    },
-    {
-      "maxSupply": 100000,
-      "tokenId": 42
-    },
-    {
-      "maxSupply": 100000,
-      "tokenId": 43
+      "tokenId": 73
     }
   ]
 }
