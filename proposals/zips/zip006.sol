@@ -5,7 +5,7 @@ import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/Timelock
 
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
-contract zip004 is TimelockProposal {
+contract zip006 is TimelockProposal {
 
     struct TokenIDMaxSupplySettings {
         uint256 maxSupply;
@@ -28,11 +28,11 @@ contract zip004 is TimelockProposal {
 
     // Provides a brief description of the proposal.
     function description() public pure override returns (string memory) {
-        return "ZTX Wearables tokenIds and MaxSupply config proposal - consolidates all historical wearable supplies - part 3";
+        return "ZTX Mobile Wearables maxSupply and transferability config proposal - previous non-common items with maxSupply updates";
     }
 
     function _setAndConfirmData() private {
-        // Wearable and placeable data
+        // Wearable data
         string memory data = string(
             abi.encodePacked(vm.readFile("./proposals/zips/zip006.json"))
         );
@@ -54,7 +54,7 @@ contract zip004 is TimelockProposal {
         }
 
         /// @notice sanity checks for wearables
-        assertEq(wearableTokenIDMaxSupplySettings.length, 30, "Invalid wearableTokenIDMaxSupplySettings length");
+        assertEq(wearableTokenIDMaxSupplySettings.length, 15, "Invalid wearableTokenIDMaxSupplySettings length");
 
         uint wearableMaxSupplyTotal = 0;
 
@@ -62,7 +62,22 @@ contract zip004 is TimelockProposal {
             wearableMaxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
         }
 
-        assertEq(wearableMaxSupplyTotal, 2308071, "Invalid maxSupplyTotal for wearables");
+        assertEq(wearableMaxSupplyTotal, 275000, "Invalid maxSupplyTotal for wearables");
+    }
+
+    /// @notice helper to call setSupplyCapBatch
+    function _callSetSupplyCapBatch(
+        ERC1155MaxSupplyMintable tokenContract,
+        TokenIDMaxSupplySettings[] storage settings
+    ) internal {
+        uint256 total = settings.length;
+        uint256[] memory ids = new uint256[](total);
+        uint256[] memory caps = new uint256[](total);
+        for (uint256 i = 0; i < total; ++i) {
+            ids[i] = settings[i].tokenId;
+            caps[i] = settings[i].maxSupply;
+        }
+        tokenContract.setSupplyCapBatch(ids, caps);
     }
 
     function build()
@@ -70,10 +85,8 @@ contract zip004 is TimelockProposal {
         override
         buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER"))
     {
-        /// @notice wearable config
-        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
-            wearable.setSupplyCap(wearableTokenIDMaxSupplySettings[i].tokenId, wearableTokenIDMaxSupplySettings[i].maxSupply);
-        }
+        /// @notice wearable config using batch API
+        _callSetSupplyCapBatch(wearable, wearableTokenIDMaxSupplySettings);
     }
 
     function run() public override {

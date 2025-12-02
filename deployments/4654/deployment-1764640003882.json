@@ -1,0 +1,78 @@
+{
+  "createdAt": 1764640003882,
+  "lastCompletedProposal": 8,
+  "deployedAddresses": [
+    {
+      "addr": "0x1ad41e6E501750031D9bBe509Ff1B8393342EFbb",
+      "name": "TOKEN",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xB150344C4026dC3983c3a71Bdc7F233e9f43225E",
+      "name": "CORE",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x468D013480Fc6B90c45aD3617df0690F3eF8d032",
+      "name": "GLOBAL_REENTRANCY_LOCK",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x43a77e55231834EC9fC6B5A263C24592ed1Ef278",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x2ea9147c456EcCB589c89A40D2fD78A81003b160",
+      "name": "ERC1155_MAX_SUPPLY_ADMIN_MINTER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xb1e7290a6D27d23Ff4Cb5aA582c648FAB2eC36D2",
+      "name": "ADMIN_TIMELOCK_CONTROLLER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x0216DB49Bc753f83A2cbF13979e3F5c2926C7771",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x2F74227581948121407613F86eB7AD1842BEe12A",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xFc4e4c3897160638e0f83bA610c7C9fDb0D9FC0F",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x328073F7d6B52bA12ca4143F8F8d73E6fD262232",
+      "name": "CONSUMABLE_SPLITTER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0xAdDc1d3C998F5546D480f6663E98A615c48e1d10",
+      "name": "ERC1155_AUTO_GRAPH_MINTER",
+      "chainId": 4654,
+      "isContract": true
+    },
+    {
+      "addr": "0x9Cf5C5f755a0E0BAC10B1BE0bD20f594DD946c29",
+      "name": "GAME_CONSUMER",
+      "chainId": 4654,
+      "isContract": true
+    }
+  ]
+}

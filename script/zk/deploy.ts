@@ -217,7 +217,7 @@ async function main() {
                 "--zksync",
                 "-vvvv",
                 "--gas-limit",
-                "30000000",
+                "3000000000",
             ];
 
             const dryRunCommand = ["forge", "script", proposalPath, ...dryRunArgs].join(

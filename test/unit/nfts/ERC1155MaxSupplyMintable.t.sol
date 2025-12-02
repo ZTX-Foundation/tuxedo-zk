@@ -454,4 +454,182 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
     function testDoesNotSupportInvalidInterface() public view {
         assertFalse(nft.supportsInterface(0xffffffff));
     }
+
+    /// Batch API Tests
+
+    function testSetSupplyCapBatchWithoutRoleFails() public {
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 1;
+        ids[1] = 2;
+        uint256[] memory caps = new uint256[](2);
+        caps[0] = 100;
+        caps[1] = 200;
+
+        vm.expectRevert("CoreRef: no role on core");
+        nft.setSupplyCapBatch(ids, caps);
+    }
+
+    function testSetSupplyCapBatchSuccess() public {
+        uint256[] memory ids = new uint256[](3);
+        ids[0] = 1;
+        ids[1] = 2;
+        ids[2] = 3;
+        uint256[] memory caps = new uint256[](3);
+        caps[0] = 100;
+        caps[1] = 200;
+        caps[2] = 300;
+
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapBatch(ids, caps);
+
+        assertEq(nft.maxTokenSupply(1), 100);
+        assertEq(nft.maxTokenSupply(2), 200);
+        assertEq(nft.maxTokenSupply(3), 300);
+    }
+
+    function testSetSupplyCapBatchLengthMismatchReverts() public {
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 1;
+        ids[1] = 2;
+        uint256[] memory caps = new uint256[](1);
+        caps[0] = 100;
+
+        vm.prank(addresses.adminAddress);
+        vm.expectRevert("ERC1155: length mismatch");
+        nft.setSupplyCapBatch(ids, caps);
+    }
+
+    function testSetSupplyCapBatchTooSmallRevertsAtomic() public {
+        // First mint some tokens to tokenId 7
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCap(7, 1000);
+
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), 7, 100);
+
+        // Now try to set cap < 100 in batch - should revert atomically
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 8; // this one would succeed
+        ids[1] = 7; // this one should fail
+        uint256[] memory caps = new uint256[](2);
+        caps[0] = 500;
+        caps[1] = 50; // less than current supply of 100
+
+        vm.prank(addresses.adminAddress);
+        vm.expectRevert("BaseERC1155NFT: maxSupply cannot be less than current supply");
+        nft.setSupplyCapBatch(ids, caps);
+
+        // Ensure neither value was set (atomic revert)
+        assertEq(nft.maxTokenSupply(8), 0);
+    }
+
+    function testSetNonTransferableBatchWithoutRoleFails() public {
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 1;
+        ids[1] = 2;
+        bool[] memory flags = new bool[](2);
+        flags[0] = true;
+        flags[1] = true;
+
+        vm.expectRevert("CoreRef: no role on core");
+        nft.setNonTransferableBatch(ids, flags);
+    }
+
+    function testSetNonTransferableBatchSuccess() public {
+        // First set supply caps to initialize tokens
+        uint256[] memory ids = new uint256[](3);
+        ids[0] = 10;
+        ids[1] = 11;
+        ids[2] = 12;
+        uint256[] memory caps = new uint256[](3);
+        caps[0] = 1000;
+        caps[1] = 1000;
+        caps[2] = 1000;
+
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapBatch(ids, caps);
+
+        // Now set non-transferable flags
+        bool[] memory flags = new bool[](3);
+        flags[0] = true;
+        flags[1] = false;
+        flags[2] = true;
+
+        vm.prank(addresses.adminAddress);
+        nft.setNonTransferableBatch(ids, flags);
+
+        assertTrue(nft.nonTransferableTokens(10));
+        assertFalse(nft.nonTransferableTokens(11));
+        assertTrue(nft.nonTransferableTokens(12));
+    }
+
+    function testSetNonTransferableBatchLengthMismatchReverts() public {
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 1;
+        ids[1] = 2;
+        bool[] memory flags = new bool[](1);
+        flags[0] = true;
+
+        vm.prank(addresses.adminAddress);
+        vm.expectRevert("ERC1155: length mismatch");
+        nft.setNonTransferableBatch(ids, flags);
+    }
+
+    function testSetSupplyCapAndNonTransferableBatchWithoutRoleFails() public {
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 1;
+        ids[1] = 2;
+        uint256[] memory caps = new uint256[](2);
+        caps[0] = 100;
+        caps[1] = 200;
+        bool[] memory flags = new bool[](2);
+        flags[0] = true;
+        flags[1] = true;
+
+        vm.expectRevert("CoreRef: no role on core");
+        nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
+    }
+
+    function testSetSupplyCapAndNonTransferableBatchSuccess() public {
+        uint256[] memory ids = new uint256[](3);
+        ids[0] = 20;
+        ids[1] = 21;
+        ids[2] = 22;
+        uint256[] memory caps = new uint256[](3);
+        caps[0] = 100;
+        caps[1] = 200;
+        caps[2] = 300;
+        bool[] memory flags = new bool[](3);
+        flags[0] = true;
+        flags[1] = false;
+        flags[2] = true;
+
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
+
+        assertEq(nft.maxTokenSupply(20), 100);
+        assertEq(nft.maxTokenSupply(21), 200);
+        assertEq(nft.maxTokenSupply(22), 300);
+        assertTrue(nft.nonTransferableTokens(20));
+        assertFalse(nft.nonTransferableTokens(21));
+        assertTrue(nft.nonTransferableTokens(22));
+    }
+
+    function testSetSupplyCapAndNonTransferableBatchLengthMismatchReverts() public {
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = 1;
+        ids[1] = 2;
+        uint256[] memory caps = new uint256[](2);
+        caps[0] = 100;
+        caps[1] = 200;
+        bool[] memory flags = new bool[](1);
+        flags[0] = true;
+
+        vm.prank(addresses.adminAddress);
+        vm.expectRevert("ERC1155: length mismatch");
+        nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
+    }
 }
