@@ -128,6 +128,54 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC519
         emit SupplyCapUpdated(tokenId, oldSupplyCap, maxSupply);
     }
 
+    // --------- Batch helpers ---------
+
+    /// @notice Set multiple supply caps in a single transaction.
+    /// @dev Atomic: reverts whole call on any invalid entry. Reuses _setSupplyCap so behavior is identical to single-call.
+    /// @param tokenIds array of token IDs
+    /// @param maxSupplies array of max supplies (same length)
+    function setSupplyCapBatch(
+        uint256[] calldata tokenIds,
+        uint256[] calldata maxSupplies
+    ) external onlyRole(Roles.ADMIN) {
+        require(tokenIds.length == maxSupplies.length, "ERC1155: length mismatch");
+        uint256 n = tokenIds.length;
+        for (uint256 i = 0; i < n; ++i) {
+            _setSupplyCap(tokenIds[i], maxSupplies[i]);
+        }
+    }
+
+    /// @notice Set non-transferable flags in batch.
+    /// @param tokenIds array of token IDs
+    /// @param flags matching array of bools; true = non-transferable
+    function setNonTransferableBatch(
+        uint256[] calldata tokenIds,
+        bool[] calldata flags
+    ) external onlyRole(Roles.ADMIN) {
+        require(tokenIds.length == flags.length, "ERC1155: length mismatch");
+        uint256 n = tokenIds.length;
+        for (uint256 i = 0; i < n; ++i) {
+            _setNonTransferable(tokenIds[i], flags[i]);
+        }
+    }
+
+    /// @notice Set supply caps and non-transferable flags in one atomic batch.
+    /// @param tokenIds array of token IDs
+    /// @param maxSupplies array of max supplies
+    /// @param flags array of non-transferable flags
+    function setSupplyCapAndNonTransferableBatch(
+        uint256[] calldata tokenIds,
+        uint256[] calldata maxSupplies,
+        bool[] calldata flags
+    ) external onlyRole(Roles.ADMIN) {
+        require(tokenIds.length == maxSupplies.length && tokenIds.length == flags.length, "ERC1155: length mismatch");
+        uint256 n = tokenIds.length;
+        for (uint256 i = 0; i < n; ++i) {
+            _setSupplyCap(tokenIds[i], maxSupplies[i]);
+            _setNonTransferable(tokenIds[i], flags[i]);
+        }
+    }
+
     /// @notice set the URI for the token
     /// @param newuri the new URI
     /// callable by admin

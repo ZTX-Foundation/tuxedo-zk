@@ -18,17 +18,6 @@ import {zip006} from "proposals/zips/zip006.sol";
 import {zip007} from "proposals/zips/zip007.sol";
 import {zip008} from "proposals/zips/zip008.sol";
 import {zip009} from "proposals/zips/zip009.sol";
-import {zip010} from "proposals/zips/zip010.sol";
-import {zip011} from "proposals/zips/zip011.sol";
-import {zip012} from "proposals/zips/zip012.sol";
-import {zip013} from "proposals/zips/zip013.sol";
-import {zip014} from "proposals/zips/zip014.sol";
-import {zip016} from "proposals/zips/zip016.sol";
-import {zip017} from "proposals/zips/zip017.sol";
-import {zip018} from "proposals/zips/zip018.sol";
-import {zip019} from "proposals/zips/zip019.sol";
-import {zip020} from "proposals/zips/zip020.sol";
-import {zip021} from "proposals/zips/zip021.sol";
 import {zipTest} from "proposals/zips/zipTest.sol";
 
 /*
@@ -58,24 +47,13 @@ contract TestProposals is Test {
             proposals.push(Proposal(address(new zip000()))); /// Genesis token proposal
             proposals.push(Proposal(address(new zip001()))); /// Wearables, Core, ADMIN_MULTISIG proposal
             proposals.push(Proposal(address(new zip002()))); /// Timelock proposal
-            proposals.push(Proposal(address(new zip003()))); /// CGv1 proposal
-            proposals.push(Proposal(address(new zip004()))); /// TokenIds, MaxSupply and Capsule settings proposal
-            proposals.push(Proposal(address(new zip005()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip006()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip007()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip008()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip009()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip010()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip011()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip012()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip013()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip014()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip016()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip017()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip018()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip019()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip020()))); /// MaxSupply settings proposal
-            proposals.push(Proposal(address(new zip021()))); /// MaxSupply settings proposal
+            proposals.push(Proposal(address(new zip003()))); /// ZTX Mobile contracts proposal
+            proposals.push(Proposal(address(new zip004()))); /// Wearables MaxSupply settings proposal (consolidated)
+            proposals.push(Proposal(address(new zip005()))); /// ZTX Mobile wearables MaxSupply and transferability proposal
+            proposals.push(Proposal(address(new zip006()))); /// Non-common tier wearables MaxSupply updates
+            proposals.push(Proposal(address(new zip007()))); /// ZTX Mobile new common items MaxSupply and transferability
+            proposals.push(Proposal(address(new zip008()))); /// ZTX Mobile new non-common items MaxSupply
+            proposals.push(Proposal(address(new zip009()))); /// ZTX Mobile Enhanceables MaxSupply and transferability
         }
 
         proposals.push(Proposal(address(new zipTest()))); /// RnD/testing only proposal

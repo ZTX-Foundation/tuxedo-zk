@@ -1,102 +1,64 @@
-[
+{
+  "wearables": [
     {
-        "maxSupply": 100000,
-        "tokenId": 7
+      "maxSupply": 20000,
+      "tokenId": 45
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 26
+      "maxSupply": 20000,
+      "tokenId": 46
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 27
+      "maxSupply": 20000,
+      "tokenId": 47
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 28
+      "maxSupply": 20000,
+      "tokenId": 48
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 29
+      "maxSupply": 20000,
+      "tokenId": 54
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 30
+      "maxSupply": 20000,
+      "tokenId": 77
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 31
+      "maxSupply": 20000,
+      "tokenId": 114
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 32
+      "maxSupply": 20000,
+      "tokenId": 139
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 33
+      "maxSupply": 7500,
+      "tokenId": 143
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 34
+      "maxSupply": 7500,
+      "tokenId": 144
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 35
+      "maxSupply": 20000,
+      "tokenId": 153
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 36
+      "maxSupply": 20000,
+      "tokenId": 154
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 37
+      "maxSupply": 20000,
+      "tokenId": 172
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 38
+      "maxSupply": 20000,
+      "tokenId": 173
     },
     {
-        "maxSupply": 100000,
-        "tokenId": 39
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 40
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 41
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 42
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 43
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 44
-    },
-    {
-        "maxSupply": 6000,
-        "tokenId": 45
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 46
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 47
-    },
-    {
-        "maxSupply": 100000,
-        "tokenId": 48
-    },
-    {
-        "maxSupply": 69,
-        "tokenId": 49
+      "maxSupply": 20000,
+      "tokenId": 174
     }
-]
+  ]
+}
