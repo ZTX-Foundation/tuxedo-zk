@@ -26,9 +26,9 @@ const NETWORKS = {
     },
     "qa": {
         name: "Creator Testnet (QA)",
-        rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
-        chainId: 4654,
-        verifierUrl: "https://creator-testnet.explorer.caldera.xyz/api",
+        rpcUrl: "https://zksync-os-testnet-creator.zksync.dev",
+        chainId: 278701,
+        verifierUrl: "https://block-explorer-api.zksync-os-testnet-creator.zksync.dev/api",
     },
     "localnet-zk": {
         name: "Local Network ZK",
