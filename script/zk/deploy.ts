@@ -168,8 +168,9 @@ async function main() {
         "--broadcast",
         "--private-key",
         privateKey,
-        "--gas-limit",
-        "3000000000",
+        "--slow",
+        //"--gas-limit",
+        //"300000000",
     ];
 
     // Add verification flags if verifierUrl is specified
@@ -216,8 +217,8 @@ async function main() {
                 networkConfig.rpcUrl,
                 "--zksync",
                 "-vvvv",
-                "--gas-limit",
-                "3000000000",
+               // "--gas-limit",
+               // "300000000",
             ];
 
             const dryRunCommand = ["forge", "script", proposalPath, ...dryRunArgs].join(

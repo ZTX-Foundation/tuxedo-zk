@@ -8,13 +8,13 @@
     {
         "name": "TREASURY_WALLET_MULTISIG",
         "chainid": 260,
-        "addr": "0x0000000000000000000000000000000000000101",
+        "addr": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
         "isContract": false
     },
     {
         "name": "ADMIN_MULTISIG",
         "chainid": 260,
-        "addr": "0x2145cc1cc05690eBa6eAD2782B3fD547CE66C29C",
+        "addr": "0x5Ec41e3a9c712D0BBC26d2CbA0E653c5d2cc982C",
         "isContract": false
     },
     {
@@ -32,19 +32,19 @@
     {
         "name": "GAME_CONSUMER_PAYMENT_RECIPIENT",
         "chainid": 260,
-        "addr": "0x0000000000000000000000000000000000000001",
+        "addr": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
         "isContract": false
     },
     {
         "name": "REVENUE_WALLET_MULTISIG01",
         "chainid": 260,
-        "addr": "0x0000000000000000000000000000000000000002",
+        "addr": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
         "isContract": false
     },
     {
         "name": "REVENUE_WALLET_MULTISIG02",
         "chainid": 260,
-        "addr": "0x0000000000000000000000000000000000000003",
+        "addr": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
         "isContract": false
     },
     {
@@ -56,7 +56,7 @@
     {
         "name": "DEPLOYER_EOA",
         "chainid": 260,
-        "addr": "0x73bbde7e45e26546f2ef0202865917e4d6ce2a01",
+        "addr": "0x327528709c2C2eA98D522E83A996247CfbdE788c",
         "isContract": false
     }
 ]
