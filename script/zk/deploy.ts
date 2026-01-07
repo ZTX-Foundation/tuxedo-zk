@@ -163,19 +163,16 @@ async function main() {
     const baseArgs = [
         "--rpc-url",
         networkConfig.rpcUrl,
-        "--zksync",
         "-vvvv",
         "--broadcast",
         "--private-key",
         privateKey,
         "--slow",
-        //"--gas-limit",
-        //"300000000",
     ];
 
     // Add verification flags if verifierUrl is specified
     if (networkConfig.verifierUrl) {
-        baseArgs.push("--verify", "--verifier", "zksync", "--verifier-url", networkConfig.verifierUrl);
+        baseArgs.push("--verify", "--verifier", "custom", "--verifier-url", networkConfig.verifierUrl);
     }
 
     // Summary
@@ -215,10 +212,7 @@ async function main() {
             const dryRunArgs = [
                 "--rpc-url",
                 networkConfig.rpcUrl,
-                "--zksync",
                 "-vvvv",
-               // "--gas-limit",
-               // "300000000",
             ];
 
             const dryRunCommand = ["forge", "script", proposalPath, ...dryRunArgs].join(
