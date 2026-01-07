@@ -18,4 +18,16 @@ contract MockCoreRef is CoreRef {
     function testGuardian() public onlyRole(Roles.GUARDIAN) {}
 
     function testLocker() public onlyRole(Roles.LOCKER_PROTOCOL_ROLE) {}
+
+    // Test hasRole modifier (separate from onlyRole)
+    function testHasRoleMinter() public hasRole(Roles.MINTER_PROTOCOL_ROLE) {}
+
+    // Test hasAnyOfTwoRoles modifier
+    function testHasAnyOfTwoRoles() public hasAnyOfTwoRoles(Roles.ADMIN, Roles.GUARDIAN) {}
+
+    // Test hasAnyOfFourRoles modifier
+    function testHasAnyOfFourRoles()
+        public
+        hasAnyOfFourRoles(Roles.ADMIN, Roles.GUARDIAN, Roles.GOVERNOR_DAO_PROTOCOL_ROLE, Roles.MINTER_PROTOCOL_ROLE)
+    {}
 }

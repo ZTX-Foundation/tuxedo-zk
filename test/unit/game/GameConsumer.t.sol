@@ -343,4 +343,23 @@ contract GameConsumerUnitTest is BaseTest {
 
         assertEq(address(gameConsumer.proceedsRecipient()), address(1));
     }
+
+    /// recoverSigner() direct test for coverage
+    function testRecoverSignerReturnsCorrectAddress() public {
+        // Create a test signer
+        uint256 privateKey = 0x1234;
+        address expectedSigner = vm.addr(privateKey);
+
+        // Create a hash and sign it
+        bytes32 hash = keccak256("test message");
+        bytes32 ethSignedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, ethSignedHash);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        // Recover the signer
+        address recovered = gameConsumer.recoverSigner(ethSignedHash, signature);
+
+        assertEq(recovered, expectedSigner);
+    }
 }

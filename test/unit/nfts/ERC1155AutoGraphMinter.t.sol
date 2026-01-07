@@ -1008,4 +1008,59 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
         _autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(address(nft), address(this), params);
     }
+
+    /// getHash() direct test for coverage
+    function testGetHashReturnsConsistentHash() public view {
+        ERC1155AutoGraphMinter.HashInputsParams memory params = ERC1155AutoGraphMinter.HashInputsParams({
+            recipient: address(this),
+            jobId: 123,
+            tokenId: 1,
+            units: 10,
+            salt: 456,
+            nftContract: address(nft),
+            paymentToken: address(0),
+            paymentAmount: 0,
+            expiryToken: block.timestamp
+        });
+
+        bytes32 hash1 = _autoGraphMinter.getHash(params);
+        bytes32 hash2 = _autoGraphMinter.getHash(params);
+
+        // Same inputs should produce same hash
+        assertEq(hash1, hash2);
+        // Hash should not be zero
+        assertTrue(hash1 != bytes32(0));
+    }
+
+    function testGetHashDifferentInputsProduceDifferentHashes() public view {
+        ERC1155AutoGraphMinter.HashInputsParams memory params1 = ERC1155AutoGraphMinter.HashInputsParams({
+            recipient: address(this),
+            jobId: 123,
+            tokenId: 1,
+            units: 10,
+            salt: 456,
+            nftContract: address(nft),
+            paymentToken: address(0),
+            paymentAmount: 0,
+            expiryToken: block.timestamp
+        });
+
+        ERC1155AutoGraphMinter.HashInputsParams memory params2 = ERC1155AutoGraphMinter.HashInputsParams({
+            recipient: address(this),
+            jobId: 124, // Different jobId
+            tokenId: 1,
+            units: 10,
+            salt: 456,
+            nftContract: address(nft),
+            paymentToken: address(0),
+            paymentAmount: 0,
+            expiryToken: block.timestamp
+        });
+
+        bytes32 hash1 = _autoGraphMinter.getHash(params1);
+        bytes32 hash2 = _autoGraphMinter.getHash(params2);
+
+        // Different inputs should produce different hashes
+        assertTrue(hash1 != hash2);
+    }
 }

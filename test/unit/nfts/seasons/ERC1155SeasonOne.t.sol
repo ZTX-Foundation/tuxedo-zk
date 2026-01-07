@@ -416,4 +416,9 @@ contract UnitTestERC1155SeasonOne is SeasonBase {
         vm.expectRevert("CoreRef: no role on core");
         _seasonOne.clawbackAll(recepitent);
     }
+
+    /// balanceReportedIn() direct test for coverage
+    function testBalanceReportedInReturnsRewardToken() public view {
+        assertEq(_seasonOne.balanceReportedIn(), address(token));
+    }
 }
