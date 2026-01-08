@@ -18,12 +18,6 @@ process.on("SIGINT", () => {
 
 // Network configuration with chain IDs
 const NETWORKS = {
-    "creator-testnet": {
-        name: "Creator Testnet",
-        rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
-        chainId: 4654,
-        verifierUrl: "https://creator-testnet.explorer.caldera.xyz/api",
-    },
     "qa": {
         name: "Creator Testnet (QA)",
         rpcUrl: "https://zksync-os-testnet-creator.zksync.dev",
@@ -50,12 +44,7 @@ const availableProposals = fs
 // Proposals with build() functions that require governance submission
 const PROPOSALS_WITH_BUILD = [
     "zip003",
-    "zip004",
-    "zip005",
-    "zip006",
-    "zip007",
-    "zip008",
-    "zip009",
+    "zip004", // Consolidated wearables and enhanceables config
     "zip010",
     "zip011",
     "zip012",

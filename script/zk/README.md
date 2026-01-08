@@ -28,8 +28,7 @@ npm run deploy
 
 ### 1. Select Network
 
-- Creator Testnet (Chain ID: 4654)
-- Creator Testnet QA (Chain ID: 278701)
+- Creator Testnet (QA) (Chain ID: 278701)
 - Local Network ZK (Chain ID: 260)
 
 ### 2. Choose Run Type
@@ -76,11 +75,6 @@ Edit `script/zk/deploy.ts`:
 
 ```typescript
 const NETWORKS = {
-  'creator-testnet': {
-    name: 'Creator Testnet',
-    rpcUrl: 'https://creator-testnet.rpc.caldera.xyz/http',
-    chainId: 4654,
-  },
   'qa': {
     name: 'Creator Testnet (QA)',
     rpcUrl: 'https://zksync-os-testnet-creator.zksync.dev',
@@ -103,20 +97,14 @@ Add new networks:
 Start new deployment:
 ```bash
 npm run deploy
-# Creator Testnet -> New run
+# Creator Testnet (QA) -> New run
 # Submit governance actions when prompted
 ```
 
 Resume paused deployment:
 ```bash
 npm run deploy
-# Creator Testnet -> Resume run -> Select run
-```
-
-Deploy to QA testnet:
-```bash
-npm run deploy
-# Creator Testnet (QA) -> New run
+# Creator Testnet (QA) -> Resume run -> Select run
 ```
 
 Deploy to local zkSync node:

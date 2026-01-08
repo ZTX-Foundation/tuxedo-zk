@@ -13,11 +13,6 @@ import {zip001} from "proposals/zips/zip001.sol";
 import {zip002} from "proposals/zips/zip002.sol";
 import {zip003} from "proposals/zips/zip003.sol";
 import {zip004} from "proposals/zips/zip004.sol";
-import {zip005} from "proposals/zips/zip005.sol";
-import {zip006} from "proposals/zips/zip006.sol";
-import {zip007} from "proposals/zips/zip007.sol";
-import {zip008} from "proposals/zips/zip008.sol";
-import {zip009} from "proposals/zips/zip009.sol";
 import {zipTest} from "proposals/zips/zipTest.sol";
 
 /*
@@ -48,12 +43,7 @@ contract TestProposals is Test {
             proposals.push(Proposal(address(new zip001()))); /// Wearables, Core, ADMIN_MULTISIG proposal
             proposals.push(Proposal(address(new zip002()))); /// Timelock proposal
             proposals.push(Proposal(address(new zip003()))); /// ZTX Mobile contracts proposal
-            proposals.push(Proposal(address(new zip004()))); /// Wearables MaxSupply settings proposal (consolidated)
-            proposals.push(Proposal(address(new zip005()))); /// ZTX Mobile wearables MaxSupply and transferability proposal
-            proposals.push(Proposal(address(new zip006()))); /// Non-common tier wearables MaxSupply updates
-            proposals.push(Proposal(address(new zip007()))); /// ZTX Mobile new common items MaxSupply and transferability
-            proposals.push(Proposal(address(new zip008()))); /// ZTX Mobile new non-common items MaxSupply
-            proposals.push(Proposal(address(new zip009()))); /// ZTX Mobile Enhanceables MaxSupply and transferability
+            proposals.push(Proposal(address(new zip004()))); /// Consolidated wearables and enhanceables config
         }
 
         proposals.push(Proposal(address(new zipTest()))); /// RnD/testing only proposal
