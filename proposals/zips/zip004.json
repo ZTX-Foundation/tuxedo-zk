@@ -1,31 +1,1166 @@
 {
-  "transferableWearables": [
+  "nonTransferableEnhanceables": [
     {
-      "maxSupply": 500,
-      "tokenId": 8
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 6
     },
     {
-      "maxSupply": 500,
-      "tokenId": 9
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 10
     },
     {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 13
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 15
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 20
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 23
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 36
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 56
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 57
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 67
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 81
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 91
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 92
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 94
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 99
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 110
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 119
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 126
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 143
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 165
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 167
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 179
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 183
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 187
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 194
+    }
+  ],
+  "nonTransferableWearables": [
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 3
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 4
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 5
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 7
+    },
+    {
+      "isNonTransferable": true,
       "maxSupply": 500,
       "tokenId": 10
     },
     {
-      "maxSupply": 6000,
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 11
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 13
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 14
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 15
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 16
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 17
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 18
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 4000,
+      "tokenId": 19
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 27
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 29
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 30
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 32
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 33
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 37
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 51
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 52
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 57
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 58
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 69
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 71
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 72
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 74
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 76
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 80
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 85
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 86
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 42,
+      "tokenId": 93
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 102
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1,
+      "tokenId": 112
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1,
+      "tokenId": 113
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 120
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 123
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 129
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 132
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 133
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 137
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 160
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 166
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 169
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 171
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 177
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 179
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 180
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 181
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 186
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1010
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 202
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 207
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 212
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 213
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1039
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1081
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1302
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1305
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1306
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1315
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1322
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1323
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1352
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1353
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1396
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1408
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1424
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1433
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1435
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1445
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1448
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1461
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1462
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1464
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1466
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1471
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1474
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1478
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1479
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1481
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1483
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1484
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1485
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1487
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1488
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1491
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1492
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1493
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1496
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1498
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1499
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1500
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1502
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1505
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1508
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1509
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1510
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1511
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1513
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1516
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1517
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1521
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1522
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1525
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1526
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1527
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1528
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1531
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1532
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1534
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1536
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1540
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1541
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1542
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1543
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1545
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1547
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1548
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1550
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1551
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1552
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1555
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1556
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1557
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1558
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1559
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1560
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1562
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1563
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1564
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1565
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1566
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1567
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1568
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1569
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1570
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1571
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1575
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1576
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1578
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1582
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1590
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1591
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1595
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1622
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1624
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1627
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1628
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1629
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1631
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1632
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1641
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1642
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1644
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1647
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1650
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1654
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1657
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1659
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1661
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1662
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1663
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1664
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1665
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1666
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1667
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1668
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1669
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1670
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1778
+    }
+  ],
+  "transferableEnhanceables": [
+    {
+      "maxSupply": 7500,
+      "tokenId": 2
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 4
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 18
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 22
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 32
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 42
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 50
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 52
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 58
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 64
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 70
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 73
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 78
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 80
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 82
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 84
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 90
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 106
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 125
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 127
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 129
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 131
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 132
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 134
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 135
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 138
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 139
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 141
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 142
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 174
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 178
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 181
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 182
+    },
+    {
+      "maxSupply": 7500,
+      "tokenId": 189
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 193
+    }
+  ],
+  "transferableWearables": [
+    {
+      "maxSupply": 120,
+      "tokenId": 20
+    },
+    {
+      "maxSupply": 120,
+      "tokenId": 21
+    },
+    {
+      "maxSupply": 120,
+      "tokenId": 22
+    },
+    {
+      "maxSupply": 120,
+      "tokenId": 23
+    },
+    {
+      "maxSupply": 14,
+      "tokenId": 24
+    },
+    {
+      "maxSupply": 14,
+      "tokenId": 25
+    },
+    {
+      "maxSupply": 20000,
       "tokenId": 45
     },
     {
-      "maxSupply": 100000,
-      "tokenId": 46
-    },
-    {
-      "maxSupply": 100000,
-      "tokenId": 47
-    },
-    {
-      "maxSupply": 100000,
+      "maxSupply": 20000,
       "tokenId": 48
     },
     {
@@ -37,28 +1172,12 @@
       "tokenId": 50
     },
     {
-      "maxSupply": 6000,
-      "tokenId": 54
-    },
-    {
       "maxSupply": 420,
       "tokenId": 75
     },
     {
-      "maxSupply": 100000,
-      "tokenId": 77
-    },
-    {
       "maxSupply": 120,
       "tokenId": 89
-    },
-    {
-      "maxSupply": 420,
-      "tokenId": 92
-    },
-    {
-      "maxSupply": 42,
-      "tokenId": 93
     },
     {
       "maxSupply": 69,
@@ -77,120 +1196,16 @@
       "tokenId": 111
     },
     {
-      "maxSupply": 1,
-      "tokenId": 112
-    },
-    {
-      "maxSupply": 1,
-      "tokenId": 113
-    },
-    {
-      "maxSupply": 4000,
+      "maxSupply": 20000,
       "tokenId": 114
     },
     {
-      "maxSupply": 250000,
+      "maxSupply": 20000,
       "tokenId": 139
     },
     {
       "maxSupply": 200,
       "tokenId": 140
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 143
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 144
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 153
-    },
-    {
-      "maxSupply": 6000,
-      "tokenId": 154
-    },
-    {
-      "maxSupply": 4000,
-      "tokenId": 172
-    },
-    {
-      "maxSupply": 4000,
-      "tokenId": 173
-    },
-    {
-      "maxSupply": 4000,
-      "tokenId": 174
-    },
-    {
-      "maxSupply": 100,
-      "tokenId": 175
-    },
-    {
-      "maxSupply": 100,
-      "tokenId": 176
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 45
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 46
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 47
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 48
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 54
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 77
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 114
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 139
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 143
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 144
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 153
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 154
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 172
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 173
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 174
     },
     {
       "maxSupply": 7500,
@@ -206,23 +1221,27 @@
     },
     {
       "maxSupply": 20000,
+      "tokenId": 1006
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 153
+    },
+    {
+      "maxSupply": 20000,
       "tokenId": 154
     },
     {
       "maxSupply": 20000,
-      "tokenId": 204
+      "tokenId": 174
     },
     {
-      "maxSupply": 20000,
-      "tokenId": 214
+      "maxSupply": 100,
+      "tokenId": 175
     },
     {
-      "maxSupply": 20000,
-      "tokenId": 215
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 1006
+      "maxSupply": 100,
+      "tokenId": 176
     },
     {
       "maxSupply": 20000,
@@ -243,6 +1262,18 @@
     {
       "maxSupply": 7500,
       "tokenId": 1017
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 204
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 214
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 215
     },
     {
       "maxSupply": 20000,
@@ -802,6 +1833,10 @@
     },
     {
       "maxSupply": 20000,
+      "tokenId": 1671
+    },
+    {
+      "maxSupply": 20000,
       "tokenId": 1683
     },
     {
@@ -823,1577 +1858,6 @@
     {
       "maxSupply": 1000,
       "tokenId": 1776
-    }
-  ],
-  "nonTransferableWearables": [
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 2
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 3
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 4
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 5
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 6
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 7
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 11
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 12
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 26
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 27
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 28
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 29
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 30
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 31
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 32
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 33
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 34
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 35
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 36
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 37
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 38
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 39
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 40
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 41
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 42
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 43
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 44
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 51
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 52
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 53
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 55
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 56
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 57
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 58
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 59
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 60
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 61
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 62
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 63
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 64
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 65
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 66
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 67
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 68
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 69
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 70
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 71
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 72
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 73
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 74
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 76
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 78
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 79
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 80
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 81
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 82
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 83
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 84
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 85
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 86
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 87
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 88
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 90
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 91
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 95
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 96
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 97
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 98
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 99
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 100
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 101
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 102
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 103
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 104
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 105
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 106
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 107
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 108
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 115
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 116
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 117
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 118
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 119
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 120
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 121
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 122
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 123
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 124
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 125
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 126
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 127
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 128
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 129
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 130
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 131
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 132
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 133
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 134
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 135
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 136
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 137
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 138
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 155
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 156
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 157
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 158
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 159
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 160
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 161
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 162
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 163
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 164
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 165
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 166
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 167
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 168
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 169
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 170
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 171
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 177
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 178
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 179
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 180
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 181
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 182
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 183
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 184
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 185
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 186
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 187
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 188
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 189
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 190
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 191
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 202
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 224
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 225
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 226
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 227
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 228
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 229
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 230
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 231
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 232
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 233
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1010
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 207
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 212
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 213
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1039
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1081
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1302
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1305
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1306
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1315
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1322
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1323
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1352
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1353
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1396
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1408
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1424
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1433
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1435
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1445
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1448
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1461
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1462
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1464
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1466
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1471
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1474
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1478
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1479
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1481
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1483
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1484
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1485
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1487
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1488
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1491
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1492
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1493
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1496
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1498
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1499
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1500
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1502
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1505
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1508
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1509
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1510
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1511
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1513
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1516
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1517
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1521
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1522
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1525
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1526
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1527
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1528
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1531
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1532
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1534
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1536
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1540
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1541
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1542
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1543
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1545
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1547
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1548
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1550
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1551
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1552
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1555
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1556
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1557
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1558
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1559
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1560
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1562
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1563
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1564
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1565
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1566
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1567
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1568
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1569
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1570
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1571
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1575
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1576
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1578
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1582
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1590
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1591
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1595
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1622
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1624
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1627
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1628
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1629
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1631
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1632
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1641
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1642
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1644
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1647
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1650
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1654
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1657
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1659
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1661
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1664
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1665
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1668
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1778
-    }
-  ],
-  "transferableEnhanceables": [
-    {
-      "maxSupply": 7500,
-      "tokenId": 2
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 4
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 18
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 22
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 32
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 42
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 50
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 52
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 58
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 64
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 70
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 73
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 78
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 80
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 82
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 84
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 90
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 106
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 125
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 127
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 129
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 131
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 132
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 134
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 135
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 138
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 139
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 141
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 142
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 174
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 178
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 181
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 182
-    },
-    {
-      "maxSupply": 7500,
-      "tokenId": 189
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 193
-    }
-  ],
-  "nonTransferableEnhanceables": [
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 6,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 10,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 13,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 15,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 20,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 23,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 36,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 56,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 57,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 67,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 81,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 91,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 92,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 94,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 99,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 110,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 119,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 126,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 143,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 165,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 167,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 179,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 183,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 187,
-      "isNonTransferable": true
-    },
-    {
-      "maxSupply": 1000000000,
-      "tokenId": 194,
-      "isNonTransferable": true
     }
   ]
 }
