@@ -44,18 +44,7 @@ const availableProposals = fs
 // Proposals with build() functions that require governance submission
 const PROPOSALS_WITH_BUILD = [
     "zip003",
-    "zip004", // Consolidated wearables and enhanceables config
-    "zip010",
-    "zip011",
-    "zip012",
-    "zip013",
-    "zip014",
-    "zip016",
-    "zip017",
-    "zip018",
-    "zip019",
-    "zip020",
-    "zip021",
+    "zip004",
 ];
 
 async function main() {
