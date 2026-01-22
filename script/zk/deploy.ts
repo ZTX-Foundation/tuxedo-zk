@@ -18,17 +18,11 @@ process.on("SIGINT", () => {
 
 // Network configuration with chain IDs
 const NETWORKS = {
-    "creator-testnet": {
-        name: "Creator Testnet",
-        rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
-        chainId: 4654,
-        verifierUrl: "https://creator-testnet.explorer.caldera.xyz/api",
-    },
     "qa": {
         name: "Creator Testnet (QA)",
-        rpcUrl: "https://creator-testnet.rpc.caldera.xyz/http",
-        chainId: 4654,
-        verifierUrl: "https://creator-testnet.explorer.caldera.xyz/api",
+        rpcUrl: "https://zksync-os-testnet-creator.zksync.dev",
+        chainId: 278701,
+        verifierUrl: "https://block-explorer-api.zksync-os-testnet-creator.zksync.dev/api",
     },
     "localnet-zk": {
         name: "Local Network ZK",
@@ -51,22 +45,6 @@ const availableProposals = fs
 const PROPOSALS_WITH_BUILD = [
     "zip003",
     "zip004",
-    "zip005",
-    "zip006",
-    "zip007",
-    "zip008",
-    "zip009",
-    "zip010",
-    "zip011",
-    "zip012",
-    "zip013",
-    "zip014",
-    "zip016",
-    "zip017",
-    "zip018",
-    "zip019",
-    "zip020",
-    "zip021",
 ];
 
 async function main() {
@@ -163,18 +141,16 @@ async function main() {
     const baseArgs = [
         "--rpc-url",
         networkConfig.rpcUrl,
-        "--zksync",
         "-vvvv",
         "--broadcast",
         "--private-key",
         privateKey,
-        "--gas-limit",
-        "3000000000",
+        "--slow",
     ];
 
     // Add verification flags if verifierUrl is specified
     if (networkConfig.verifierUrl) {
-        baseArgs.push("--verify", "--verifier", "zksync", "--verifier-url", networkConfig.verifierUrl);
+        baseArgs.push("--verify", "--verifier", "custom", "--verifier-url", networkConfig.verifierUrl);
     }
 
     // Summary
@@ -214,10 +190,7 @@ async function main() {
             const dryRunArgs = [
                 "--rpc-url",
                 networkConfig.rpcUrl,
-                "--zksync",
                 "-vvvv",
-                "--gas-limit",
-                "3000000000",
             ];
 
             const dryRunCommand = ["forge", "script", proposalPath, ...dryRunArgs].join(

@@ -12,16 +12,33 @@ contract zip004 is TimelockProposal {
         uint256 tokenId;
     }
 
-    struct Collections {
-        TokenIDMaxSupplySettings[] wearables;
+    struct TokenIDMaxSupplyAndTransferSettings {
+        bool isNonTransferable;
+        uint256 maxSupply;
+        uint256 tokenId;
     }
 
-    TokenIDMaxSupplySettings[] private wearableTokenIDMaxSupplySettings;
+    struct Collections {
+        // NOTE: Fields must be in alphabetical order for vm.parseJson to work correctly
+        TokenIDMaxSupplyAndTransferSettings[] nonTransferableEnhanceables;
+        TokenIDMaxSupplyAndTransferSettings[] nonTransferableWearables;
+        TokenIDMaxSupplySettings[] transferableEnhanceables;
+        TokenIDMaxSupplySettings[] transferableWearables;
+    }
+
+    // Storage arrays for wearables
+    TokenIDMaxSupplySettings[] private transferableWearableSettings;
+    TokenIDMaxSupplyAndTransferSettings[] private nonTransferableWearableSettings;
+
+    // Storage arrays for enhanceables
+    TokenIDMaxSupplySettings[] private transferableEnhanceableSettings;
+    TokenIDMaxSupplyAndTransferSettings[] private nonTransferableEnhanceableSettings;
 
     /// @notice ERC1155 collections
     ERC1155MaxSupplyMintable wearable;
+    ERC1155MaxSupplyMintable enhanceable;
 
-    /// @notice batch size for chunked calls - start with 60 for testing
+    /// @notice batch size for chunked calls
     uint256 private constant PROPOSAL_MAX_BATCH = 60;
 
     // Returns the name of the proposal.
@@ -31,11 +48,11 @@ contract zip004 is TimelockProposal {
 
     // Provides a brief description of the proposal.
     function description() public pure override returns (string memory) {
-        return "ZTX Mobile Wearables maxSupply config proposal - consolidates all historical wearable supplies";
+        return "Consolidated ZTX Mobile config - wearables and enhanceables maxSupply and transferability";
     }
 
     function _setAndConfirmData() private {
-        // Wearable data
+        // Load JSON data
         string memory data = string(
             abi.encodePacked(vm.readFile("./proposals/zips/zip004.json"))
         );
@@ -47,29 +64,85 @@ contract zip004 is TimelockProposal {
             (Collections)
         );
 
-        for (uint256 i = 0; i < decodedData.wearables.length; i++) {
-            wearableTokenIDMaxSupplySettings.push(
+        // Load transferable wearables
+        for (uint256 i = 0; i < decodedData.transferableWearables.length; i++) {
+            transferableWearableSettings.push(
                 TokenIDMaxSupplySettings(
-                    decodedData.wearables[i].maxSupply,
-                    decodedData.wearables[i].tokenId
+                    decodedData.transferableWearables[i].maxSupply,
+                    decodedData.transferableWearables[i].tokenId
                 )
             );
         }
 
-        /// @notice sanity checks for wearables
-        assertEq(wearableTokenIDMaxSupplySettings.length, 179, "Invalid wearableTokenIDMaxSupplySettings length");
-
-        uint wearableMaxSupplyTotal = 0;
-
-        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
-            wearableMaxSupplyTotal += wearableTokenIDMaxSupplySettings[i].maxSupply;
+        // Load non-transferable wearables
+        for (uint256 i = 0; i < decodedData.nonTransferableWearables.length; i++) {
+            nonTransferableWearableSettings.push(
+                TokenIDMaxSupplyAndTransferSettings(
+                    decodedData.nonTransferableWearables[i].isNonTransferable,
+                    decodedData.nonTransferableWearables[i].maxSupply,
+                    decodedData.nonTransferableWearables[i].tokenId
+                )
+            );
         }
 
-        assertEq(wearableMaxSupplyTotal, 20392883, "Invalid maxSupplyTotal for wearables");
+        // Load transferable enhanceables
+        for (uint256 i = 0; i < decodedData.transferableEnhanceables.length; i++) {
+            transferableEnhanceableSettings.push(
+                TokenIDMaxSupplySettings(
+                    decodedData.transferableEnhanceables[i].maxSupply,
+                    decodedData.transferableEnhanceables[i].tokenId
+                )
+            );
+        }
+
+        // Load non-transferable enhanceables
+        for (uint256 i = 0; i < decodedData.nonTransferableEnhanceables.length; i++) {
+            nonTransferableEnhanceableSettings.push(
+                TokenIDMaxSupplyAndTransferSettings(
+                    decodedData.nonTransferableEnhanceables[i].isNonTransferable,
+                    decodedData.nonTransferableEnhanceables[i].maxSupply,
+                    decodedData.nonTransferableEnhanceables[i].tokenId
+                )
+            );
+        }
+
+        /// @notice sanity checks
+        assertEq(transferableWearableSettings.length, 182, "Invalid transferableWearableSettings length");
+        assertEq(nonTransferableWearableSettings.length, 172, "Invalid nonTransferableWearableSettings length");
+        assertEq(transferableEnhanceableSettings.length, 35, "Invalid transferableEnhanceableSettings length");
+        assertEq(nonTransferableEnhanceableSettings.length, 25, "Invalid nonTransferableEnhanceableSettings length");
+
+        // Verify max supply totals
+        uint256 twTotal = 0;
+        for (uint256 i = 0; i < transferableWearableSettings.length; i++) {
+            twTotal += transferableWearableSettings[i].maxSupply;
+        }
+        assertEq(twTotal, 2405927, "Invalid maxSupplyTotal for transferable wearables");
+
+        uint256 ntwTotal = 0;
+        for (uint256 i = 0; i < nonTransferableWearableSettings.length; i++) {
+            ntwTotal += nonTransferableWearableSettings[i].maxSupply;
+        }
+        assertEq(ntwTotal, 161000028544, "Invalid maxSupplyTotal for non-transferable wearables");
+
+        uint256 teTotal = 0;
+        for (uint256 i = 0; i < transferableEnhanceableSettings.length; i++) {
+            teTotal += transferableEnhanceableSettings[i].maxSupply;
+        }
+        assertEq(teTotal, 550000, "Invalid maxSupplyTotal for transferable enhanceables");
+
+        uint256 nteTotal = 0;
+        for (uint256 i = 0; i < nonTransferableEnhanceableSettings.length; i++) {
+            nteTotal += nonTransferableEnhanceableSettings[i].maxSupply;
+        }
+        assertEq(nteTotal, 25000000000, "Invalid maxSupplyTotal for non-transferable enhanceables");
     }
 
     /// @notice helper to call setSupplyCapBatch with chunking
-    function _callSetSupplyCapBatch(ERC1155MaxSupplyMintable tokenContract, TokenIDMaxSupplySettings[] storage settings) internal {
+    function _callSetSupplyCapBatch(
+        ERC1155MaxSupplyMintable tokenContract,
+        TokenIDMaxSupplySettings[] storage settings
+    ) internal {
         uint256 total = settings.length;
         for (uint256 start = 0; start < total; start += PROPOSAL_MAX_BATCH) {
             uint256 len = total - start;
@@ -84,13 +157,43 @@ contract zip004 is TimelockProposal {
         }
     }
 
+    /// @notice helper to call setSupplyCapAndNonTransferableBatch with chunking
+    function _callSetSupplyCapAndNonTransferableBatch(
+        ERC1155MaxSupplyMintable tokenContract,
+        TokenIDMaxSupplyAndTransferSettings[] storage settings
+    ) internal {
+        uint256 total = settings.length;
+        for (uint256 start = 0; start < total; start += PROPOSAL_MAX_BATCH) {
+            uint256 len = total - start;
+            if (len > PROPOSAL_MAX_BATCH) len = PROPOSAL_MAX_BATCH;
+            uint256[] memory ids = new uint256[](len);
+            uint256[] memory caps = new uint256[](len);
+            bool[] memory flags = new bool[](len);
+            for (uint256 i = 0; i < len; ++i) {
+                ids[i] = settings[start + i].tokenId;
+                caps[i] = settings[start + i].maxSupply;
+                flags[i] = settings[start + i].isNonTransferable;
+            }
+            tokenContract.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
+        }
+    }
+
     function build()
         public
         override
         buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER"))
     {
-        /// @notice wearable config using batch API
-        _callSetSupplyCapBatch(wearable, wearableTokenIDMaxSupplySettings);
+        /// @notice Wearables configuration
+        // Transferable wearables - only set maxSupply (default is transferable)
+        _callSetSupplyCapBatch(wearable, transferableWearableSettings);
+        // Non-transferable wearables - set maxSupply and isNonTransferable
+        _callSetSupplyCapAndNonTransferableBatch(wearable, nonTransferableWearableSettings);
+
+        /// @notice Enhanceables configuration
+        // Transferable enhanceables - only set maxSupply (default is transferable)
+        _callSetSupplyCapBatch(enhanceable, transferableEnhanceableSettings);
+        // Non-transferable enhanceables - set maxSupply and isNonTransferable
+        _callSetSupplyCapAndNonTransferableBatch(enhanceable, nonTransferableEnhanceableSettings);
     }
 
     function run() public override {
@@ -98,6 +201,10 @@ contract zip004 is TimelockProposal {
 
         wearable = ERC1155MaxSupplyMintable(
             addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")
+        );
+
+        enhanceable = ERC1155MaxSupplyMintable(
+            addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES")
         );
 
         _setAndConfirmData();
@@ -113,14 +220,49 @@ contract zip004 is TimelockProposal {
     }
 
     function validate() public override {
-        /// @notice verify wearables
-        for (uint256 i = 0; i < wearableTokenIDMaxSupplySettings.length; i++) {
-            uint256 tokenId = wearableTokenIDMaxSupplySettings[i].tokenId;
-            uint256 maxSupply = wearableTokenIDMaxSupplySettings[i].maxSupply;
+        /// @notice verify transferable wearables
+        for (uint256 i = 0; i < transferableWearableSettings.length; i++) {
+            uint256 tokenId = transferableWearableSettings[i].tokenId;
+            uint256 maxSupply = transferableWearableSettings[i].maxSupply;
             uint256 currentSupply = wearable.totalSupply(tokenId);
 
-            assertEq(wearable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for tokenId");
-            assertEq(wearable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for tokenId");
+            assertEq(wearable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for wearable tokenId");
+            assertEq(wearable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for wearable tokenId");
+        }
+
+        /// @notice verify non-transferable wearables
+        for (uint256 i = 0; i < nonTransferableWearableSettings.length; i++) {
+            uint256 tokenId = nonTransferableWearableSettings[i].tokenId;
+            uint256 maxSupply = nonTransferableWearableSettings[i].maxSupply;
+            bool isNonTransferable = nonTransferableWearableSettings[i].isNonTransferable;
+            uint256 currentSupply = wearable.totalSupply(tokenId);
+
+            assertEq(wearable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for wearable tokenId");
+            assertEq(wearable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for wearable tokenId");
+            assertEq(wearable.nonTransferableTokens(tokenId), isNonTransferable, "Invalid nonTransferableTokens for wearable tokenId");
+        }
+
+        /// @notice verify transferable enhanceables
+        for (uint256 i = 0; i < transferableEnhanceableSettings.length; i++) {
+            uint256 tokenId = transferableEnhanceableSettings[i].tokenId;
+            uint256 maxSupply = transferableEnhanceableSettings[i].maxSupply;
+            uint256 currentSupply = enhanceable.totalSupply(tokenId);
+
+            assertEq(enhanceable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for enhanceable tokenId");
+            assertEq(enhanceable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for enhanceable tokenId");
+            assertEq(enhanceable.nonTransferableTokens(tokenId), false, "Enhanceable token should be transferable");
+        }
+
+        /// @notice verify non-transferable enhanceables
+        for (uint256 i = 0; i < nonTransferableEnhanceableSettings.length; i++) {
+            uint256 tokenId = nonTransferableEnhanceableSettings[i].tokenId;
+            uint256 maxSupply = nonTransferableEnhanceableSettings[i].maxSupply;
+            bool isNonTransferable = nonTransferableEnhanceableSettings[i].isNonTransferable;
+            uint256 currentSupply = enhanceable.totalSupply(tokenId);
+
+            assertEq(enhanceable.maxTokenSupply(tokenId), maxSupply, "Invalid maxTokenSupply for enhanceable tokenId");
+            assertEq(enhanceable.getMintAmountLeft(tokenId), maxSupply - currentSupply, "Invalid getMintAmountLeft for enhanceable tokenId");
+            assertEq(enhanceable.nonTransferableTokens(tokenId), isNonTransferable, "Invalid nonTransferableTokens for enhanceable tokenId");
         }
     }
 }

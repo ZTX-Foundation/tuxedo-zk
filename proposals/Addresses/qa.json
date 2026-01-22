@@ -1,62 +1,62 @@
 [
     {
         "name": "WETH",
-        "chainId": 4654,
-        "addr": "0x34AF38Ec07708dBC01C5A814fc418D3840448fce",
+        "chainId": 278701,
+        "addr": "0x58f36c3942C5464002A867dd03Aefd33621009eb",
         "isContract": true
     },
     {
         "name": "TREASURY_WALLET_MULTISIG",
-        "chainId": 4654,
+        "chainId": 278701,
         "addr": "0x122cE5b2D6711cEac9A6dfCB424846da3f22eaa2",
         "isContract": false
     },
     {
         "name": "GUARDIAN_MULTISIG",
-        "chainId": 4654,
-        "addr": "0xc3c1D74048115316dCbd66baeDA8214D2CA83C35",
+        "chainId": 278701,
+        "addr": "0xc3c1D74048115316dCbD66baeDA8214D2CA83C35",
         "isContract": false
     },
     {
         "name": "GAME_CONSUMER_PAYMENT_RECIPIENT",
-        "chainId": 4654,
+        "chainId": 278701,
         "addr": "0xF11cE4b4f8ba5bBf2B6eEbB4DB9099E7CF7ABa04",
         "isContract": false
     },
     {
         "name": "REVENUE_WALLET_MULTISIG01",
-        "chainId": 4654,
+        "chainId": 278701,
         "addr": "0x0e6aCa776b3d12dd85363Fd6050eE05A4a242be9",
         "isContract": false
     },
     {
         "name": "REVENUE_WALLET_MULTISIG02",
-        "chainId": 4654,
+        "chainId": 278701,
         "addr": "0x3A601fE7bD6F8F23488861f7E831893ec5bf4AAb",
         "isContract": false
     },
     {
         "name": "AUTOGRAPH_MINTER_PAYMENT_RECIPIENT",
-        "chainId": 4654,
+        "chainId": 278701,
         "addr": "0xA6363759eD11a8b3BC1C7e068AA416a66A816DEf",
         "isContract": false
     },
     {
         "name": "AUTOGRAPH_SERVICE_KMS_WALLET",
         "addr": "0x2526550d7c61559df4f55fbce69935c2d536f75e",
-        "chainId": 4654,
+        "chainId": 278701,
         "isContract": false
     },
     {
         "name": "DEPLOYER_EOA",
-        "chainId": 4654,
+        "chainId": 278701,
         "addr": "0x327528709c2c2ea98d522e83a996247cfbde788c",
         "isContract": false
     },
     {
         "name": "ADMIN_MULTISIG",
-        "chainId": 4654,
-        "addr": "0x5Ec41e3a9c712D0BBC26d2CbA0E653c5d2cc982C",
-        "isContract": false
+        "chainId": 278701,
+        "addr": "0xa052dbA9E5A69f3F99317F14dcdF12853B12701a",
+        "isContract": true
     }
 ]

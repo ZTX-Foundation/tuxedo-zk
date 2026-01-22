@@ -632,4 +632,38 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.expectRevert("ERC1155: length mismatch");
         nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
     }
+
+    /// exists() function tests
+
+    function testExistsReturnsFalseForUnmintedToken() public view {
+        // Token that has never been minted should return false
+        assertFalse(nft.exists(999));
+    }
+
+    function testExistsReturnsTrueAfterMint() public {
+        // Mint some tokens
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), tokenId, 100);
+
+        // Token should now exist
+        assertTrue(nft.exists(tokenId));
+    }
+
+    function testExistsReturnsTrueAfterBurn() public {
+        // Mint then burn - exists should still return true (totalSupply doesn't decrease)
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), tokenId, 100);
+
+        // Burn all tokens
+        nft.burn(address(this), tokenId, 100);
+
+        // Token should still exist (totalSupply tracks minted, not current balance)
+        assertTrue(nft.exists(tokenId));
+    }
 }

@@ -195,5 +195,107 @@ contract CoreRefTest is Test {
         coreRef.emergencyAction(calls);
     }
 
+    function testEmergencyActionFailsZeroAddressTarget() public {
+        MockCoreRef.Call[] memory calls = new MockCoreRef.Call[](1);
+        calls[0].target = address(0);
+        calls[0].value = 0;
+
+        vm.prank(addresses.adminAddress);
+        vm.expectRevert("CoreRef: taget cannot be address(0)");
+        coreRef.emergencyAction(calls);
+    }
+
+    function testUnpauseSucceedsAdmin() public {
+        // First pause
+        vm.prank(addresses.adminAddress);
+        coreRef.pause();
+        assertTrue(coreRef.paused());
+
+        // Then unpause
+        vm.prank(addresses.adminAddress);
+        coreRef.unpause();
+        assertFalse(coreRef.paused());
+    }
+
+    function testUnpauseSucceedsGuardian() public {
+        // First pause
+        vm.prank(addresses.adminAddress);
+        coreRef.pause();
+        assertTrue(coreRef.paused());
+
+        // Then unpause as guardian
+        vm.prank(addresses.guardianAddress);
+        coreRef.unpause();
+        assertFalse(coreRef.paused());
+    }
+
+    function testUnpauseFailsNonAuthorized() public {
+        // First pause
+        vm.prank(addresses.adminAddress);
+        coreRef.pause();
+
+        // Try to unpause without role
+        vm.expectRevert("CoreRef: no role on core");
+        coreRef.unpause();
+    }
+
+    /// hasRole modifier tests
+
+    function testHasRoleModifierSucceeds() public {
+        vm.prank(addresses.minterAddress);
+        coreRef.testHasRoleMinter();
+    }
+
+    function testHasRoleModifierFails() public {
+        vm.expectRevert("CoreRef: no role on core");
+        coreRef.testHasRoleMinter();
+    }
+
+    /// hasAnyOfTwoRoles modifier tests
+
+    function testHasAnyOfTwoRolesSucceedsWithFirstRole() public {
+        vm.prank(addresses.adminAddress);
+        coreRef.testHasAnyOfTwoRoles();
+    }
+
+    function testHasAnyOfTwoRolesSucceedsWithSecondRole() public {
+        vm.prank(addresses.guardianAddress);
+        coreRef.testHasAnyOfTwoRoles();
+    }
+
+    function testHasAnyOfTwoRolesFails() public {
+        vm.prank(addresses.minterAddress); // minter has neither ADMIN nor GUARDIAN
+        vm.expectRevert("CoreRef: no role on core");
+        coreRef.testHasAnyOfTwoRoles();
+    }
+
+    /// hasAnyOfFourRoles modifier tests
+
+    function testHasAnyOfFourRolesSucceedsWithFirstRole() public {
+        vm.prank(addresses.adminAddress);
+        coreRef.testHasAnyOfFourRoles();
+    }
+
+    function testHasAnyOfFourRolesSucceedsWithSecondRole() public {
+        vm.prank(addresses.guardianAddress);
+        coreRef.testHasAnyOfFourRoles();
+    }
+
+    function testHasAnyOfFourRolesSucceedsWithThirdRole() public {
+        vm.prank(addresses.tokenGovernorAddress);
+        coreRef.testHasAnyOfFourRoles();
+    }
+
+    function testHasAnyOfFourRolesSucceedsWithFourthRole() public {
+        vm.prank(addresses.minterAddress);
+        coreRef.testHasAnyOfFourRoles();
+    }
+
+    function testHasAnyOfFourRolesFails() public {
+        vm.prank(addresses.financialControllerAddress); // has none of the 4 roles
+        vm.expectRevert("CoreRef: no role on core");
+        coreRef.testHasAnyOfFourRoles();
+    }
+
     receive() external payable {}
 }
