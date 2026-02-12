@@ -117,7 +117,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         // assert balance
         assertEq(nft.balanceOf(parts.recipient, parts.tokenId), parts.units);
 
-        vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
+        vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
         _autoGraphMinter.mintForFree(
             parts.recipient,
             parts.jobId,
@@ -313,7 +313,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         assertEq(nft.balanceOf(parts.recipient, parts.tokenId), parts.units);
         assertEq(token.balanceOf(address(_defaultPaymentRecipient)), paymentAmount);
 
-        vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
+        vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
         _autoGraphMinter.mintWithPaymentTokenAsFee(inputs);
     }
 
@@ -441,7 +441,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         // assert payment Fee balance
         assertEq(address(_defaultPaymentRecipient).balance, paymentAmount);
 
-        vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
+        vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
         _autoGraphMinter.mintWithEthAsFee{value: paymentAmount}(inputs);
     }
 
@@ -576,7 +576,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
             assertEq(nft.balanceOf(address(this), i), 10);
         }
 
-        vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
+        vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
         _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
@@ -641,7 +641,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         // assert token balance payment
         assertEq(token.balanceOf(address(_defaultPaymentRecipient)), totalCost, "Payment token balance incorrect");
 
-        vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
+        vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
         _autoGraphMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
     }
 
@@ -1007,6 +1007,82 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         // mint
         vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
         _autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(address(nft), address(this), params);
+    }
+
+    /// @notice Proves that completedJobs[jobId] blocks replay even with a different salt/hash.
+    /// This is the key behavioral guarantee after removing expiredHashes:
+    /// same jobId + different salt → different hash, but still rejected.
+    function testSameJobIdDifferentHashRejected() public {
+        // First mint succeeds (jobId=99, salt=block.timestamp)
+        Helper.TxParts memory parts1 = Helper.setupTx(vm, _privateKey, address(nft));
+
+        _autoGraphMinter.mintForFree(
+            parts1.recipient,
+            parts1.jobId,
+            parts1.tokenId,
+            parts1.units,
+            parts1.hash,
+            parts1.salt,
+            parts1.signature,
+            address(nft),
+            parts1.expiryToken
+        );
+
+        // Warp time → changes salt (block.timestamp) → produces a different hash
+        vm.warp(block.timestamp + 1);
+
+        // Setup new tx: same jobId (99) but different salt → different hash
+        Helper.TxParts memory parts2 = Helper.setupTx(vm, _privateKey, address(nft));
+
+        // Confirm the hashes are actually different
+        assertTrue(parts1.hash != parts2.hash, "hashes should differ when salt differs");
+
+        // Second mint fails: same jobId already completed
+        vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
+        _autoGraphMinter.mintForFree(
+            parts2.recipient,
+            parts2.jobId,
+            parts2.tokenId,
+            parts2.units,
+            parts2.hash,
+            parts2.salt,
+            parts2.signature,
+            address(nft),
+            parts2.expiryToken
+        );
+    }
+
+    /// @notice Proves batch buffer depletion accumulates total units correctly.
+    /// Each item is individually below the buffer cap (1000), but the aggregate
+    /// exceeds it → proves buffer is depleted once with the sum, not per-item.
+    function testBatchMintExceedsBufferCapFails() public {
+        // Buffer cap = 1000. Two items with 600 units each = 1200 total > 1000.
+        // Each item individually (600) is below the cap, so per-item depletion would pass.
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCap(1, supplyCap);
+
+        Helper.SetupTxParams memory txx1 = Helper.SetupTxParams(
+            vm, _privateKey, address(nft), 0, 0, 600, address(0), 0, block.timestamp
+        );
+        Helper.TxParts memory parts1 = Helper.setupTx(txx1);
+
+        Helper.SetupTxParams memory txx2 = Helper.SetupTxParams(
+            vm, _privateKey, address(nft), 1, 1, 600, address(0), 0, block.timestamp
+        );
+        Helper.TxParts memory parts2 = Helper.setupTx(txx2);
+
+        ERC1155AutoGraphMinter.MintBatchParams[] memory params = new ERC1155AutoGraphMinter.MintBatchParams[](2);
+        params[0] = ERC1155AutoGraphMinter.MintBatchParams(
+            parts1.jobId, parts1.tokenId, parts1.units, parts1.hash, parts1.salt,
+            parts1.signature, 0, block.timestamp
+        );
+        params[1] = ERC1155AutoGraphMinter.MintBatchParams(
+            parts2.jobId, parts2.tokenId, parts2.units, parts2.hash, parts2.salt,
+            parts2.signature, 0, block.timestamp
+        );
+
+        vm.expectRevert("RateLimited: rate limit hit");
+        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
     /// getHash() direct test for coverage

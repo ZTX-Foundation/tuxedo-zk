@@ -43,8 +43,8 @@
     },
     {
         "name": "AUTOGRAPH_SERVICE_KMS_WALLET",
-        "addr": "0x2526550d7c61559df4f55fbce69935c2d536f75e",
         "chainId": 278701,
+        "addr": "0x2526550d7c61559df4f55fbce69935c2d536f75e",
         "isContract": false
     },
     {
@@ -57,6 +57,78 @@
         "name": "ADMIN_MULTISIG",
         "chainId": 278701,
         "addr": "0xa052dbA9E5A69f3F99317F14dcdF12853B12701a",
+        "isContract": true
+    },
+    {
+        "name": "TOKEN",
+        "chainId": 278701,
+        "addr": "0x34B0d4a0449864d5382CE8E358CaCD106A892b19",
+        "isContract": true
+    },
+    {
+        "name": "CORE",
+        "chainId": 278701,
+        "addr": "0x6D9C125Fa8108B3348D3c32e207E1Edd4e591312",
+        "isContract": true
+    },
+    {
+        "name": "GLOBAL_REENTRANCY_LOCK",
+        "chainId": 278701,
+        "addr": "0xa2Bd88D7ABcAEA7D7c04d465F010d9dD437c5308",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES",
+        "chainId": 278701,
+        "addr": "0x51b986FE2Dc249CF525f0439305805A1006cDD78",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_ADMIN_MINTER",
+        "chainId": 278701,
+        "addr": "0x253E5D4d32bc6da6a5CD8b4168cDD6805a649068",
+        "isContract": true
+    },
+    {
+        "name": "ADMIN_TIMELOCK_CONTROLLER",
+        "chainId": 278701,
+        "addr": "0xD4844B902936CF1592B91b450E685BC45b8c3992",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES",
+        "chainId": 278701,
+        "addr": "0x863319d0DB8c7bf4F337D1faF721bEc7d2adD444",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES",
+        "chainId": 278701,
+        "addr": "0x5a8164b0030f7364550134E81bEA8F720850ef16",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES",
+        "chainId": 278701,
+        "addr": "0x4592D9f738F08A91d153c3886B9c6682c90B8452",
+        "isContract": true
+    },
+    {
+        "name": "CONSUMABLE_SPLITTER",
+        "chainId": 278701,
+        "addr": "0x37AF7049A129595DB43080e1d3877C455bb88749",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_AUTO_GRAPH_MINTER",
+        "chainId": 278701,
+        "addr": "0x017Af760E6A19F594E466aE049f4e7C73d480e7B",
+        "isContract": true
+    },
+    {
+        "name": "GAME_CONSUMER",
+        "chainId": 278701,
+        "addr": "0x7BB14E4b8Ea57A8b0a1e494eaA03f6fcE0b909ea",
         "isContract": true
     }
 ]

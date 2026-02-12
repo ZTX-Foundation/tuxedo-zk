@@ -14,8 +14,14 @@ contract BaseTest is Test, ERC1155Holder {
     uint256 arbitrumFork;
 
     function setUp() public virtual {
-        arbitrumFork = vm.createFork(vm.envString("RPC_URL"));
-        vm.selectFork(arbitrumFork);
+        // When run with --fork-url (+ --fork-retries for flaky RPCs),
+        // a fork is already active. Otherwise, create one from the endpoint alias.
+        try vm.activeFork() returns (uint256 forkId) {
+            arbitrumFork = forkId;
+        } catch {
+            arbitrumFork = vm.createFork("testnet");
+            vm.selectFork(arbitrumFork);
+        }
 
         runProposals();
     }
