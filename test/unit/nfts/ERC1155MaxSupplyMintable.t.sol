@@ -1,6 +1,6 @@
 pragma solidity 0.8.18;
 
-import {IERC5633, IERC5192} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
+import {IERC5633, IERC5192, ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
 import "test/BaseTest.sol";
 
@@ -358,7 +358,10 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.prank(address(sale));
         lock.lock(1);
 
-        vm.expectRevert("BaseERC1155NFT: supply exceeded");
+        /// total requested = 4000 * 3 = 12000, but max supply is 10000
+        /// first failing check: currentSupply=12000, amounts[0]=4000
+        /// supplyBeforeMint = 12000 - 4000 = 8000, availableBeforeMint = 10000 - 8000 = 2000
+        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.SupplyExceeded.selector, tokenId, amount, 2000));
         vm.prank(addresses.minterAddress);
         nft.mintBatch(address(this), tokenIds, amounts);
     }
@@ -370,7 +373,8 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.prank(address(sale));
         lock.lock(1);
 
-        vm.expectRevert("BaseERC1155NFT: supply exceeded");
+        /// requesting 10001 but only 10000 available
+        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.SupplyExceeded.selector, tokenId, amount, supplyCap));
         vm.prank(addresses.minterAddress);
         nft.mint(address(this), tokenId, amount);
     }
@@ -419,6 +423,56 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         nft.safeTransferFrom(address(this), address(nft), tokenId, 1, "");
     }
 
+    function testMintWithoutMinterRoleFails() public {
+        vm.expectRevert("CoreRef: no role on core");
+        vm.prank(address(this));
+        nft.mint(address(this), tokenId, supplyCap);
+    }
+
+    function testMintBatchWithoutMinterRoleFails() public {
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = supplyCap;
+
+        vm.expectRevert("CoreRef: no role on core");
+        vm.prank(address(this));
+        nft.mintBatch(address(this), tokenIds, amounts);
+    }
+
+    /// @notice mint reverts with MaxSupplyNotSet when token has no supply cap configured
+    function testMintUninitializedTokenFails() public {
+        uint256 uninitializedTokenId = 999;
+
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.MaxSupplyNotSet.selector, uninitializedTokenId));
+        vm.prank(addresses.minterAddress);
+        nft.mint(address(this), uninitializedTokenId, 1);
+    }
+
+    /// @notice mintBatch reverts with MaxSupplyNotSet when any tokenId in batch has no supply cap
+    function testMintBatchWithUninitializedTokenFails() public {
+        uint256 uninitializedTokenId = 999;
+
+        vm.prank(address(sale));
+        lock.lock(1);
+
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = tokenId; // initialized with supplyCap
+        tokenIds[1] = uninitializedTokenId; // NOT initialized
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 100;
+        amounts[1] = 1;
+
+        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.MaxSupplyNotSet.selector, uninitializedTokenId));
+        vm.prank(addresses.minterAddress);
+        nft.mintBatch(address(this), tokenIds, amounts);
+    }
+
     function testNotLockedMintFails() public {
         vm.expectRevert("GlobalReentrancyLock: invalid lock level");
         vm.prank(addresses.minterAddress);
@@ -435,6 +489,74 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         vm.expectRevert("GlobalReentrancyLock: invalid lock level");
         vm.prank(addresses.minterAddress);
         nft.mintBatch(address(this), tokenIds, amounts);
+    }
+
+    /// canMint / canMintBatch Tests
+
+    function testCanMintReturnsCorrectValues() public view {
+        (bool mintable, uint256 available) = nft.canMint(tokenId, 100);
+        assertTrue(mintable);
+        assertEq(available, supplyCap);
+
+        // Check unmintable amount
+        (mintable, available) = nft.canMint(tokenId, supplyCap + 1);
+        assertFalse(mintable);
+        assertEq(available, supplyCap);
+    }
+
+    function testCanMintReturnsFalseForUninitializedToken() public view {
+        uint256 uninitializedTokenId = 999;
+        (bool mintable, uint256 available) = nft.canMint(uninitializedTokenId, 1);
+        assertFalse(mintable);
+        assertEq(available, 0);
+    }
+
+    function testCanMintBatchWithDuplicateTokenIds() public view {
+        // Test that canMintBatch properly aggregates demand for duplicate tokenIds
+        // supplyCap = 10000, so [6000, 6000] for same tokenId should show:
+        // - first entry: mintable=true, available=10000
+        // - second entry: mintable=false, available=4000 (10000 - 6000 from first)
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = tokenId;
+        tokenIds[1] = tokenId;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 6000;
+        amounts[1] = 6000;
+
+        (bool[] memory mintable, uint256[] memory available) = nft.canMintBatch(tokenIds, amounts);
+
+        // First entry: 6000 <= 10000, so mintable
+        assertTrue(mintable[0]);
+        assertEq(available[0], supplyCap);
+
+        // Second entry: 6000 > 4000 (remaining after first), so NOT mintable
+        assertFalse(mintable[1]);
+        assertEq(available[1], supplyCap - 6000); // 4000 remaining
+    }
+
+    function testCanMintBatchWithDuplicateTokenIdsAllMintable() public view {
+        // Test where duplicates collectively fit: [3000, 3000, 3000] for 10000 supply
+        uint256[] memory tokenIds = new uint256[](3);
+        tokenIds[0] = tokenId;
+        tokenIds[1] = tokenId;
+        tokenIds[2] = tokenId;
+
+        uint256[] memory amounts = new uint256[](3);
+        amounts[0] = 3000;
+        amounts[1] = 3000;
+        amounts[2] = 3000;
+
+        (bool[] memory mintable, uint256[] memory available) = nft.canMintBatch(tokenIds, amounts);
+
+        assertTrue(mintable[0]);
+        assertEq(available[0], supplyCap); // 10000
+
+        assertTrue(mintable[1]);
+        assertEq(available[1], supplyCap - 3000); // 7000
+
+        assertTrue(mintable[2]);
+        assertEq(available[2], supplyCap - 6000); // 4000
     }
 
     /// EIP-165 Interface Support Tests
