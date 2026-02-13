@@ -1139,4 +1139,173 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         // Different inputs should produce different hashes
         assertTrue(hash1 != hash2);
     }
+
+    /// --------------------- Testing canMintBatchFree --------------------- ///
+
+    function testCanMintBatchFreeAllMintable() public {
+        vm.startPrank(addresses.adminAddress);
+        nft.setSupplyCap(1, supplyCap);
+        nft.setSupplyCap(2, supplyCap);
+        vm.stopPrank();
+
+        uint256[] memory tokenIds = new uint256[](3);
+        uint256[] memory amounts = new uint256[](3);
+        uint256[] memory jobIds = new uint256[](3);
+        tokenIds[0] = 0; amounts[0] = 100; jobIds[0] = 10;
+        tokenIds[1] = 1; amounts[1] = 200; jobIds[1] = 11;
+        tokenIds[2] = 2; amounts[2] = 300; jobIds[2] = 12;
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        assertTrue(mintable[0]);
+        assertTrue(mintable[1]);
+        assertTrue(mintable[2]);
+        assertEq(available[0], supplyCap);
+        assertEq(available[1], supplyCap);
+        assertEq(available[2], supplyCap);
+    }
+
+    function testCanMintBatchFreeWithCompletedJob() public {
+        // Mint once to mark jobId=99 as completed
+        Helper.TxParts memory parts = Helper.setupTx(vm, _privateKey, address(nft));
+        _autoGraphMinter.mintForFree(
+            parts.recipient, parts.jobId, parts.tokenId, parts.units,
+            parts.hash, parts.salt, parts.signature, address(nft), parts.expiryToken
+        );
+
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCap(1, supplyCap);
+
+        uint256[] memory tokenIds = new uint256[](2);
+        uint256[] memory amounts = new uint256[](2);
+        uint256[] memory jobIds = new uint256[](2);
+        tokenIds[0] = 0;  amounts[0] = 10;  jobIds[0] = 99;  // completed
+        tokenIds[1] = 1;  amounts[1] = 10;  jobIds[1] = 200; // not completed
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        assertFalse(mintable[0]);
+        assertEq(available[0], 0);
+        assertTrue(mintable[1]);
+        assertEq(available[1], supplyCap);
+    }
+
+    function testCanMintBatchFreeWithInsufficientSupply() public {
+        uint256[] memory tokenIds = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
+        uint256[] memory jobIds = new uint256[](1);
+        tokenIds[0] = 0;
+        amounts[0] = supplyCap + 1;
+        jobIds[0] = 10;
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        assertFalse(mintable[0]);
+        assertEq(available[0], supplyCap);
+    }
+
+    function testCanMintBatchFreeWithUninitializedToken() public {
+        uint256[] memory tokenIds = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
+        uint256[] memory jobIds = new uint256[](1);
+        tokenIds[0] = 999; // never had setSupplyCap called
+        amounts[0] = 1;
+        jobIds[0] = 10;
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        assertFalse(mintable[0]);
+        assertEq(available[0], 0);
+    }
+
+    function testCanMintBatchFreeDuplicateTokenIdsWithCompletedJob() public {
+        // Setup: tokenId=0 has supplyCap=8
+        vm.prank(addresses.adminAddress);
+        nft.setSupplyCap(0, 8);
+
+        // Mint once to mark jobId=99 as completed
+        Helper.TxParts memory parts = Helper.setupTx(vm, _privateKey, address(nft));
+        _autoGraphMinter.mintForFree(
+            parts.recipient, parts.jobId, parts.tokenId, parts.units,
+            parts.hash, parts.salt, parts.signature, address(nft), parts.expiryToken
+        );
+        // tokenId=0 now has totalSupply=1, available=7
+
+        // Batch: 3 items all for tokenId=0
+        // Item 0: jobId=99 (completed) — should be skipped, freeing supply for others
+        // Item 1: jobId=200, amount=5 — should be mintable (7 available)
+        // Item 2: jobId=201, amount=3 — should be mintable (7-5=2? no, 3>2 → false)
+        uint256[] memory tokenIds = new uint256[](3);
+        uint256[] memory amounts = new uint256[](3);
+        uint256[] memory jobIds = new uint256[](3);
+        tokenIds[0] = 0; amounts[0] = 5; jobIds[0] = 99;  // completed
+        tokenIds[1] = 0; amounts[1] = 5; jobIds[1] = 200;
+        tokenIds[2] = 0; amounts[2] = 2; jobIds[2] = 201;
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        // Item 0: completed job → not mintable
+        assertFalse(mintable[0]);
+        assertEq(available[0], 0);
+
+        // Item 1: no prior mintable demand for tokenId=0 (item 0 skipped) → 7 available
+        assertTrue(mintable[1]);
+        assertEq(available[1], 7);
+
+        // Item 2: prior mintable demand = 5 (from item 1) → 7-5=2, amount=2 ≤ 2 → mintable
+        assertTrue(mintable[2]);
+        assertEq(available[2], 2);
+    }
+
+    function testCanMintBatchFreeDuplicateTokenIdsExceedSupply() public {
+        // tokenId=0 has supplyCap (10_000 from BaseTest)
+        // 3 items all for tokenId=0, each wanting 4000
+        uint256[] memory tokenIds = new uint256[](3);
+        uint256[] memory amounts = new uint256[](3);
+        uint256[] memory jobIds = new uint256[](3);
+        tokenIds[0] = 0; amounts[0] = 4000; jobIds[0] = 10;
+        tokenIds[1] = 0; amounts[1] = 4000; jobIds[1] = 11;
+        tokenIds[2] = 0; amounts[2] = 4000; jobIds[2] = 12;
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        // Item 0: 10000 available, 4000 ≤ 10000 → true
+        assertTrue(mintable[0]);
+        assertEq(available[0], supplyCap);
+
+        // Item 1: 10000 - 4000 = 6000 available, 4000 ≤ 6000 → true
+        assertTrue(mintable[1]);
+        assertEq(available[1], 6000);
+
+        // Item 2: 10000 - 8000 = 2000 available, 4000 > 2000 → false
+        assertFalse(mintable[2]);
+        assertEq(available[2], 2000);
+    }
+
+    function testCanMintBatchFreeEmptyArrays() public view {
+        uint256[] memory tokenIds = new uint256[](0);
+        uint256[] memory amounts = new uint256[](0);
+        uint256[] memory jobIds = new uint256[](0);
+
+        (bool[] memory mintable, uint256[] memory available) =
+            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+
+        assertEq(mintable.length, 0);
+        assertEq(available.length, 0);
+    }
+
+    function testCanMintBatchFreeLengthMismatchReverts() public {
+        uint256[] memory tokenIds = new uint256[](2);
+        uint256[] memory amounts = new uint256[](1);
+        uint256[] memory jobIds = new uint256[](2);
+
+        vm.expectRevert("ERC1155AutoGraphMinter: length mismatch");
+        _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+    }
 }

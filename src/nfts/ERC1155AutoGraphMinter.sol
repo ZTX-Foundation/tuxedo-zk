@@ -469,6 +469,60 @@ contract ERC1155AutoGraphMinter is WhitelistedAddresses, CoreRef, RateLimited {
         emit ERC1155BatchMinted(nftContract, recipient, tokenIds, units);
     }
 
+    /// ------ View functions ------ ///
+
+    /// @notice Check which items in a batch can be minted, combining supply and job checks.
+    /// @dev Handles duplicate tokenIds correctly: only counts supply demand from items
+    /// that are themselves mintable (not filtered out by completed jobs).
+    /// @param nftContract the NFT contract to check supply against
+    /// @param tokenIds token IDs to check
+    /// @param amounts amounts to check
+    /// @param jobIds job IDs to check
+    /// @return mintable per-item: true only if supply available AND job not yet completed
+    /// @return available per-item: remaining supply after accounting for prior mintable entries
+    function canMintBatchFree(
+        address nftContract,
+        uint256[] calldata tokenIds,
+        uint256[] calldata amounts,
+        uint256[] calldata jobIds
+    ) external view returns (bool[] memory mintable, uint256[] memory available) {
+        require(
+            tokenIds.length == amounts.length && tokenIds.length == jobIds.length,
+            "ERC1155AutoGraphMinter: length mismatch"
+        );
+
+        mintable = new bool[](tokenIds.length);
+        available = new uint256[](tokenIds.length);
+        ERC1155MaxSupplyMintable nft = ERC1155MaxSupplyMintable(nftContract);
+
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            if (completedJobs[jobIds[i]]) {
+                continue;
+            }
+
+            uint256 maxSupply = nft.maxTokenSupply(tokenIds[i]);
+            uint256 currentSupply = nft.totalSupply(tokenIds[i]);
+
+            if (maxSupply == 0) {
+                continue;
+            }
+
+            /// only count prior demand from items that are themselves mintable
+            uint256 priorDemand = 0;
+            for (uint256 j = 0; j < i; j++) {
+                if (tokenIds[j] == tokenIds[i] && mintable[j]) {
+                    priorDemand += amounts[j];
+                }
+            }
+
+            uint256 totalAvailable = maxSupply - currentSupply;
+            uint256 remaining = totalAvailable > priorDemand ? totalAvailable - priorDemand : 0;
+
+            available[i] = remaining;
+            mintable[i] = amounts[i] <= remaining;
+        }
+    }
+
     /// ------ Hashing functions ------ ///
 
     /// @dev - Returns the hash of the message
