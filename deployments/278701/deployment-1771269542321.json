@@ -1,0 +1,90 @@
+{
+  "createdAt": 1771269542321,
+  "lastCompletedProposal": 4,
+  "deployedAddresses": [
+    {
+      "addr": "0x73000058111ACF210852AA3569146ce51ECD7838",
+      "name": "TOKEN",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x5f5c903f9A838a561FCdfCc444fF268067F06256",
+      "name": "CORE",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x27B689d79a9DcD01b05AefEA4a357E49758d2Bcb",
+      "name": "GLOBAL_REENTRANCY_LOCK",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0xfbaAb5f4359E3635086a03f5A422bc411Df8Dc70",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0xAB47710124D918B2F6f71bd88D8f7c47d71d8CA2",
+      "name": "ERC1155_MAX_SUPPLY_ADMIN_MINTER",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x51DCf95B962DDef1bB57A7B6dFB88040186ADB96",
+      "name": "ERC1155_BATCH_OPERATOR",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x8aE8e4f4D21E72CEBD8194B30e84B9bd9004dC08",
+      "name": "ADMIN_TIMELOCK_CONTROLLER",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x3160193E1c3b37eEE61a43fE4B5d65C6ca77f093",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x3098472731a60eA28b2CbCD432544D76f1145A27",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x052b7D2f30575dD19f590331f0eF5b3093DD8b7c",
+      "name": "ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0xcA614b8085e8815cCCc07Da33b84eF4B238c7e0c",
+      "name": "CONSUMABLE_SPLITTER",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x420eFFcc1416A9Cb684F3a4C857958a1B3feB7b6",
+      "name": "ERC1155_AUTO_GRAPH_MINTER",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x306B70990069A5A662A0a4CFE149054276417504",
+      "name": "ERC1155_AUTO_GRAPH_BATCH_MINTER",
+      "chainId": 278701,
+      "isContract": true
+    },
+    {
+      "addr": "0x9740c5728C62483Da0873511cA50395Af84814b8",
+      "name": "GAME_CONSUMER",
+      "chainId": 278701,
+      "isContract": true
+    }
+  ]
+}

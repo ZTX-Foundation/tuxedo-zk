@@ -71,24 +71,6 @@ sequenceDiagram
         ERC1155AutoGraphMinter->>-User: Revert
     end
 
-    User->>+ERC1155AutoGraphMinter: mintBatchForFree(...)
-    ERC1155AutoGraphMinter->>ERC1155AutoGraphMinter: _mintBatch(...)
-    ERC1155AutoGraphMinter->>ERC1155MaxSupplyMintable: mintBatch(...)
-    ERC1155AutoGraphMinter-->>-ERC1155AutoGraphMinter: Emit ERC1155BatchMinted event
-    
-    User->>+ERC1155AutoGraphMinter: mintBatchWithPaymentTokenAsFee(...)
-    ERC1155AutoGraphMinter->>ERC1155AutoGraphMinter: _mintBatch(...)
-    ERC1155AutoGraphMinter->>IERC20: safeTransferFrom(...)
-    IERC20->>ERC1155AutoGraphMinter: Transfer Successful
-    ERC1155AutoGraphMinter->>ERC1155MaxSupplyMintable: mintBatch(...)
-    ERC1155AutoGraphMinter->>-ERC1155AutoGraphMinter: Emit ERC1155BatchMinted event
-    
-    User->>+ERC1155AutoGraphMinter: mintBatchWithEthAsFee(...)
-    ERC1155AutoGraphMinter->>ERC1155AutoGraphMinter: _mintBatch(...)
-    ERC1155AutoGraphMinter->>ERC1155AutoGraphMinter: Transfer ETH to paymentRecipient
-    ERC1155AutoGraphMinter->>ERC1155MaxSupplyMintable: mintBatch(...)
-    ERC1155AutoGraphMinter->>-ERC1155AutoGraphMinter: Emit ERC1155BatchMinted event
-    
     User->>+ERC1155AutoGraphMinter: getHash(...)
     ERC1155AutoGraphMinter->>-User: return hash
     
@@ -252,14 +234,6 @@ Logs:
 - `jobId`: The ID of the job.
 - `tokenId`: The ID of the token that was minted.
 
-### `ERC1155BatchMinted`
-Emitted when a batch of ERC1155 tokens are minted.
-Logs:
-- `nftContract`: The address of the contract that was minted.
-- `recipient`: The address of the recipient of the minted tokens.
-- `tokenIds`: The IDs of the tokens that were minted.
-- `units`: The number of tokens that were minted.
-
 ### `PaymentRecipientUpdated`
 Emitted when the payment recipient is updated.
 Logs:
@@ -302,15 +276,6 @@ Mints NFTs to a given address with a provided signature, using a token as a fee 
 ### `mintWithEthAsFee`
 Mints NFTs to a given address with a provided signature, using ETH as a fee for payment.
 
-### `mintBatchForFree`
-Mints a batch of NFTs to a given address with provided signatures for free.
-
-### `mintBatchWithPaymentTokenAsFee`
-Mints a batch of NFTs to a given address with provided signatures, using a token as a fee for payment.
-
-### `mintBatchWithEthAsFee`
-Mints a batch of NFTs to a given address with provided signatures, using ETH as a fee for payment.
-
 ### `getHash`
 Computes the hash of a message based on input parameters.
 
@@ -335,23 +300,4 @@ Allows `ADMIN` to update the payment recipient address.
 ### `updateExpiryTokenHoursValid`
 Allows `ADMIN` to update the expiry token hours valid range.
 
-### `_calculateRewards()`
-Calculates rewards based on the time tokens are staked and the amount staked.
-
-### `_getAllUnclaimedRewardsPreviousEpochs()`
-Retrieves unclaimed rewards from previous epochs for a user.
-
-### `_updatePreviousEpochs()`
-Updates a user's rewards for previous epochs and returns the rewards claimed.
-
-### `updateUserReward()`
-Allows a user to claim their rewards and updates their reward points.
-
-### `stake()`
-Allows users to stake ERC721 tokens by providing an array of token IDs.
-
-### `unstake()`
-Allows users to withdraw previously staked ERC721 tokens by providing an array of token IDs.
-
-### `createNewEpoch()`
-Allows `ADMIN` to create a new epoch with a specified start time and duration.
+> **Note:** Batch minting functions (`mintBatchForFree`, `mintBatchWithPaymentTokenAsFee`, `mintBatchWithEthAsFee`) have been moved to [ERC1155AutoGraphBatchMinter](./ERC1155AutoGraphBatchMinter.md) to reduce contract bytecode size for zkSync OS deployment.
