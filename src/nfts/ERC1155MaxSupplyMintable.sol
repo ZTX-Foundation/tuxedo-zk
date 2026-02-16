@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
@@ -43,10 +43,6 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC519
 
     /// @notice an event emitted when a batch of tokens are minted
     event BatchMinted(address indexed account, uint256[] tokenIds, uint256[] amounts);
-
-    /// @notice custom errors for better diagnostics
-    error SupplyExceeded(uint256 tokenId, uint256 requested, uint256 available);
-    error MaxSupplyNotSet(uint256 tokenId);
 
     /// @notice the maximum supply of a given token
     mapping(uint256 tokenId => uint256 tokenMaxSupply) public maxTokenSupply;
@@ -129,54 +125,6 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC519
         emit SupplyCapUpdated(tokenId, oldSupplyCap, maxSupply);
     }
 
-    // --------- Batch helpers ---------
-
-    /// @notice Set multiple supply caps in a single transaction.
-    /// @dev Atomic: reverts whole call on any invalid entry. Reuses _setSupplyCap so behavior is identical to single-call.
-    /// @param tokenIds array of token IDs
-    /// @param maxSupplies array of max supplies (same length)
-    function setSupplyCapBatch(
-        uint256[] calldata tokenIds,
-        uint256[] calldata maxSupplies
-    ) external onlyRole(Roles.ADMIN) {
-        require(tokenIds.length == maxSupplies.length, "ERC1155: length mismatch");
-        uint256 n = tokenIds.length;
-        for (uint256 i = 0; i < n; ++i) {
-            _setSupplyCap(tokenIds[i], maxSupplies[i]);
-        }
-    }
-
-    /// @notice Set non-transferable flags in batch.
-    /// @param tokenIds array of token IDs
-    /// @param flags matching array of bools; true = non-transferable
-    function setNonTransferableBatch(
-        uint256[] calldata tokenIds,
-        bool[] calldata flags
-    ) external onlyRole(Roles.ADMIN) {
-        require(tokenIds.length == flags.length, "ERC1155: length mismatch");
-        uint256 n = tokenIds.length;
-        for (uint256 i = 0; i < n; ++i) {
-            _setNonTransferable(tokenIds[i], flags[i]);
-        }
-    }
-
-    /// @notice Set supply caps and non-transferable flags in one atomic batch.
-    /// @param tokenIds array of token IDs
-    /// @param maxSupplies array of max supplies
-    /// @param flags array of non-transferable flags
-    function setSupplyCapAndNonTransferableBatch(
-        uint256[] calldata tokenIds,
-        uint256[] calldata maxSupplies,
-        bool[] calldata flags
-    ) external onlyRole(Roles.ADMIN) {
-        require(tokenIds.length == maxSupplies.length && tokenIds.length == flags.length, "ERC1155: length mismatch");
-        uint256 n = tokenIds.length;
-        for (uint256 i = 0; i < n; ++i) {
-            _setSupplyCap(tokenIds[i], maxSupplies[i]);
-            _setNonTransferable(tokenIds[i], flags[i]);
-        }
-    }
-
     /// @notice set the URI for the token
     /// @param newuri the new URI
     /// callable by admin
@@ -190,19 +138,15 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC519
     /// @param recipient the address to mint to
     /// @param tokenId the id of the token to mint
     /// @param amount the amount of tokens to mint
-    /// @dev callable only by minter role
+    /// callable only by minter role
+    /// can only be accessed if global lock is at level 1
     /// @dev pauseable
     function mint(
         address recipient,
         uint256 tokenId,
         uint256 amount
     ) external onlyRole(Roles.MINTER_PROTOCOL_ROLE) whenNotPaused globalLock(2) {
-        uint256 currentSupply = totalSupply[tokenId];
-        uint256 maxSupply = maxTokenSupply[tokenId];
-        if (maxSupply == 0) revert MaxSupplyNotSet(tokenId);
-        if (currentSupply + amount > maxSupply) {
-            revert SupplyExceeded(tokenId, amount, maxSupply - currentSupply);
-        }
+        require(totalSupply[tokenId] + amount <= maxTokenSupply[tokenId], "BaseERC1155NFT: supply exceeded");
 
         /// no bytes passed on mint
         _mint(recipient, tokenId, amount, "");
@@ -212,28 +156,16 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC519
     /// @param recipient the address to mint to
     /// @param tokenIds the ids of the tokens to mint
     /// @param amounts the amounts of tokens to mint
-    /// @dev callable only by minter role
-    /// @dev pauseable
     function mintBatch(
         address recipient,
         uint256[] calldata tokenIds,
         uint256[] calldata amounts
     ) external onlyRole(Roles.MINTER_PROTOCOL_ROLE) whenNotPaused globalLock(2) {
-
         /// arity check on tokenIds.length and amounts.length done in ERC1155 _mintBatch
         _mintBatch(recipient, tokenIds, amounts, "");
 
-        /// post-check supplies after minting (totalSupply updated in _beforeTokenTransfer)
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            uint256 currentSupply = totalSupply[tokenIds[i]];
-            uint256 maxSupply = maxTokenSupply[tokenIds[i]];
-            if (maxSupply == 0) revert MaxSupplyNotSet(tokenIds[i]);
-            if (currentSupply > maxSupply) {
-                /// compute available before mint: maxSupply - (currentSupply - amounts[i])
-                uint256 supplyBeforeMint = currentSupply - amounts[i];
-                uint256 availableBeforeMint = maxSupply > supplyBeforeMint ? maxSupply - supplyBeforeMint : 0;
-                revert SupplyExceeded(tokenIds[i], amounts[i], availableBeforeMint);
-            }
+            require(totalSupply[tokenIds[i]] <= maxTokenSupply[tokenIds[i]], "BaseERC1155NFT: supply exceeded");
         }
 
         emit BatchMinted(recipient, tokenIds, amounts);
@@ -255,70 +187,6 @@ contract ERC1155MaxSupplyMintable is ERC1155Burnable, CoreRef, IERC5633, IERC519
     /// @param tokenId the id of the token to query
     function getMintAmountLeft(uint256 tokenId) public view returns (uint256) {
         return maxTokenSupply[tokenId] - totalSupply[tokenId];
-    }
-
-    /// @notice Check if a single token can be minted
-    /// @param tokenId the id of the token to check
-    /// @param amount the amount to check
-    /// @return mintable whether the token can be minted
-    /// @return available the available supply
-    function canMint(
-        uint256 tokenId,
-        uint256 amount
-    ) external view returns (bool mintable, uint256 available) {
-        uint256 maxSupply = maxTokenSupply[tokenId];
-        uint256 currentSupply = totalSupply[tokenId];
-
-        if (maxSupply == 0) {
-            return (false, 0);
-        }
-
-        available = maxSupply - currentSupply;
-        mintable = amount <= available;
-    }
-
-    /// @notice Check if a batch of tokens can be minted, accounting for duplicate tokenIds
-    /// @param tokenIds the ids of the tokens to check
-    /// @param amounts the amounts of tokens to check
-    /// @return mintable array of booleans indicating if each token can be minted (considering cumulative demand)
-    /// @return available array of remaining available supply for each token after prior batch entries
-    /// @dev For duplicate tokenIds, available decreases and mintable accounts for cumulative demand
-    function canMintBatch(
-        uint256[] calldata tokenIds,
-        uint256[] calldata amounts
-    ) external view returns (bool[] memory mintable, uint256[] memory available) {
-        require(tokenIds.length == amounts.length, "ERC1155: length mismatch");
-
-        mintable = new bool[](tokenIds.length);
-        available = new uint256[](tokenIds.length);
-
-        /// track cumulative demand per tokenId to handle duplicates
-        /// using a simple O(n^2) approach since batches are typically small
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            uint256 tokenId = tokenIds[i];
-            uint256 maxSupply = maxTokenSupply[tokenId];
-            uint256 currentSupply = totalSupply[tokenId];
-
-            if (maxSupply == 0) {
-                mintable[i] = false;
-                available[i] = 0;
-                continue;
-            }
-
-            /// calculate cumulative demand from earlier entries in batch for same tokenId
-            uint256 priorDemand = 0;
-            for (uint256 j = 0; j < i; j++) {
-                if (tokenIds[j] == tokenId) {
-                    priorDemand += amounts[j];
-                }
-            }
-
-            uint256 totalAvailable = maxSupply - currentSupply;
-            uint256 remainingAfterPrior = totalAvailable > priorDemand ? totalAvailable - priorDemand : 0;
-
-            available[i] = remainingAfterPrior;
-            mintable[i] = amounts[i] <= remainingAfterPrior;
-        }
     }
 
     /// @notice returns the name of the token

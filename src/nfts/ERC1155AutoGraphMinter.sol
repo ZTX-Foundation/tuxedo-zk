@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -23,13 +23,6 @@ contract ERC1155AutoGraphMinter is WhitelistedAddresses, CoreRef, RateLimited {
     /// @notice - Event emitted when the mint is successful
     event ERC1155Minted(address indexed nftContract, address indexed recipient, uint256 indexed jobId, uint256 tokenId);
 
-    /// @notice - Event emitted when the batch mint is successful
-    event ERC1155BatchMinted(
-        address indexed nftContract,
-        address indexed recipient,
-        uint256[] tokenIds,
-        uint256[] units
-    );
     /// @notice - Event emitted when the payment recipient is updated
     event PaymentRecipientUpdated(address indexed paymentRecipient);
 
@@ -169,18 +162,9 @@ contract ERC1155AutoGraphMinter is WhitelistedAddresses, CoreRef, RateLimited {
 
     /// ----------- Helpers ----------- ///
 
-    /// @dev - Verifies the inputs and processes the mint
-    /// ie checks and efforts
+    /// @dev - Verifies the inputs, expires the job, and depletes the rate limit buffer
     /// @param params - VerifyInputParams struct
     function _verifyHashAndSignerRoleExpireHashAndDepleteBuffer(VerifyInputParams memory params) internal {
-        _verifyHashAndSignerRoleExpireHash(params);
-        _depleteBuffer(params.units);
-    }
-
-    /// @dev - Verifies inputs and expires hash/job WITHOUT depleting the rate limit buffer.
-    /// Used by _mintBatch to accumulate total units and deplete buffer once after the loop.
-    /// @param params - VerifyInputParams struct
-    function _verifyHashAndSignerRoleExpireHash(VerifyInputParams memory params) internal {
         require(_isExpiryTokenValid(params.expiryToken), "ERC1155AutoGraphMinter: Expiry token is expired");
         require(params.inputHash == params.generatedHash, "ERC1155AutoGraphMinter: Hash mismatch");
         require(!completedJobs[params.jobId], "ERC1155AutoGraphMinter: Job already completed");
@@ -190,6 +174,7 @@ contract ERC1155AutoGraphMinter is WhitelistedAddresses, CoreRef, RateLimited {
         );
 
         completedJobs[params.jobId] = true;
+        _depleteBuffer(params.units);
     }
 
     function _isExpiryTokenValid(uint256 expiryToken) internal view returns (bool) {
@@ -218,65 +203,6 @@ contract ERC1155AutoGraphMinter is WhitelistedAddresses, CoreRef, RateLimited {
     function _mintChecksForEthFee(uint256 paymentAmount) internal view {
         require(paymentAmount > 0, "ERC1155AutoGraphMinter: paymentAmount must be greater than 0");
         require(msg.value == paymentAmount, "ERC1155AutoGraphMinter: Payment amount does not match msg.value");
-    }
-
-    /// @dev helper function to mint batch of NFTs
-    /// Buffer is depleted once after the loop with accumulated totalUnits
-    /// instead of per-item, saving (N-1) storage writes and event emissions.
-    function _mintBatch(
-        address nftContract,
-        address recipient,
-        address paymentToken,
-        MintBatchParams[] calldata inputs
-    ) internal returns (uint256[] memory, uint256[] memory, uint256) {
-        uint256[] memory tokenIds = new uint256[](inputs.length);
-        uint256[] memory units = new uint256[](inputs.length);
-        uint256 totalPayment = 0;
-        HashInputsParams memory input;
-        VerifyInputParams memory params;
-
-        unchecked {
-            for (uint256 i = 0; i < inputs.length; i++) {
-                tokenIds[i] = inputs[i].tokenId;
-                units[i] = inputs[i].units;
-
-                input = HashInputsParams(
-                    recipient,
-                    inputs[i].jobId,
-                    inputs[i].tokenId,
-                    inputs[i].units,
-                    inputs[i].salt,
-                    nftContract,
-                    paymentToken,
-                    inputs[i].paymentAmount,
-                    inputs[i].expiryToken
-                );
-                params = VerifyInputParams(
-                    inputs[i].hash,
-                    inputs[i].jobId,
-                    getHash(input),
-                    inputs[i].signature,
-                    inputs[i].units,
-                    nftContract,
-                    inputs[i].expiryToken
-                );
-                _verifyHashAndSignerRoleExpireHash(params);
-                /// No way the total payment will overflow
-                totalPayment += inputs[i].paymentAmount;
-            }
-        }
-
-        /// Deplete rate limit buffer once with accumulated total units
-        /// instead of per-item, saving (N-1) storage writes and events
-        {
-            uint256 totalUnits = 0;
-            for (uint256 i = 0; i < units.length; i++) {
-                unchecked { totalUnits += units[i]; }
-            }
-            _depleteBuffer(totalUnits);
-        }
-
-        return (tokenIds, units, totalPayment);
     }
 
     /// @dev helper function to check if a uint8 is within a range
@@ -404,123 +330,6 @@ contract ERC1155AutoGraphMinter is WhitelistedAddresses, CoreRef, RateLimited {
 
         ERC1155MaxSupplyMintable(params.nftContract).mint(params.recipient, params.tokenId, params.units);
         emit ERC1155Minted(params.nftContract, params.recipient, params.jobId, params.tokenId);
-    }
-
-    // ----------------------- Mint Batch functions ----------------------- //
-
-    /// @dev - Mint Batch of NFTs
-    /// @param nftContract - Address of the NFT contract to Mint from
-    /// @param recipient - Address of the receiver of the NFT
-    /// @param inputs - Array of MintBatchParams
-    function mintBatchForFree(
-        address nftContract,
-        address recipient,
-        MintBatchParams[] calldata inputs
-    ) external globalLock(1) whenNotPaused onlyWhitelist(nftContract) {
-        (uint256[] memory tokenIds, uint256[] memory units, ) = _mintBatch(nftContract, recipient, address(0), inputs);
-
-        ERC1155MaxSupplyMintable(nftContract).mintBatch(recipient, tokenIds, units);
-        emit ERC1155BatchMinted(nftContract, recipient, tokenIds, units);
-    }
-
-    function mintBatchWithPaymentTokenAsFee(
-        address nftContract,
-        address recipient,
-        address paymentToken,
-        MintBatchParams[] calldata inputs
-    ) external globalLock(1) whenNotPaused onlyWhitelist(nftContract) {
-        (uint256[] memory tokenIds, uint256[] memory units, uint256 totalPayment) = _mintBatch(
-            nftContract,
-            recipient,
-            paymentToken,
-            inputs
-        );
-
-        _mintChecksForPaymentTokenFee(paymentToken, totalPayment);
-
-        /// make transfer for fee payment
-        IERC20(paymentToken).safeTransferFrom(msg.sender, paymentRecipient, totalPayment);
-
-        ERC1155MaxSupplyMintable(nftContract).mintBatch(recipient, tokenIds, units);
-        emit ERC1155BatchMinted(nftContract, recipient, tokenIds, units);
-    }
-
-    // @dev - Mint Batch of NFTs with Eth as a fee used for Instant Craft ingame
-    /// @param nftContract - Address of the NFT contract to Mint from
-    /// @param recipient - Address of the receiver of the NFT
-    /// @param inputs - Array of MintBatchParams
-    function mintBatchWithEthAsFee(
-        address nftContract,
-        address recipient,
-        MintBatchParams[] calldata inputs
-    ) external payable globalLock(1) whenNotPaused onlyWhitelist(nftContract) {
-        (uint256[] memory tokenIds, uint256[] memory units, uint256 totalPayment) = _mintBatch(
-            nftContract,
-            recipient,
-            address(0),
-            inputs
-        );
-
-        _mintChecksForEthFee(totalPayment);
-        (bool sent, ) = payable(paymentRecipient).call{value: totalPayment}("");
-        require(sent, "ERC1155AutoGraphMinter: Failed to send Ether");
-
-        ERC1155MaxSupplyMintable(nftContract).mintBatch(recipient, tokenIds, units);
-        emit ERC1155BatchMinted(nftContract, recipient, tokenIds, units);
-    }
-
-    /// ------ View functions ------ ///
-
-    /// @notice Check which items in a batch can be minted, combining supply and job checks.
-    /// @dev Handles duplicate tokenIds correctly: only counts supply demand from items
-    /// that are themselves mintable (not filtered out by completed jobs).
-    /// @param nftContract the NFT contract to check supply against
-    /// @param tokenIds token IDs to check
-    /// @param amounts amounts to check
-    /// @param jobIds job IDs to check
-    /// @return mintable per-item: true only if supply available AND job not yet completed
-    /// @return available per-item: remaining supply after accounting for prior mintable entries
-    function canMintBatchFree(
-        address nftContract,
-        uint256[] calldata tokenIds,
-        uint256[] calldata amounts,
-        uint256[] calldata jobIds
-    ) external view returns (bool[] memory mintable, uint256[] memory available) {
-        require(
-            tokenIds.length == amounts.length && tokenIds.length == jobIds.length,
-            "ERC1155AutoGraphMinter: length mismatch"
-        );
-
-        mintable = new bool[](tokenIds.length);
-        available = new uint256[](tokenIds.length);
-        ERC1155MaxSupplyMintable nft = ERC1155MaxSupplyMintable(nftContract);
-
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            if (completedJobs[jobIds[i]]) {
-                continue;
-            }
-
-            uint256 maxSupply = nft.maxTokenSupply(tokenIds[i]);
-            uint256 currentSupply = nft.totalSupply(tokenIds[i]);
-
-            if (maxSupply == 0) {
-                continue;
-            }
-
-            /// only count prior demand from items that are themselves mintable
-            uint256 priorDemand = 0;
-            for (uint256 j = 0; j < i; j++) {
-                if (tokenIds[j] == tokenIds[i] && mintable[j]) {
-                    priorDemand += amounts[j];
-                }
-            }
-
-            uint256 totalAvailable = maxSupply - currentSupply;
-            uint256 remaining = totalAvailable > priorDemand ? totalAvailable - priorDemand : 0;
-
-            available[i] = remaining;
-            mintable[i] = amounts[i] <= remaining;
-        }
     }
 
     /// ------ Hashing functions ------ ///

@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {MultisigProposal} from "@forge-proposal-simulator/src/proposals/MultisigProposal.sol";
 
@@ -7,6 +7,7 @@ import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
 import {CoreRef} from "@protocol/refs/CoreRef.sol";
 import {ERC1155AdminMinter} from "@protocol/nfts/ERC1155AdminMinter.sol";
+import {ERC1155BatchOperator} from "@protocol/nfts/ERC1155BatchOperator.sol";
 import {GlobalReentrancyLock} from "@protocol/core/GlobalReentrancyLock.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
@@ -52,6 +53,10 @@ contract zip001 is MultisigProposal {
         ERC1155AdminMinter minter = new ERC1155AdminMinter(address(_core));
         addresses.addAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER", address(minter), true);
 
+        /// Batch operator for configuring ERC1155 supply caps and transferability
+        ERC1155BatchOperator batchOperator = new ERC1155BatchOperator(address(_core));
+        addresses.addAddress("ERC1155_BATCH_OPERATOR", address(batchOperator), true);
+
         // Setup ADMIN_MULTISIG
         _core.grantRole(Roles.ADMIN, addresses.getAddress("ADMIN_MULTISIG"));
 
@@ -65,6 +70,9 @@ contract zip001 is MultisigProposal {
         /// Set MINTER role for all NFT minting contracts
         _core.grantRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES"));
         _core.grantRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_ADMIN_MINTER"));
+
+        /// Grant ADMIN role to batch operator so it can configure token contracts
+        _core.grantRole(Roles.ADMIN, addresses.getAddress("ERC1155_BATCH_OPERATOR"));
 
         /// Revoke ADMIN role from deployer on mainnet
         if (block.chainid == Constants.ARBITRUM_MAINNET) _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
@@ -144,16 +152,27 @@ contract zip001 is MultisigProposal {
             "incorrect minter admin minter"
         );
 
+        /// Verify batch operator
+        assertTrue(
+            _core.hasRole(Roles.ADMIN, addresses.getAddress("ERC1155_BATCH_OPERATOR")),
+            "incorrect admin role for batch operator"
+        );
+        assertEq(
+            address(ERC1155BatchOperator(addresses.getAddress("ERC1155_BATCH_OPERATOR")).core()),
+            address(_core),
+            "incorrect core address batch operator"
+        );
+
         // Sum of Role counts to date
         assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 2, "incorrect locker count");
         assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 2, "incorrect minter count");
 
-        // Verify ADMIN count
+        // Verify ADMIN count (deployer + multisig + batch operator = 3 on testnet, multisig + batch operator = 2 on mainnet)
         if (block.chainid == Constants.ARBITRUM_MAINNET) {
-            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 1, "incorrect admin count");
+            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 2, "incorrect admin count");
         }
         else {
-            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 2, "incorrect admin count");
+            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 3, "incorrect admin count");
         }
 
         // Verify ADMIN role has been revoked from deployer on mainnet

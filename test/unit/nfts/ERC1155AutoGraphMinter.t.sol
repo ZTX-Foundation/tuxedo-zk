@@ -1,4 +1,4 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import "@forge-std/Test.sol";
 
@@ -11,12 +11,14 @@ import {MockERC20, IERC20} from "test/mock/MockERC20.sol";
 import {GlobalReentrancyLock} from "@protocol/core/GlobalReentrancyLock.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 import {ERC1155AutoGraphMinter} from "@protocol/nfts/ERC1155AutoGraphMinter.sol";
+import {ERC1155AutoGraphBatchMinter} from "@protocol/nfts/ERC1155AutoGraphBatchMinter.sol";
 import {TestAddresses as addresses} from "test/fixtures/TestAddresses.sol";
 import {ERC1155AutoGraphMinterHelperLib as Helper} from "test/helpers/ERC1155AutoGraphMinterHelper.sol";
 import {BaseTest} from "test/BaseTest.sol";
 
 contract UnitTestERC1155AutoGraphMinter is BaseTest {
     ERC1155AutoGraphMinter private _autoGraphMinter;
+    ERC1155AutoGraphBatchMinter private _autoGraphBatchMinter;
 
     uint256 private _privateKey;
     address private _notary;
@@ -52,11 +54,20 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
             1
         );
 
+        _autoGraphBatchMinter = new ERC1155AutoGraphBatchMinter(
+            address(core),
+            _autoGraphMinter,
+            _REPLENISH_RATE_PER_SECOND,
+            _BUFFER_CAP
+        );
+
         vm.startPrank(addresses.adminAddress);
         _autoGraphMinter.addWhitelistedContract(address(nft));
         nft.setSupplyCap(0, supplyCap);
         core.grantRole(Roles.MINTER_PROTOCOL_ROLE, address(_autoGraphMinter));
         core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, address(_autoGraphMinter));
+        core.grantRole(Roles.MINTER_PROTOCOL_ROLE, address(_autoGraphBatchMinter));
+        core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, address(_autoGraphBatchMinter));
         core.grantRole(Roles.MINTER_NOTARY_PROTOCOL_ROLE, _notary);
         vm.stopPrank();
     }
@@ -569,7 +580,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -577,7 +588,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         }
 
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
     function testMintBatchForFreeIncorrectSigningRole() public {
@@ -592,7 +603,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         core.revokeRole(Roles.MINTER_NOTARY_PROTOCOL_ROLE, _notary);
 
         vm.expectRevert("ERC1155AutoGraphMinter: Missing MINTER_NOTARY Role");
-        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
     function testMintBatchForFreeInvalidUnits() public {
@@ -606,7 +617,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         params[params.length - 1].units = 999;
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash mismatch");
-        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
     /// --------------------- Testing Mint Batch With PaymentToken as fee functions --------------------- ///
@@ -628,10 +639,10 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         );
 
         token.mint(address(this), totalCost);
-        token.approve(address(_autoGraphMinter), totalCost);
+        token.approve(address(_autoGraphBatchMinter), totalCost);
 
         // mint
-        _autoGraphMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
+        _autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -642,7 +653,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         assertEq(token.balanceOf(address(_defaultPaymentRecipient)), totalCost, "Payment token balance incorrect");
 
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        _autoGraphMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
+        _autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
     }
 
     /// --------------------- Testing Mint Batch With Eth as Fee functions --------------------- ///
@@ -664,7 +675,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        _autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(address(nft), address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -692,7 +703,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         );
 
         vm.expectRevert("ERC1155AutoGraphMinter: Payment amount does not match msg.value");
-        _autoGraphMinter.mintBatchWithEthAsFee{value: totalCost / 2}(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost / 2}(address(nft), address(this), params);
     }
 
     /// --------------------- Testing Update Payment Recipient functions  --------------------- ///
@@ -955,7 +966,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
 
         // mint
         vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
-        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
     function testMintBatchWithPaymentTokenAsFeeExpiryTokenExpired() public {
@@ -975,14 +986,14 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         );
 
         token.mint(address(this), totalCost);
-        token.approve(address(_autoGraphMinter), totalCost);
+        token.approve(address(_autoGraphBatchMinter), totalCost);
 
         /// warp 1 hour and 1.
         vm.warp(block.timestamp + 1 hours + 1);
 
         // mint
         vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
-        _autoGraphMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
+        _autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(address(nft), address(this), address(token), params);
     }
 
     function testMintBatchWithEthAsFeeExpiryTokenExpired() public {
@@ -1006,7 +1017,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
 
         // mint
         vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
-        _autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(address(nft), address(this), params);
     }
 
     /// @notice Proves that completedJobs[jobId] blocks replay even with a different salt/hash.
@@ -1082,7 +1093,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         );
 
         vm.expectRevert("RateLimited: rate limit hit");
-        _autoGraphMinter.mintBatchForFree(address(nft), address(this), params);
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
     }
 
     /// getHash() direct test for coverage
@@ -1156,7 +1167,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         tokenIds[2] = 2; amounts[2] = 300; jobIds[2] = 12;
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         assertTrue(mintable[0]);
         assertTrue(mintable[1]);
@@ -1167,12 +1178,14 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
     }
 
     function testCanMintBatchFreeWithCompletedJob() public {
-        // Mint once to mark jobId=99 as completed
+        // Mint once via batch minter to mark jobId=99 as completed on batch minter
         Helper.TxParts memory parts = Helper.setupTx(vm, _privateKey, address(nft));
-        _autoGraphMinter.mintForFree(
-            parts.recipient, parts.jobId, parts.tokenId, parts.units,
-            parts.hash, parts.salt, parts.signature, address(nft), parts.expiryToken
+        ERC1155AutoGraphMinter.MintBatchParams[] memory batchParams = new ERC1155AutoGraphMinter.MintBatchParams[](1);
+        batchParams[0] = ERC1155AutoGraphMinter.MintBatchParams(
+            parts.jobId, parts.tokenId, parts.units, parts.hash, parts.salt,
+            parts.signature, 0, parts.expiryToken
         );
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), parts.recipient, batchParams);
 
         vm.prank(addresses.adminAddress);
         nft.setSupplyCap(1, supplyCap);
@@ -1184,7 +1197,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         tokenIds[1] = 1;  amounts[1] = 10;  jobIds[1] = 200; // not completed
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         assertFalse(mintable[0]);
         assertEq(available[0], 0);
@@ -1201,7 +1214,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         jobIds[0] = 10;
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         assertFalse(mintable[0]);
         assertEq(available[0], supplyCap);
@@ -1216,7 +1229,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         jobIds[0] = 10;
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         assertFalse(mintable[0]);
         assertEq(available[0], 0);
@@ -1227,12 +1240,14 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         vm.prank(addresses.adminAddress);
         nft.setSupplyCap(0, 8);
 
-        // Mint once to mark jobId=99 as completed
+        // Mint once via batch minter to mark jobId=99 as completed
         Helper.TxParts memory parts = Helper.setupTx(vm, _privateKey, address(nft));
-        _autoGraphMinter.mintForFree(
-            parts.recipient, parts.jobId, parts.tokenId, parts.units,
-            parts.hash, parts.salt, parts.signature, address(nft), parts.expiryToken
+        ERC1155AutoGraphMinter.MintBatchParams[] memory batchParams = new ERC1155AutoGraphMinter.MintBatchParams[](1);
+        batchParams[0] = ERC1155AutoGraphMinter.MintBatchParams(
+            parts.jobId, parts.tokenId, parts.units, parts.hash, parts.salt,
+            parts.signature, 0, parts.expiryToken
         );
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), parts.recipient, batchParams);
         // tokenId=0 now has totalSupply=1, available=7
 
         // Batch: 3 items all for tokenId=0
@@ -1247,7 +1262,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         tokenIds[2] = 0; amounts[2] = 2; jobIds[2] = 201;
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         // Item 0: completed job → not mintable
         assertFalse(mintable[0]);
@@ -1273,7 +1288,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         tokenIds[2] = 0; amounts[2] = 4000; jobIds[2] = 12;
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         // Item 0: 10000 available, 4000 ≤ 10000 → true
         assertTrue(mintable[0]);
@@ -1294,7 +1309,7 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         uint256[] memory jobIds = new uint256[](0);
 
         (bool[] memory mintable, uint256[] memory available) =
-            _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+            _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
 
         assertEq(mintable.length, 0);
         assertEq(available.length, 0);
@@ -1306,6 +1321,6 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         uint256[] memory jobIds = new uint256[](2);
 
         vm.expectRevert("ERC1155AutoGraphMinter: length mismatch");
-        _autoGraphMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
+        _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
     }
 }

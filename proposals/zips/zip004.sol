@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
 
+import {ERC1155BatchOperator} from "@protocol/nfts/ERC1155BatchOperator.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
 contract zip004 is TimelockProposal {
@@ -37,6 +38,9 @@ contract zip004 is TimelockProposal {
     /// @notice ERC1155 collections
     ERC1155MaxSupplyMintable wearable;
     ERC1155MaxSupplyMintable enhanceable;
+
+    /// @notice batch operator for configuring supply caps and transferability
+    ERC1155BatchOperator batchOperator;
 
     /// @notice batch size for chunked calls
     uint256 private constant PROPOSAL_MAX_BATCH = 60;
@@ -138,7 +142,7 @@ contract zip004 is TimelockProposal {
         assertEq(nteTotal, 25000000000, "Invalid maxSupplyTotal for non-transferable enhanceables");
     }
 
-    /// @notice helper to call setSupplyCapBatch with chunking
+    /// @notice helper to call setSupplyCapBatch via the batch operator with chunking
     function _callSetSupplyCapBatch(
         ERC1155MaxSupplyMintable tokenContract,
         TokenIDMaxSupplySettings[] storage settings
@@ -153,11 +157,11 @@ contract zip004 is TimelockProposal {
                 ids[i] = settings[start + i].tokenId;
                 caps[i] = settings[start + i].maxSupply;
             }
-            tokenContract.setSupplyCapBatch(ids, caps);
+            batchOperator.setSupplyCapBatch(tokenContract, ids, caps);
         }
     }
 
-    /// @notice helper to call setSupplyCapAndNonTransferableBatch with chunking
+    /// @notice helper to call setSupplyCapAndNonTransferableBatch via the batch operator with chunking
     function _callSetSupplyCapAndNonTransferableBatch(
         ERC1155MaxSupplyMintable tokenContract,
         TokenIDMaxSupplyAndTransferSettings[] storage settings
@@ -174,7 +178,7 @@ contract zip004 is TimelockProposal {
                 caps[i] = settings[start + i].maxSupply;
                 flags[i] = settings[start + i].isNonTransferable;
             }
-            tokenContract.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
+            batchOperator.setSupplyCapAndNonTransferableBatch(tokenContract, ids, caps, flags);
         }
     }
 
@@ -205,6 +209,10 @@ contract zip004 is TimelockProposal {
 
         enhanceable = ERC1155MaxSupplyMintable(
             addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES")
+        );
+
+        batchOperator = ERC1155BatchOperator(
+            addresses.getAddress("ERC1155_BATCH_OPERATOR")
         );
 
         _setAndConfirmData();

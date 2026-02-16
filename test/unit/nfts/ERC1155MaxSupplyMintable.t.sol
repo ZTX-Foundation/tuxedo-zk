@@ -1,4 +1,4 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {IERC5633, IERC5192, ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
@@ -359,9 +359,7 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         lock.lock(1);
 
         /// total requested = 4000 * 3 = 12000, but max supply is 10000
-        /// first failing check: currentSupply=12000, amounts[0]=4000
-        /// supplyBeforeMint = 12000 - 4000 = 8000, availableBeforeMint = 10000 - 8000 = 2000
-        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.SupplyExceeded.selector, tokenId, amount, 2000));
+        vm.expectRevert("BaseERC1155NFT: supply exceeded");
         vm.prank(addresses.minterAddress);
         nft.mintBatch(address(this), tokenIds, amounts);
     }
@@ -374,7 +372,7 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         lock.lock(1);
 
         /// requesting 10001 but only 10000 available
-        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.SupplyExceeded.selector, tokenId, amount, supplyCap));
+        vm.expectRevert("BaseERC1155NFT: supply exceeded");
         vm.prank(addresses.minterAddress);
         nft.mint(address(this), tokenId, amount);
     }
@@ -441,19 +439,19 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         nft.mintBatch(address(this), tokenIds, amounts);
     }
 
-    /// @notice mint reverts with MaxSupplyNotSet when token has no supply cap configured
+    /// @notice mint reverts when token has no supply cap configured (maxSupply=0)
     function testMintUninitializedTokenFails() public {
         uint256 uninitializedTokenId = 999;
 
         vm.prank(address(sale));
         lock.lock(1);
 
-        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.MaxSupplyNotSet.selector, uninitializedTokenId));
+        vm.expectRevert("BaseERC1155NFT: supply exceeded");
         vm.prank(addresses.minterAddress);
         nft.mint(address(this), uninitializedTokenId, 1);
     }
 
-    /// @notice mintBatch reverts with MaxSupplyNotSet when any tokenId in batch has no supply cap
+    /// @notice mintBatch reverts when any tokenId in batch has no supply cap
     function testMintBatchWithUninitializedTokenFails() public {
         uint256 uninitializedTokenId = 999;
 
@@ -468,7 +466,7 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         amounts[0] = 100;
         amounts[1] = 1;
 
-        vm.expectRevert(abi.encodeWithSelector(ERC1155MaxSupplyMintable.MaxSupplyNotSet.selector, uninitializedTokenId));
+        vm.expectRevert("BaseERC1155NFT: supply exceeded");
         vm.prank(addresses.minterAddress);
         nft.mintBatch(address(this), tokenIds, amounts);
     }
@@ -491,74 +489,6 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
         nft.mintBatch(address(this), tokenIds, amounts);
     }
 
-    /// canMint / canMintBatch Tests
-
-    function testCanMintReturnsCorrectValues() public view {
-        (bool mintable, uint256 available) = nft.canMint(tokenId, 100);
-        assertTrue(mintable);
-        assertEq(available, supplyCap);
-
-        // Check unmintable amount
-        (mintable, available) = nft.canMint(tokenId, supplyCap + 1);
-        assertFalse(mintable);
-        assertEq(available, supplyCap);
-    }
-
-    function testCanMintReturnsFalseForUninitializedToken() public view {
-        uint256 uninitializedTokenId = 999;
-        (bool mintable, uint256 available) = nft.canMint(uninitializedTokenId, 1);
-        assertFalse(mintable);
-        assertEq(available, 0);
-    }
-
-    function testCanMintBatchWithDuplicateTokenIds() public view {
-        // Test that canMintBatch properly aggregates demand for duplicate tokenIds
-        // supplyCap = 10000, so [6000, 6000] for same tokenId should show:
-        // - first entry: mintable=true, available=10000
-        // - second entry: mintable=false, available=4000 (10000 - 6000 from first)
-        uint256[] memory tokenIds = new uint256[](2);
-        tokenIds[0] = tokenId;
-        tokenIds[1] = tokenId;
-
-        uint256[] memory amounts = new uint256[](2);
-        amounts[0] = 6000;
-        amounts[1] = 6000;
-
-        (bool[] memory mintable, uint256[] memory available) = nft.canMintBatch(tokenIds, amounts);
-
-        // First entry: 6000 <= 10000, so mintable
-        assertTrue(mintable[0]);
-        assertEq(available[0], supplyCap);
-
-        // Second entry: 6000 > 4000 (remaining after first), so NOT mintable
-        assertFalse(mintable[1]);
-        assertEq(available[1], supplyCap - 6000); // 4000 remaining
-    }
-
-    function testCanMintBatchWithDuplicateTokenIdsAllMintable() public view {
-        // Test where duplicates collectively fit: [3000, 3000, 3000] for 10000 supply
-        uint256[] memory tokenIds = new uint256[](3);
-        tokenIds[0] = tokenId;
-        tokenIds[1] = tokenId;
-        tokenIds[2] = tokenId;
-
-        uint256[] memory amounts = new uint256[](3);
-        amounts[0] = 3000;
-        amounts[1] = 3000;
-        amounts[2] = 3000;
-
-        (bool[] memory mintable, uint256[] memory available) = nft.canMintBatch(tokenIds, amounts);
-
-        assertTrue(mintable[0]);
-        assertEq(available[0], supplyCap); // 10000
-
-        assertTrue(mintable[1]);
-        assertEq(available[1], supplyCap - 3000); // 7000
-
-        assertTrue(mintable[2]);
-        assertEq(available[2], supplyCap - 6000); // 4000
-    }
-
     /// EIP-165 Interface Support Tests
 
     function testSupportsERC5633Interface() public view {
@@ -575,184 +505,6 @@ contract UnitTestERC1155MaxSupplyMintable is BaseTest {
 
     function testDoesNotSupportInvalidInterface() public view {
         assertFalse(nft.supportsInterface(0xffffffff));
-    }
-
-    /// Batch API Tests
-
-    function testSetSupplyCapBatchWithoutRoleFails() public {
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 1;
-        ids[1] = 2;
-        uint256[] memory caps = new uint256[](2);
-        caps[0] = 100;
-        caps[1] = 200;
-
-        vm.expectRevert("CoreRef: no role on core");
-        nft.setSupplyCapBatch(ids, caps);
-    }
-
-    function testSetSupplyCapBatchSuccess() public {
-        uint256[] memory ids = new uint256[](3);
-        ids[0] = 1;
-        ids[1] = 2;
-        ids[2] = 3;
-        uint256[] memory caps = new uint256[](3);
-        caps[0] = 100;
-        caps[1] = 200;
-        caps[2] = 300;
-
-        vm.prank(addresses.adminAddress);
-        nft.setSupplyCapBatch(ids, caps);
-
-        assertEq(nft.maxTokenSupply(1), 100);
-        assertEq(nft.maxTokenSupply(2), 200);
-        assertEq(nft.maxTokenSupply(3), 300);
-    }
-
-    function testSetSupplyCapBatchLengthMismatchReverts() public {
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 1;
-        ids[1] = 2;
-        uint256[] memory caps = new uint256[](1);
-        caps[0] = 100;
-
-        vm.prank(addresses.adminAddress);
-        vm.expectRevert("ERC1155: length mismatch");
-        nft.setSupplyCapBatch(ids, caps);
-    }
-
-    function testSetSupplyCapBatchTooSmallRevertsAtomic() public {
-        // First mint some tokens to tokenId 7
-        vm.prank(addresses.adminAddress);
-        nft.setSupplyCap(7, 1000);
-
-        vm.prank(address(sale));
-        lock.lock(1);
-
-        vm.prank(addresses.minterAddress);
-        nft.mint(address(this), 7, 100);
-
-        // Now try to set cap < 100 in batch - should revert atomically
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 8; // this one would succeed
-        ids[1] = 7; // this one should fail
-        uint256[] memory caps = new uint256[](2);
-        caps[0] = 500;
-        caps[1] = 50; // less than current supply of 100
-
-        vm.prank(addresses.adminAddress);
-        vm.expectRevert("BaseERC1155NFT: maxSupply cannot be less than current supply");
-        nft.setSupplyCapBatch(ids, caps);
-
-        // Ensure neither value was set (atomic revert)
-        assertEq(nft.maxTokenSupply(8), 0);
-    }
-
-    function testSetNonTransferableBatchWithoutRoleFails() public {
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 1;
-        ids[1] = 2;
-        bool[] memory flags = new bool[](2);
-        flags[0] = true;
-        flags[1] = true;
-
-        vm.expectRevert("CoreRef: no role on core");
-        nft.setNonTransferableBatch(ids, flags);
-    }
-
-    function testSetNonTransferableBatchSuccess() public {
-        // First set supply caps to initialize tokens
-        uint256[] memory ids = new uint256[](3);
-        ids[0] = 10;
-        ids[1] = 11;
-        ids[2] = 12;
-        uint256[] memory caps = new uint256[](3);
-        caps[0] = 1000;
-        caps[1] = 1000;
-        caps[2] = 1000;
-
-        vm.prank(addresses.adminAddress);
-        nft.setSupplyCapBatch(ids, caps);
-
-        // Now set non-transferable flags
-        bool[] memory flags = new bool[](3);
-        flags[0] = true;
-        flags[1] = false;
-        flags[2] = true;
-
-        vm.prank(addresses.adminAddress);
-        nft.setNonTransferableBatch(ids, flags);
-
-        assertTrue(nft.nonTransferableTokens(10));
-        assertFalse(nft.nonTransferableTokens(11));
-        assertTrue(nft.nonTransferableTokens(12));
-    }
-
-    function testSetNonTransferableBatchLengthMismatchReverts() public {
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 1;
-        ids[1] = 2;
-        bool[] memory flags = new bool[](1);
-        flags[0] = true;
-
-        vm.prank(addresses.adminAddress);
-        vm.expectRevert("ERC1155: length mismatch");
-        nft.setNonTransferableBatch(ids, flags);
-    }
-
-    function testSetSupplyCapAndNonTransferableBatchWithoutRoleFails() public {
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 1;
-        ids[1] = 2;
-        uint256[] memory caps = new uint256[](2);
-        caps[0] = 100;
-        caps[1] = 200;
-        bool[] memory flags = new bool[](2);
-        flags[0] = true;
-        flags[1] = true;
-
-        vm.expectRevert("CoreRef: no role on core");
-        nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
-    }
-
-    function testSetSupplyCapAndNonTransferableBatchSuccess() public {
-        uint256[] memory ids = new uint256[](3);
-        ids[0] = 20;
-        ids[1] = 21;
-        ids[2] = 22;
-        uint256[] memory caps = new uint256[](3);
-        caps[0] = 100;
-        caps[1] = 200;
-        caps[2] = 300;
-        bool[] memory flags = new bool[](3);
-        flags[0] = true;
-        flags[1] = false;
-        flags[2] = true;
-
-        vm.prank(addresses.adminAddress);
-        nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
-
-        assertEq(nft.maxTokenSupply(20), 100);
-        assertEq(nft.maxTokenSupply(21), 200);
-        assertEq(nft.maxTokenSupply(22), 300);
-        assertTrue(nft.nonTransferableTokens(20));
-        assertFalse(nft.nonTransferableTokens(21));
-        assertTrue(nft.nonTransferableTokens(22));
-    }
-
-    function testSetSupplyCapAndNonTransferableBatchLengthMismatchReverts() public {
-        uint256[] memory ids = new uint256[](2);
-        ids[0] = 1;
-        ids[1] = 2;
-        uint256[] memory caps = new uint256[](2);
-        caps[0] = 100;
-        caps[1] = 200;
-        bool[] memory flags = new bool[](1);
-        flags[0] = true;
-
-        vm.prank(addresses.adminAddress);
-        vm.expectRevert("ERC1155: length mismatch");
-        nft.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
     }
 
     /// exists() function tests
