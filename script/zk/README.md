@@ -77,7 +77,7 @@ Edit `script/zk/deploy.ts`:
 const NETWORKS = {
   'qa': {
     name: 'Creator Testnet (QA)',
-    rpcUrl: 'https://zksync-os-testnet-creator.zksync.dev',
+    rpcUrl: 'https://rpc.testnet.oncreator.com',
     chainId: 278701,
   },
   'localnet-zk': {
