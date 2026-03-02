@@ -24,6 +24,12 @@ const NETWORKS = {
         chainId: 278701,
         verifierUrl: "https://explorer-api.testnet.oncreator.com/api",
     },
+    "mainnet": {
+        name: "Creator Mainnet",
+        rpcUrl: process.env.MAINNET_RPC_URL || "https://rpc.mainnet.oncreator.com",
+        chainId: 2787,
+        verifierUrl: "https://explorer-api.mainnet.oncreator.com/api",
+    },
     "localnet-zk": {
         name: "Local Network ZK",
         rpcUrl: "http://127.0.0.1:8011",

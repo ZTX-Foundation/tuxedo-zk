@@ -42,7 +42,7 @@ contract zip002 is MultisigProposal {
 
         /// For the sake of testing, give the ADMIN role to the ADMIN_TIMELOCK_CONTROLLER.
         /// This is not possible onchain as the deployer is not an Admin
-        if (block.chainid != Constants.ARBITRUM_MAINNET) {
+        if (block.chainid != Constants.CREATOR_MAINNET) {
             _core.grantRole(Roles.ADMIN, addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER"));
         }
 

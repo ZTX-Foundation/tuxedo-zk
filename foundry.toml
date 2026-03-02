@@ -16,6 +16,7 @@ gas_reports = ["*"]
 
 [rpc_endpoints]
 testnet = "${RPC_URL}"
+mainnet = "${MAINNET_RPC_URL}"
 
 [fuzz]
 runs = 1000

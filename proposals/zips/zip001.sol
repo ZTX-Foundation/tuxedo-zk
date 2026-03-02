@@ -75,7 +75,7 @@ contract zip001 is MultisigProposal {
         _core.grantRole(Roles.ADMIN, addresses.getAddress("ERC1155_BATCH_OPERATOR"));
 
         /// Revoke ADMIN role from deployer on mainnet
-        if (block.chainid == Constants.ARBITRUM_MAINNET) _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
+        if (block.chainid == Constants.CREATOR_MAINNET) _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
     }
 
     function validate() public override {
@@ -168,7 +168,7 @@ contract zip001 is MultisigProposal {
         assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 2, "incorrect minter count");
 
         // Verify ADMIN count (deployer + multisig + batch operator = 3 on testnet, multisig + batch operator = 2 on mainnet)
-        if (block.chainid == Constants.ARBITRUM_MAINNET) {
+        if (block.chainid == Constants.CREATOR_MAINNET) {
             assertEq(_core.getRoleMemberCount(Roles.ADMIN), 2, "incorrect admin count");
         }
         else {
@@ -176,7 +176,7 @@ contract zip001 is MultisigProposal {
         }
 
         // Verify ADMIN role has been revoked from deployer on mainnet
-        if (block.chainid == Constants.ARBITRUM_MAINNET)
+        if (block.chainid == Constants.CREATOR_MAINNET)
             assertFalse(
                 _core.hasRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA")),
                 "deployer should not have admin role"
