@@ -1323,4 +1323,66 @@ contract UnitTestERC1155AutoGraphMinter is BaseTest {
         vm.expectRevert("ERC1155AutoGraphMinter: length mismatch");
         _autoGraphBatchMinter.canMintBatchFree(address(nft), tokenIds, amounts, jobIds);
     }
+
+    /// ----- Batch Minter Expiry Token Validation Regression Tests ----- ///
+
+    /// @notice Batch mint with expiryToken = block.timestamp - 60 should succeed.
+    ///         This is the case that currently fails in production (recent past timestamp).
+    function testBatchMintExpiryTokenValidWithRecentTimestamp() public {
+        // Warp to a realistic timestamp so subtracting 60 doesn't underflow
+        vm.warp(1_700_000_000);
+        uint256 recentPast = block.timestamp - 60;
+
+        ERC1155AutoGraphMinter.MintBatchParams[] memory params = Helper.setupTxs(
+            vm, _privateKey, nft, 0, addresses.adminAddress, 2, address(0), 0, recentPast
+        );
+
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
+
+        // Verify minting succeeded
+        assertGt(nft.balanceOf(address(this), 0), 0, "Token 0 should have been minted");
+        assertGt(nft.balanceOf(address(this), 1), 0, "Token 1 should have been minted");
+    }
+
+    /// @notice Batch mint with expiryToken too far in the past should fail with "Expiry token is expired".
+    function testBatchMintExpiryTokenExpiredFails() public {
+        vm.warp(1_700_000_000);
+        // expiryTokenHoursValid = 1, so 2 hours ago should be expired
+        uint256 twoHoursAgo = block.timestamp - 7200;
+
+        ERC1155AutoGraphMinter.MintBatchParams[] memory params = Helper.setupTxs(
+            vm, _privateKey, nft, 0, addresses.adminAddress, 2, address(0), 0, twoHoursAgo
+        );
+
+        vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
+    }
+
+    /// @notice Batch mint with expiryToken in the future should fail with "Expiry token must be in the past".
+    function testBatchMintExpiryTokenFutureFails() public {
+        vm.warp(1_700_000_000);
+        uint256 futureTimestamp = block.timestamp + 60;
+
+        ERC1155AutoGraphMinter.MintBatchParams[] memory params = Helper.setupTxs(
+            vm, _privateKey, nft, 0, addresses.adminAddress, 2, address(0), 0, futureTimestamp
+        );
+
+        vm.expectRevert("ERC1155AutoGraphMinter: Expiry token must be in the past");
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
+    }
+
+    /// @notice Edge case: expiryToken = block.timestamp - 3600 (exactly 1 hour).
+    ///         With expiryTokenHoursValid = 1, hoursInSeconds = 3600 and diff = 3600.
+    ///         The check is `diff < hoursInSeconds`, so diff == hoursInSeconds should FAIL.
+    function testBatchMintExpiryTokenEdgeCaseExactlyOneHour() public {
+        vm.warp(1_700_000_000);
+        uint256 exactlyOneHourAgo = block.timestamp - 3600;
+
+        ERC1155AutoGraphMinter.MintBatchParams[] memory params = Helper.setupTxs(
+            vm, _privateKey, nft, 0, addresses.adminAddress, 2, address(0), 0, exactlyOneHourAgo
+        );
+
+        vm.expectRevert("ERC1155AutoGraphMinter: Expiry token is expired");
+        _autoGraphBatchMinter.mintBatchForFree(address(nft), address(this), params);
+    }
 }
