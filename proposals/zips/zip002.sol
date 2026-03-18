@@ -40,14 +40,18 @@ contract zip002 is MultisigProposal {
         );
         addresses.addAddress("ADMIN_TIMELOCK_CONTROLLER", address(_adminTimelock), true);
 
-        /// For the sake of testing, give the ADMIN role to the ADMIN_TIMELOCK_CONTROLLER.
-        /// This is not possible onchain as the deployer is not an Admin
-        if (block.chainid != Constants.CREATOR_MAINNET) {
+        /// On localnet (anvil), deployer still has ADMIN so we can auto-grant.
+        /// On Creator chains (testnet + mainnet), deployer ADMIN was revoked in zip001,
+        /// so ADMIN_MULTISIG must manually grant Roles.ADMIN to ADMIN_TIMELOCK_CONTROLLER
+        /// before zip003 can execute.
+        if (block.chainid == Constants.ANVIL) {
             _core.grantRole(Roles.ADMIN, addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER"));
+        } else {
+            console.log("ACTION REQUIRED: Grant Roles.ADMIN to ADMIN_TIMELOCK_CONTROLLER from ADMIN_MULTISIG");
+            console.log("  ADMIN_TIMELOCK_CONTROLLER:", addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER"));
+            console.log("  ADMIN_MULTISIG:", addresses.getAddress("ADMIN_MULTISIG"));
+            console.log("  CORE:", address(_core));
         }
-
-        /// The ADMIN_MULTISIG now needs to give the ADMIN role to the ADMIN_TIMELOCK_CONTROLLER
-        console.log("Please give Roles.Admin to the ADMIN_TIMELOCK_CONTROLLER from the ADMIN_MULTISIG");
     }
 
     function run() public override {

@@ -74,8 +74,11 @@ contract zip001 is MultisigProposal {
         /// Grant ADMIN role to batch operator so it can configure token contracts
         _core.grantRole(Roles.ADMIN, addresses.getAddress("ERC1155_BATCH_OPERATOR"));
 
-        /// Revoke ADMIN role from deployer on mainnet
-        if (block.chainid == Constants.CREATOR_MAINNET) _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
+        /// Revoke ADMIN role from deployer on Creator chains (mainnet + testnet)
+        /// Localnet (anvil) keeps deployer ADMIN for convenience
+        if (block.chainid == Constants.CREATOR_MAINNET || block.chainid == Constants.CREATOR_TESTNET) {
+            _core.revokeRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA"));
+        }
     }
 
     function validate() public override {
@@ -167,20 +170,16 @@ contract zip001 is MultisigProposal {
         assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 2, "incorrect locker count");
         assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 2, "incorrect minter count");
 
-        // Verify ADMIN count (deployer + multisig + batch operator = 3 on testnet, multisig + batch operator = 2 on mainnet)
-        if (block.chainid == Constants.CREATOR_MAINNET) {
+        // Verify ADMIN count: multisig + batch operator = 2 on Creator chains, + deployer = 3 on localnet
+        if (block.chainid == Constants.CREATOR_MAINNET || block.chainid == Constants.CREATOR_TESTNET) {
             assertEq(_core.getRoleMemberCount(Roles.ADMIN), 2, "incorrect admin count");
-        }
-        else {
-            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 3, "incorrect admin count");
-        }
-
-        // Verify ADMIN role has been revoked from deployer on mainnet
-        if (block.chainid == Constants.CREATOR_MAINNET)
             assertFalse(
                 _core.hasRole(Roles.ADMIN, addresses.getAddress("DEPLOYER_EOA")),
                 "deployer should not have admin role"
             );
+        } else {
+            assertEq(_core.getRoleMemberCount(Roles.ADMIN), 3, "incorrect admin count");
+        }
     }
 
     function run() public override {

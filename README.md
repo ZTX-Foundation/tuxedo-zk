@@ -25,14 +25,10 @@ The system also requires the following environment variables to be set:
 
 | Variable               | Description                                                           |
 |------------------------|-----------------------------------------------------------------------|
-| `TOKEN_NAME`           | The name of the token (e.g. `ZTX Token`).                             |
-| `TOKEN_SYMBOL`         | The symbol of the primay token (e.g. `ZTX`).                          |
-| `DOMAIN`               | The domain of where the metadata is hosted.                           |
-| `ENVIRONMENT`          | The environment of the deployment (`devnet`, `testnet` or `mainnet`). |
+| `ADDRESS_FILE`         | Address JSON filename without extension (e.g. `creator-testnet`).     |
+| `ENVIRONMENT`          | Used for metadata URI subdomain (e.g. `qa`, `mainnet`).               |
+| `DOMAIN`               | Used for metadata URI domain (e.g. `ztx.io`).                         |
 | `DEPLOYER_PRIVATE_KEY` | The private key of the deployer.                                      |
-| `MAINNET_RPC_URL`      | Arbitrum mainnet RPC host.                                            |
-| `TESTNET_RPC_URL`      | Arbitrum testnet RPC host.                                            |
-| `ARBITRUM_TESTNET_SEPOLIA_RPC_URL` | Arbitrum Sepolia Testnet RPC host                         |
 
 See the included `.env.example` for an example.
 
@@ -58,21 +54,75 @@ and the integration tests:
 npm run test:integration
 ```
 
-## Testing Deploy Scripts
+## Creator Chain Deployment
 
-Create a `.env` file in the root directory. Refer to `.env.example` for required variables.
+Creator chain (Atlas VM) is fully EVM compatible. Deployment uses standard Foundry `forge script` with phased execution to support deploying without the token contract (canonical ZTX arrives via bridge from Arb One).
 
-**EVM Node Testing**
+### Deployment Phases
 
-Run all proposals against a standard EVM node:
+**Phase 1** — Core infrastructure (deployer ADMIN is revoked after this phase):
 
 ```bash
-forge script script/deploy/BootstrapTestnet.s.sol -vvvv
+ADDRESS_FILE=creator-mainnet ENVIRONMENT=mainnet DOMAIN=ztx.io \
+  forge script script/deploy/BootstrapMainnet.s.sol:BootstrapMainnetPhase1 \
+    -vvvv --rpc-url https://rpc.mainnet.oncreator.com \
+    --broadcast --private-key $DEPLOYER_PRIVATE_KEY \
+    --verify --verifier custom \
+    --verifier-url https://explorer-api.mainnet.oncreator.com/api
 ```
 
-**zkSync Node Testing**
+Deploys: Core, GlobalReentrancyLock, Wearables, AdminMinter, BatchOperator, TimelockController.
 
-For testing against a local zkSync node, see the [zkSync deployment testing section](./script/zk/README.md#local-zksync-node-testing) in the deployment CLI documentation.
+**Manual step** — From ADMIN_MULTISIG (Safe), grant ADMIN role to the TimelockController:
+
+```bash
+# Generate calldata
+cast calldata "grantRole(bytes32,address)" \
+  0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775 \
+  <ADMIN_TIMELOCK_CONTROLLER_ADDRESS>
+```
+
+Submit to the CORE contract address from ADMIN_MULTISIG.
+
+**Phase 2** — NFT collections and minting infrastructure:
+
+```bash
+ADDRESS_FILE=creator-mainnet ENVIRONMENT=mainnet DOMAIN=ztx.io \
+  forge script script/deploy/BootstrapMainnet.s.sol:BootstrapMainnetPhase2 \
+    -vvvv --rpc-url https://rpc.mainnet.oncreator.com \
+    --broadcast --private-key $DEPLOYER_PRIVATE_KEY \
+    --verify --verifier custom \
+    --verifier-url https://explorer-api.mainnet.oncreator.com/api
+```
+
+Deploys: Consumables, Placeables, Enhanceables, AutoGraphMinter, AutoGraphBatchMinter.
+
+**Timelock governance** — After Phase 2, submit schedule+execute calldata for zip003 (role grants) and zip004 (supply caps) through ADMIN_MULTISIG → TimelockController:
+
+```bash
+ADDRESS_FILE=creator-mainnet ENVIRONMENT=mainnet DOMAIN=ztx.io \
+DO_DEPLOY=false DO_SIMULATE=false DO_VALIDATE=false DO_PRINT=true \
+  forge script script/deploy/PrintTimelockCalldata.s.sol:PrintTimelockCalldata \
+    -vvvv --rpc-url https://rpc.mainnet.oncreator.com
+```
+
+Submit 4 Safe transactions to ADMIN_TIMELOCK_CONTROLLER (schedule+execute for each ZIP).
+
+**Phase 3** (future) — ERC20Splitter + GameConsumer via zip005, after the bridged ZTX token address is known.
+
+### Testnet
+
+Same flow using `BootstrapTestnet.s.sol` with `ADDRESS_FILE=creator-testnet ENVIRONMENT=qa DOMAIN=ztx.io` and RPC `https://rpc.testnet.oncreator.com`.
+
+### Legacy Deployment (zkSync Era VM)
+
+The `script/zk/deploy.ts` CLI was used for zkSync Era VM deployments. Creator chain uses Atlas VM which is fully EVM compatible, so standard Foundry scripts are used instead. See the [zkSync deployment docs](./script/zk/README.md) for the legacy flow.
+
+### Address Files
+
+Deployed addresses are stored in `proposals/Addresses/`:
+- `creator-mainnet.json` — Creator Mainnet (chain ID 2787)
+- `creator-testnet.json` — Creator Testnet (chain ID 278701)
 
 ## Linter
 
@@ -107,6 +157,38 @@ npm run slither
 ```
 
 ## Contracts
+
+### Creator Mainnet (chain ID 2787)
+
+| Address | Contract |
+|---------|----------|
+| [`0x4c256f578e599bff9f9bb74fd499b76a1130c008`](https://explorer.mainnet.oncreator.com/address/0x4c256f578e599bff9f9bb74fd499b76a1130c008) | [CORE](./src/core/Core.sol) |
+| [`0xfba7148d6200fbb769dbcb0413aaf850ec93ab2e`](https://explorer.mainnet.oncreator.com/address/0xfba7148d6200fbb769dbcb0413aaf850ec93ab2e) | [GLOBAL_REENTRANCY_LOCK](./src/core/GlobalReentrancyLock.sol) |
+| [`0xd3ebd6b64968b7b6fc98a9c5a11002ba65c71427`](https://explorer.mainnet.oncreator.com/address/0xd3ebd6b64968b7b6fc98a9c5a11002ba65c71427) | [ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0xdfdeb60e5d3bca322fb5ffcb02f0718744e9d31f`](https://explorer.mainnet.oncreator.com/address/0xdfdeb60e5d3bca322fb5ffcb02f0718744e9d31f) | [ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0x67e23d3c1353d88ee09a7e0860af59e8e5997577`](https://explorer.mainnet.oncreator.com/address/0x67e23d3c1353d88ee09a7e0860af59e8e5997577) | [ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0x6300fcdbf06da84aeef3a8cecd525955757191cc`](https://explorer.mainnet.oncreator.com/address/0x6300fcdbf06da84aeef3a8cecd525955757191cc) | [ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0xe83c2ec735c7a81ad33d37aadfde50a01e5fabc8`](https://explorer.mainnet.oncreator.com/address/0xe83c2ec735c7a81ad33d37aadfde50a01e5fabc8) | [ERC1155_MAX_SUPPLY_ADMIN_MINTER](./src/nfts/ERC1155AdminMinter.sol) |
+| [`0xf2fdff2d3e8ff138a5d7cde4ecd99e49d7f58476`](https://explorer.mainnet.oncreator.com/address/0xf2fdff2d3e8ff138a5d7cde4ecd99e49d7f58476) | [ERC1155_BATCH_OPERATOR](./src/nfts/ERC1155BatchOperator.sol) |
+| [`0xe9ab7510420cb2e9d8a01755e0e17c80f0766789`](https://explorer.mainnet.oncreator.com/address/0xe9ab7510420cb2e9d8a01755e0e17c80f0766789) | [ERC1155_AUTO_GRAPH_MINTER](./src/nfts/ERC1155AutoGraphMinter.sol) |
+| [`0x8b83412f24b7927fd1ddf61fee4f90e8a910a873`](https://explorer.mainnet.oncreator.com/address/0x8b83412f24b7927fd1ddf61fee4f90e8a910a873) | [ERC1155_AUTO_GRAPH_BATCH_MINTER](./src/nfts/ERC1155AutoGraphBatchMinter.sol) |
+| [`0xb0fb857af82a0041e9da37ccae29eacd29ddd433`](https://explorer.mainnet.oncreator.com/address/0xb0fb857af82a0041e9da37ccae29eacd29ddd433) | [ADMIN_TIMELOCK_CONTROLLER](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol) |
+
+### Creator Testnet (chain ID 278701)
+
+| Address | Contract |
+|---------|----------|
+| [`0x0b3fef37f518d0ef865b66889ea66188353b1f09`](https://explorer.testnet.oncreator.com/address/0x0b3fef37f518d0ef865b66889ea66188353b1f09) | [CORE](./src/core/Core.sol) |
+| [`0xb68fd27ae67edd4da88ea9afd4333b66f62bdaa6`](https://explorer.testnet.oncreator.com/address/0xb68fd27ae67edd4da88ea9afd4333b66f62bdaa6) | [GLOBAL_REENTRANCY_LOCK](./src/core/GlobalReentrancyLock.sol) |
+| [`0x84337af8f9f31340401ce273509b797a1f53e9f6`](https://explorer.testnet.oncreator.com/address/0x84337af8f9f31340401ce273509b797a1f53e9f6) | [ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0x8aa808dea086dd7b6fbbcc87632915a309078fa9`](https://explorer.testnet.oncreator.com/address/0x8aa808dea086dd7b6fbbcc87632915a309078fa9) | [ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0x6a4674c20d67bde3c2f193390a83bcc6c3d667b9`](https://explorer.testnet.oncreator.com/address/0x6a4674c20d67bde3c2f193390a83bcc6c3d667b9) | [ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0xb8f6c8e23c94f2addde7284130fd8edc70a3139d`](https://explorer.testnet.oncreator.com/address/0xb8f6c8e23c94f2addde7284130fd8edc70a3139d) | [ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES](./src/nfts/ERC1155MaxSupplyMintable.sol) |
+| [`0x6bad13dc8226a0fd0888844fed0f939ea764b512`](https://explorer.testnet.oncreator.com/address/0x6bad13dc8226a0fd0888844fed0f939ea764b512) | [ERC1155_MAX_SUPPLY_ADMIN_MINTER](./src/nfts/ERC1155AdminMinter.sol) |
+| [`0xa312378f31fc261456e8edc7021229317bbd0a12`](https://explorer.testnet.oncreator.com/address/0xa312378f31fc261456e8edc7021229317bbd0a12) | [ERC1155_BATCH_OPERATOR](./src/nfts/ERC1155BatchOperator.sol) |
+| [`0x882ce526a2598cfbdb0d917f7866c30520a366ca`](https://explorer.testnet.oncreator.com/address/0x882ce526a2598cfbdb0d917f7866c30520a366ca) | [ERC1155_AUTO_GRAPH_MINTER](./src/nfts/ERC1155AutoGraphMinter.sol) |
+| [`0x597732c3c30c35d61a21a56ebf75bac81ea8106e`](https://explorer.testnet.oncreator.com/address/0x597732c3c30c35d61a21a56ebf75bac81ea8106e) | [ERC1155_AUTO_GRAPH_BATCH_MINTER](./src/nfts/ERC1155AutoGraphBatchMinter.sol) |
+| [`0xdd8c9bfc476a76d42c4643a7bc706464a8d950f6`](https://explorer.testnet.oncreator.com/address/0xdd8c9bfc476a76d42c4643a7bc706464a8d950f6) | [ADMIN_TIMELOCK_CONTROLLER](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol) |
 
 ### Arbitrum Sepolia (devnet)
 

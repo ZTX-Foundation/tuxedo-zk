@@ -111,9 +111,9 @@ contract zip004 is TimelockProposal {
         }
 
         /// @notice sanity checks
-        assertEq(transferableWearableSettings.length, 182, "Invalid transferableWearableSettings length");
-        assertEq(nonTransferableWearableSettings.length, 172, "Invalid nonTransferableWearableSettings length");
-        assertEq(transferableEnhanceableSettings.length, 35, "Invalid transferableEnhanceableSettings length");
+        assertEq(transferableWearableSettings.length, 189, "Invalid transferableWearableSettings length");
+        assertEq(nonTransferableWearableSettings.length, 169, "Invalid nonTransferableWearableSettings length");
+        assertEq(transferableEnhanceableSettings.length, 34, "Invalid transferableEnhanceableSettings length");
         assertEq(nonTransferableEnhanceableSettings.length, 25, "Invalid nonTransferableEnhanceableSettings length");
 
         // Verify max supply totals
@@ -121,19 +121,19 @@ contract zip004 is TimelockProposal {
         for (uint256 i = 0; i < transferableWearableSettings.length; i++) {
             twTotal += transferableWearableSettings[i].maxSupply;
         }
-        assertEq(twTotal, 2405927, "Invalid maxSupplyTotal for transferable wearables");
+        assertEq(twTotal, 2475927, "Invalid maxSupplyTotal for transferable wearables");
 
         uint256 ntwTotal = 0;
         for (uint256 i = 0; i < nonTransferableWearableSettings.length; i++) {
             ntwTotal += nonTransferableWearableSettings[i].maxSupply;
         }
-        assertEq(ntwTotal, 161000028544, "Invalid maxSupplyTotal for non-transferable wearables");
+        assertEq(ntwTotal, 160000028043, "Invalid maxSupplyTotal for non-transferable wearables");
 
         uint256 teTotal = 0;
         for (uint256 i = 0; i < transferableEnhanceableSettings.length; i++) {
             teTotal += transferableEnhanceableSettings[i].maxSupply;
         }
-        assertEq(teTotal, 550000, "Invalid maxSupplyTotal for transferable enhanceables");
+        assertEq(teTotal, 530000, "Invalid maxSupplyTotal for transferable enhanceables");
 
         uint256 nteTotal = 0;
         for (uint256 i = 0; i < nonTransferableEnhanceableSettings.length; i++) {

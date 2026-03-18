@@ -154,11 +154,6 @@
     },
     {
       "isNonTransferable": true,
-      "maxSupply": 500,
-      "tokenId": 10
-    },
-    {
-      "isNonTransferable": true,
       "maxSupply": 1000000000,
       "tokenId": 11
     },
@@ -300,11 +295,6 @@
     {
       "isNonTransferable": true,
       "maxSupply": 1,
-      "tokenId": 112
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1,
       "tokenId": 113
     },
     {
@@ -385,11 +375,6 @@
     {
       "isNonTransferable": true,
       "maxSupply": 1000000000,
-      "tokenId": 1010
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
       "tokenId": 202
     },
     {
@@ -406,6 +391,11 @@
       "isNonTransferable": true,
       "maxSupply": 1000000000,
       "tokenId": 213
+    },
+    {
+      "isNonTransferable": true,
+      "maxSupply": 1000000000,
+      "tokenId": 1010
     },
     {
       "isNonTransferable": true,
@@ -981,11 +971,6 @@
       "isNonTransferable": true,
       "maxSupply": 1000000000,
       "tokenId": 1670
-    },
-    {
-      "isNonTransferable": true,
-      "maxSupply": 1000000000,
-      "tokenId": 1778
     }
   ],
   "transferableEnhanceables": [
@@ -1016,10 +1001,6 @@
     {
       "maxSupply": 7500,
       "tokenId": 50
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 52
     },
     {
       "maxSupply": 20000,
@@ -1132,6 +1113,10 @@
   ],
   "transferableWearables": [
     {
+      "maxSupply": 500,
+      "tokenId": 10
+    },
+    {
       "maxSupply": 120,
       "tokenId": 20
     },
@@ -1221,10 +1206,6 @@
     },
     {
       "maxSupply": 20000,
-      "tokenId": 1006
-    },
-    {
-      "maxSupply": 20000,
       "tokenId": 153
     },
     {
@@ -1245,6 +1226,22 @@
     },
     {
       "maxSupply": 20000,
+      "tokenId": 204
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 214
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 215
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 1006
+    },
+    {
+      "maxSupply": 20000,
       "tokenId": 1011
     },
     {
@@ -1262,18 +1259,6 @@
     {
       "maxSupply": 7500,
       "tokenId": 1017
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 204
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 214
-    },
-    {
-      "maxSupply": 20000,
-      "tokenId": 215
     },
     {
       "maxSupply": 20000,
@@ -1374,6 +1359,10 @@
     {
       "maxSupply": 20000,
       "tokenId": 1096
+    },
+    {
+      "maxSupply": 1000,
+      "tokenId": 1101
     },
     {
       "maxSupply": 20000,
@@ -1572,6 +1561,10 @@
       "tokenId": 1193
     },
     {
+      "maxSupply": 1000,
+      "tokenId": 1212
+    },
+    {
       "maxSupply": 7500,
       "tokenId": 1214
     },
@@ -1649,11 +1642,23 @@
     },
     {
       "maxSupply": 1000,
+      "tokenId": 1268
+    },
+    {
+      "maxSupply": 1000,
       "tokenId": 1270
     },
     {
       "maxSupply": 1000,
       "tokenId": 1271
+    },
+    {
+      "maxSupply": 1000,
+      "tokenId": 1273
+    },
+    {
+      "maxSupply": 1000,
+      "tokenId": 1277
     },
     {
       "maxSupply": 20000,
@@ -1752,6 +1757,10 @@
       "tokenId": 1363
     },
     {
+      "maxSupply": 1000,
+      "tokenId": 1366
+    },
+    {
       "maxSupply": 20000,
       "tokenId": 1369
     },
@@ -1837,27 +1846,27 @@
     },
     {
       "maxSupply": 20000,
-      "tokenId": 1683
+      "tokenId": 1790
     },
     {
-      "maxSupply": 1000,
-      "tokenId": 1703
-    },
-    {
-      "maxSupply": 1000,
-      "tokenId": 1752
+      "maxSupply": 20000,
+      "tokenId": 1791
     },
     {
       "maxSupply": 7500,
-      "tokenId": 1753
+      "tokenId": 1792
     },
     {
-      "maxSupply": 1000,
-      "tokenId": 1756
+      "maxSupply": 7500,
+      "tokenId": 1793
     },
     {
-      "maxSupply": 1000,
-      "tokenId": 1776
+      "maxSupply": 20000,
+      "tokenId": 1794
+    },
+    {
+      "maxSupply": 20000,
+      "tokenId": 1795
     }
   ]
 }
