@@ -29,6 +29,7 @@ npm run deploy
 ### 1. Select Network
 
 - Creator Testnet (QA) (Chain ID: 278701)
+- Creator Mainnet (Chain ID: 2787)
 - Local Network ZK (Chain ID: 260)
 
 ### 2. Choose Run Type
@@ -77,8 +78,13 @@ Edit `script/zk/deploy.ts`:
 const NETWORKS = {
   'qa': {
     name: 'Creator Testnet (QA)',
-    rpcUrl: 'https://zksync-os-testnet-creator.zksync.dev',
+    rpcUrl: 'https://rpc.testnet.oncreator.com',
     chainId: 278701,
+  },
+  'mainnet': {
+    name: 'Creator Mainnet',
+    rpcUrl: 'https://rpc.mainnet.oncreator.com',
+    chainId: 2787,
   },
   'localnet-zk': {
     name: 'Local Network ZK',

@@ -1,8 +1,5 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.18;
-
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ERC20Splitter} from "@protocol/finance/ERC20Splitter.sol";
+pragma solidity 0.8.28;
 
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
 
@@ -10,7 +7,7 @@ import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 import {ERC1155AutoGraphMinter} from "@protocol/nfts/ERC1155AutoGraphMinter.sol";
-import {GameConsumer} from "@protocol/game/GameConsumer.sol";
+import {ERC1155AutoGraphBatchMinter} from "@protocol/nfts/ERC1155AutoGraphBatchMinter.sol";
 import {CoreRef} from "@protocol/refs/CoreRef.sol";
 
 contract zip003 is TimelockProposal {
@@ -23,7 +20,7 @@ contract zip003 is TimelockProposal {
 
     // Provides a brief description of the proposal.
     function description() public pure override returns (string memory) {
-        return "ZTX Mobile contracts proposal";
+        return "NFT collections and AutoGraph minter contracts";
     }
 
     function deploy() public override {
@@ -63,21 +60,6 @@ contract zip003 is TimelockProposal {
         );
         addresses.addAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES", address(erc1155Enhanceables), true);
 
-        /// ERC20Splitter allocation settings
-        ERC20Splitter.Allocation[] memory allocations = new ERC20Splitter.Allocation[](2);
-        allocations[0].deposit = addresses.getAddress("REVENUE_WALLET_MULTISIG01");
-        allocations[0].ratio = 5_000;
-        allocations[1].deposit = addresses.getAddress("REVENUE_WALLET_MULTISIG02");
-        allocations[1].ratio = 5_000;
-
-        /// ERC20Splitter consumable splitter contract
-        ERC20Splitter consumableSplitter = new ERC20Splitter(
-            address(_core),
-            addresses.getAddress("TOKEN"),
-            allocations
-        );
-        addresses.addAddress("CONSUMABLE_SPLITTER", address(consumableSplitter), true);
-
         /// AutoGraphMinter contract
         address[] memory nftContractAddresses = new address[](4);
         nftContractAddresses[0] = address(erc1155Consumables);
@@ -95,14 +77,14 @@ contract zip003 is TimelockProposal {
         );
         addresses.addAddress("ERC1155_AUTO_GRAPH_MINTER", address(erc1155AutoGraphMinter), true);
 
-        /// Game consumer
-        GameConsumer gameConsumer = new GameConsumer(
+        /// AutoGraphBatchMinter contract (batch minting extension)
+        ERC1155AutoGraphBatchMinter erc1155AutoGraphBatchMinter = new ERC1155AutoGraphBatchMinter(
             address(_core),
-            addresses.getAddress("TOKEN"),
-            addresses.getAddress("CONSUMABLE_SPLITTER"),
-            addresses.getAddress("WETH")
+            erc1155AutoGraphMinter,
+            3, // same rate limit as single minter
+            250_000 // same buffer cap
         );
-        addresses.addAddress("GAME_CONSUMER", address(gameConsumer), true);
+        addresses.addAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER", address(erc1155AutoGraphBatchMinter), true);
     }
 
     function build() public override buildModifier(addresses.getAddress("ADMIN_TIMELOCK_CONTROLLER")) {
@@ -114,15 +96,14 @@ contract zip003 is TimelockProposal {
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES"));
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES"));
         _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER"));
+        _core.grantRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER"));
 
         /// grant protocol minter role
         _core.grantRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER"));
+        _core.grantRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER"));
 
         /// grant minter notary role
         _core.grantRole(Roles.MINTER_NOTARY_PROTOCOL_ROLE, addresses.getAddress("AUTOGRAPH_SERVICE_KMS_WALLET"));
-
-        /// grant game consumer notary protocol role
-        _core.grantRole(Roles.GAME_CONSUMER_NOTARY_PROTOCOL_ROLE, addresses.getAddress("AUTOGRAPH_SERVICE_KMS_WALLET"));
     }
 
     function run() public override {
@@ -171,9 +152,9 @@ contract zip003 is TimelockProposal {
                 "Verify ERC1155_AUTO_GRAPH_MINTER is pointing to the correct core address"
             );
             assertEq(
-                address(CoreRef(addresses.getAddress("GAME_CONSUMER")).core()),
+                address(ERC1155AutoGraphBatchMinter(addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER")).core()),
                 address(_core),
-                "Verify GAME_CONSUMER is pointing to the correct core address"
+                "Verify ERC1155_AUTO_GRAPH_BATCH_MINTER is pointing to the correct core address"
             );
         }
 
@@ -209,6 +190,11 @@ contract zip003 is TimelockProposal {
                 true,
                 "Verifying ERC1155_AUTO_GRAPH_MINTER has LOCKER role"
             );
+            assertEq(
+                _core.hasRole(Roles.LOCKER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER")),
+                true,
+                "Verifying ERC1155_AUTO_GRAPH_BATCH_MINTER has LOCKER role"
+            );
 
             /// Verify MINTER role
             assertEq(
@@ -216,12 +202,17 @@ contract zip003 is TimelockProposal {
                 true,
                 "Verifying ERC1155_AUTO_GRAPH_MINTER has MINTER role"
             );
+            assertEq(
+                _core.hasRole(Roles.MINTER_PROTOCOL_ROLE, addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER")),
+                true,
+                "Verifying ERC1155_AUTO_GRAPH_BATCH_MINTER has MINTER role"
+            );
         }
 
-        /// Sum of Role counts to date
+        /// Sum of Role counts to date (added 1 to each for batch minter)
         {
-            assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 6, "Locker role count is not 6");
-            assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 3, "Minter role count is not 3");
+            assertEq(_core.getRoleMemberCount(Roles.LOCKER_PROTOCOL_ROLE), 7, "Locker role count is not 7");
+            assertEq(_core.getRoleMemberCount(Roles.MINTER_PROTOCOL_ROLE), 4, "Minter role count is not 4");
         }
 
         /// Verify MULTISIGS have the correct roles
@@ -238,20 +229,6 @@ contract zip003 is TimelockProposal {
             );
         }
 
-        /// Verify ERC20Splitter has the correct settings
-        {
-            ERC20Splitter splitter = ERC20Splitter(addresses.getAddress("CONSUMABLE_SPLITTER"));
-            assertEq(address(splitter.token()), addresses.getAddress("TOKEN"), "Verify splitter token address");
-
-            (address address0, uint ratio0) = splitter.allocations(0);
-            (address address1, uint ratio1) = splitter.allocations(1);
-
-            assertEq(address0, addresses.getAddress("REVENUE_WALLET_MULTISIG01"));
-            assertEq(ratio0, 5_000);
-            assertEq(address1, addresses.getAddress("REVENUE_WALLET_MULTISIG02"));
-            assertEq(ratio1, 5_000);
-        }
-
         /// Verify ERC1155AutoGraphMinter has the correct settings
         {
             ERC1155AutoGraphMinter minter = ERC1155AutoGraphMinter(addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER"));
@@ -265,6 +242,12 @@ contract zip003 is TimelockProposal {
             assertEq(minter.bufferCap(), 250_000, "Verify minter max tokens per day");
             assertEq(minter.buffer(), minter.bufferCap(), "Verify minter buffer == bufferCap");
             assertEq(minter.expiryTokenHoursValid(), 1, "Verify minter expiry timeout");
+
+            /// Verify batch minter references the primary minter
+            ERC1155AutoGraphBatchMinter batchMinter = ERC1155AutoGraphBatchMinter(addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER"));
+            assertEq(address(batchMinter.autoGraphMinter()), address(minter), "Verify batch minter references primary minter");
+            assertEq(batchMinter.replenishRatePerSecond(), 3, "Verify batch minter replenish rate per second");
+            assertEq(batchMinter.bufferCap(), 250_000, "Verify batch minter max tokens per day");
 
             assertEq(
                 minter.isWhitelistedAddress(addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES")),
@@ -286,48 +269,14 @@ contract zip003 is TimelockProposal {
                 true,
                 "Verify ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES is whitelisted"
             );
-
-            /// Verify Game consumable
-            ERC20Splitter.Allocation[] memory consumableAllocations = ERC20Splitter(
-                addresses.getAddress("CONSUMABLE_SPLITTER")
-            ).getAllocations();
-
-            assertEq(consumableAllocations.length, 2, "Consumable allocations length is not equal to 2");
-            assertEq(
-                consumableAllocations[0].deposit,
-                addresses.getAddress("REVENUE_WALLET_MULTISIG01"),
-                "Consumable allocation deposit is not equal to BURNER_HOLDING_DEPOSIT"
-            );
-            assertEq(consumableAllocations[0].ratio, 5_000, "Consumable allocation ratio is not equal to 5_000");
-            assertEq(
-                consumableAllocations[1].deposit,
-                addresses.getAddress("REVENUE_WALLET_MULTISIG02"),
-                "Consumable allocation deposit is not equal to TREASURY_WALLET_MULTISIG"
-            );
-            assertEq(consumableAllocations[1].ratio, 5_000, "Consumable allocation ratio is not equal to 5_000");
-
-            assertEq(
-                address(ERC20Splitter(addresses.getAddress("CONSUMABLE_SPLITTER")).core()),
-                address(_core),
-                "CONSUMABLE_SPLITTER is pointing to wrong core"
-            );
         }
 
-        /// Verify notary roles
+        /// Verify notary role
         {
             assertEq(
                 _core.hasRole(Roles.MINTER_NOTARY_PROTOCOL_ROLE, addresses.getAddress("AUTOGRAPH_SERVICE_KMS_WALLET")),
                 true,
                 "Verifying AUTOGRAPH_SERVICE_KMS_WALLET has MINTER_NOTARY role"
-            );
-
-            assertEq(
-                _core.hasRole(
-                    Roles.GAME_CONSUMER_NOTARY_PROTOCOL_ROLE,
-                    addresses.getAddress("AUTOGRAPH_SERVICE_KMS_WALLET")
-                ),
-                true,
-                "Verifying AUTOGRAPH_SERVICE_KMS_WALLET has GAME_CONSUMER_NOTARY role"
             );
         }
     }

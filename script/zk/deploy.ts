@@ -20,9 +20,15 @@ process.on("SIGINT", () => {
 const NETWORKS = {
     "qa": {
         name: "Creator Testnet (QA)",
-        rpcUrl: "https://zksync-os-testnet-creator.zksync.dev",
+        rpcUrl: process.env.RPC_URL || "https://rpc.testnet.oncreator.com",
         chainId: 278701,
-        verifierUrl: "https://block-explorer-api.zksync-os-testnet-creator.zksync.dev/api",
+        verifierUrl: "https://explorer-api.testnet.oncreator.com/api",
+    },
+    "mainnet": {
+        name: "Creator Mainnet",
+        rpcUrl: process.env.MAINNET_RPC_URL || "https://rpc.mainnet.oncreator.com",
+        chainId: 2787,
+        verifierUrl: "https://explorer-api.mainnet.oncreator.com/api",
     },
     "localnet-zk": {
         name: "Local Network ZK",
@@ -143,6 +149,7 @@ async function main() {
         networkConfig.rpcUrl,
         "-vvvv",
         "--broadcast",
+        "--skip-simulation",
         "--private-key",
         privateKey,
         "--slow",

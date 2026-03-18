@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 import {TimelockProposal} from "@forge-proposal-simulator/src/proposals/TimelockProposal.sol";
 
+import {ERC1155BatchOperator} from "@protocol/nfts/ERC1155BatchOperator.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
 
 contract zip004 is TimelockProposal {
@@ -37,6 +38,9 @@ contract zip004 is TimelockProposal {
     /// @notice ERC1155 collections
     ERC1155MaxSupplyMintable wearable;
     ERC1155MaxSupplyMintable enhanceable;
+
+    /// @notice batch operator for configuring supply caps and transferability
+    ERC1155BatchOperator batchOperator;
 
     /// @notice batch size for chunked calls
     uint256 private constant PROPOSAL_MAX_BATCH = 60;
@@ -107,9 +111,9 @@ contract zip004 is TimelockProposal {
         }
 
         /// @notice sanity checks
-        assertEq(transferableWearableSettings.length, 182, "Invalid transferableWearableSettings length");
-        assertEq(nonTransferableWearableSettings.length, 172, "Invalid nonTransferableWearableSettings length");
-        assertEq(transferableEnhanceableSettings.length, 35, "Invalid transferableEnhanceableSettings length");
+        assertEq(transferableWearableSettings.length, 189, "Invalid transferableWearableSettings length");
+        assertEq(nonTransferableWearableSettings.length, 169, "Invalid nonTransferableWearableSettings length");
+        assertEq(transferableEnhanceableSettings.length, 34, "Invalid transferableEnhanceableSettings length");
         assertEq(nonTransferableEnhanceableSettings.length, 25, "Invalid nonTransferableEnhanceableSettings length");
 
         // Verify max supply totals
@@ -117,19 +121,19 @@ contract zip004 is TimelockProposal {
         for (uint256 i = 0; i < transferableWearableSettings.length; i++) {
             twTotal += transferableWearableSettings[i].maxSupply;
         }
-        assertEq(twTotal, 2405927, "Invalid maxSupplyTotal for transferable wearables");
+        assertEq(twTotal, 2475927, "Invalid maxSupplyTotal for transferable wearables");
 
         uint256 ntwTotal = 0;
         for (uint256 i = 0; i < nonTransferableWearableSettings.length; i++) {
             ntwTotal += nonTransferableWearableSettings[i].maxSupply;
         }
-        assertEq(ntwTotal, 161000028544, "Invalid maxSupplyTotal for non-transferable wearables");
+        assertEq(ntwTotal, 160000028043, "Invalid maxSupplyTotal for non-transferable wearables");
 
         uint256 teTotal = 0;
         for (uint256 i = 0; i < transferableEnhanceableSettings.length; i++) {
             teTotal += transferableEnhanceableSettings[i].maxSupply;
         }
-        assertEq(teTotal, 550000, "Invalid maxSupplyTotal for transferable enhanceables");
+        assertEq(teTotal, 530000, "Invalid maxSupplyTotal for transferable enhanceables");
 
         uint256 nteTotal = 0;
         for (uint256 i = 0; i < nonTransferableEnhanceableSettings.length; i++) {
@@ -138,7 +142,7 @@ contract zip004 is TimelockProposal {
         assertEq(nteTotal, 25000000000, "Invalid maxSupplyTotal for non-transferable enhanceables");
     }
 
-    /// @notice helper to call setSupplyCapBatch with chunking
+    /// @notice helper to call setSupplyCapBatch via the batch operator with chunking
     function _callSetSupplyCapBatch(
         ERC1155MaxSupplyMintable tokenContract,
         TokenIDMaxSupplySettings[] storage settings
@@ -153,11 +157,11 @@ contract zip004 is TimelockProposal {
                 ids[i] = settings[start + i].tokenId;
                 caps[i] = settings[start + i].maxSupply;
             }
-            tokenContract.setSupplyCapBatch(ids, caps);
+            batchOperator.setSupplyCapBatch(tokenContract, ids, caps);
         }
     }
 
-    /// @notice helper to call setSupplyCapAndNonTransferableBatch with chunking
+    /// @notice helper to call setSupplyCapAndNonTransferableBatch via the batch operator with chunking
     function _callSetSupplyCapAndNonTransferableBatch(
         ERC1155MaxSupplyMintable tokenContract,
         TokenIDMaxSupplyAndTransferSettings[] storage settings
@@ -174,7 +178,7 @@ contract zip004 is TimelockProposal {
                 caps[i] = settings[start + i].maxSupply;
                 flags[i] = settings[start + i].isNonTransferable;
             }
-            tokenContract.setSupplyCapAndNonTransferableBatch(ids, caps, flags);
+            batchOperator.setSupplyCapAndNonTransferableBatch(tokenContract, ids, caps, flags);
         }
     }
 
@@ -205,6 +209,10 @@ contract zip004 is TimelockProposal {
 
         enhanceable = ERC1155MaxSupplyMintable(
             addresses.getAddress("ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES")
+        );
+
+        batchOperator = ERC1155BatchOperator(
+            addresses.getAddress("ERC1155_BATCH_OPERATOR")
         );
 
         _setAndConfirmData();

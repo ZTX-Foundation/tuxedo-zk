@@ -1,8 +1,9 @@
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {ERC1155AutoGraphMinterHelperLib as Helper} from "test/helpers/ERC1155AutoGraphMinterHelper.sol";
 
 import {ERC1155AutoGraphMinter} from "@protocol/nfts/ERC1155AutoGraphMinter.sol";
+import {ERC1155AutoGraphBatchMinter} from "@protocol/nfts/ERC1155AutoGraphBatchMinter.sol";
 import {Core} from "@protocol/core/Core.sol";
 import {Roles} from "@protocol/core/Roles.sol";
 import {ERC1155MaxSupplyMintable} from "@protocol/nfts/ERC1155MaxSupplyMintable.sol";
@@ -21,6 +22,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
 
     /// @notice ERC1155AutoGraphMinter contract using test
     ERC1155AutoGraphMinter autoGraphMinter;
+    ERC1155AutoGraphBatchMinter autoGraphBatchMinter;
 
     /// @notice NFT whitelisted contract addresses
     address[] nftContractAddresses = new address[](3);
@@ -52,6 +54,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
 
         /// @dev main contract under test
         autoGraphMinter = ERC1155AutoGraphMinter(addresses.getAddress("ERC1155_AUTO_GRAPH_MINTER"));
+        autoGraphBatchMinter = ERC1155AutoGraphBatchMinter(addresses.getAddress("ERC1155_AUTO_GRAPH_BATCH_MINTER"));
 
         /// @dev Set up notary signing role
         vm.startPrank(addresses.getAddress("ADMIN_MULTISIG"));
@@ -940,7 +943,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchForFree(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Consumables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -948,7 +951,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         }
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchForFree(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Consumables, address(this), params);
 
         /// ------- erc1155Placeables -------
 
@@ -965,7 +968,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchForFree(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Placeables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -973,7 +976,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         }
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchForFree(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Placeables, address(this), params);
 
         /// ------- erc1155Wearables -------
 
@@ -990,7 +993,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchForFree(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Wearables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -998,7 +1001,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         }
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchForFree(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Wearables, address(this), params);
     }
 
     function testMintBatchForFreeWithExpiredJob() public {
@@ -1010,7 +1013,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchForFree(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Consumables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1030,7 +1033,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchForFree(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Consumables, address(this), params);
 
         /// ------- erc1155Placeables -------
 
@@ -1047,7 +1050,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchForFree(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Placeables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1066,7 +1069,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchForFree(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Placeables, address(this), params);
 
         /// ------- erc1155Wearables -------
 
@@ -1083,7 +1086,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchForFree(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Wearables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1102,7 +1105,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchForFree(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchForFree(erc1155Wearables, address(this), params);
     }
 
     function testMintBatchWithPaymentTokenAsFeeWithExpiredHash() public {
@@ -1122,10 +1125,10 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         deal(address(token), address(this), totalCost, true);
-        token.approve(address(autoGraphMinter), totalCost);
+        token.approve(address(autoGraphBatchMinter), totalCost);
 
         // mint
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1136,7 +1139,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         assertEq(token.balanceOf(autoGraphMinter.paymentRecipient()), totalCost, "Payment token balance incorrect");
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
 
         /// ------- erc1155Placeables -------
 
@@ -1160,10 +1163,10 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         deal(address(token), address(this), totalCost, true);
-        token.approve(address(autoGraphMinter), totalCost);
+        token.approve(address(autoGraphBatchMinter), totalCost);
 
         // mint
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1174,7 +1177,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         assertEq(token.balanceOf(autoGraphMinter.paymentRecipient()), runningTotal, "Payment token balance incorrect");
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
 
         /// ------- erc1155Wearables -------
 
@@ -1196,10 +1199,10 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         deal(address(token), address(this), totalCost, true);
-        token.approve(address(autoGraphMinter), totalCost);
+        token.approve(address(autoGraphBatchMinter), totalCost);
 
         // mint
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1210,7 +1213,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         assertEq(token.balanceOf(autoGraphMinter.paymentRecipient()), runningTotal, "Payment token balance incorrect");
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
     }
 
     function testMintBatchWithPaymentTokenAsFeeWithExpiredJob() public {
@@ -1230,10 +1233,10 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         deal(address(token), address(this), totalCost, true);
-        token.approve(address(autoGraphMinter), totalCost);
+        token.approve(address(autoGraphBatchMinter), totalCost);
 
         // mint
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1255,7 +1258,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Consumables, address(this), address(token), params);
 
         /// ------- erc1155Placeables -------
 
@@ -1279,10 +1282,10 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         deal(address(token), address(this), totalCost, true);
-        token.approve(address(autoGraphMinter), totalCost);
+        token.approve(address(autoGraphBatchMinter), totalCost);
 
         // mint
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1304,7 +1307,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Placeables, address(this), address(token), params);
 
         /// ------- erc1155Wearables -------
 
@@ -1326,10 +1329,10 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         deal(address(token), address(this), totalCost, true);
-        token.approve(address(autoGraphMinter), totalCost);
+        token.approve(address(autoGraphBatchMinter), totalCost);
 
         // mint
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1351,7 +1354,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
+        autoGraphBatchMinter.mintBatchWithPaymentTokenAsFee(erc1155Wearables, address(this), address(token), params);
     }
 
     function testMintBatchWithEthAsFeeWithExpiredHash() public {
@@ -1371,7 +1374,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1382,7 +1385,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         assertEq(autoGraphMinter.paymentRecipient().balance, totalCost);
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
 
         /// ------- erc1155Placeables -------
         uint runningTotal = totalCost;
@@ -1405,7 +1408,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1416,7 +1419,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         assertEq(autoGraphMinter.paymentRecipient().balance, runningTotal);
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
 
         /// ------- erc1155Wearables -------
         testItems = 10;
@@ -1437,7 +1440,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1448,7 +1451,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         assertEq(autoGraphMinter.paymentRecipient().balance, runningTotal);
 
         vm.expectRevert("ERC1155AutoGraphMinter: Hash expired");
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
     }
 
     function testMintBatchWithEthAsFeeWithExpiredJob() public {
@@ -1468,7 +1471,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1490,7 +1493,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Consumables, address(this), params);
 
         /// ------- erc1155Placeables -------
         uint runningTotal = totalCost;
@@ -1513,7 +1516,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1535,7 +1538,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Placeables, address(this), params);
 
         /// ------- erc1155Wearables -------
         testItems = 10;
@@ -1556,7 +1559,7 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
         );
 
         // mint
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
 
         // assert balance
         for (uint256 i = 0; i < params.length; i++) {
@@ -1578,6 +1581,6 @@ contract IntegrationTestERC1155AutoGraphMinter is BaseTest {
             block.timestamp - 100
         );
         vm.expectRevert("ERC1155AutoGraphMinter: Job already completed");
-        autoGraphMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
+        autoGraphBatchMinter.mintBatchWithEthAsFee{value: totalCost}(erc1155Wearables, address(this), params);
     }
 }

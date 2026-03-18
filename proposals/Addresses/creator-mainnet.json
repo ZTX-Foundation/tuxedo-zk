@@ -1,0 +1,98 @@
+[
+    {
+        "name": "GUARDIAN_MULTISIG",
+        "chainId": 2787,
+        "addr": "0x8d701b18A9c14DF200784d1C691998e7cb0fC4Ca",
+        "isContract": true
+    },
+    {
+        "name": "AUTOGRAPH_MINTER_PAYMENT_RECIPIENT",
+        "chainId": 2787,
+        "addr": "0x12a3756ED8A21eb26D21794988f3e72A727d3644",
+        "isContract": true
+    },
+    {
+        "name": "AUTOGRAPH_SERVICE_KMS_WALLET",
+        "chainId": 2787,
+        "addr": "0xEE8b0f0708224FbB5832f90f0441A9BaDE417568",
+        "isContract": false
+    },
+    {
+        "name": "DEPLOYER_EOA",
+        "chainId": 2787,
+        "addr": "0x33472963730ae93649Cc03c27B7B089881b22F82",
+        "isContract": false
+    },
+    {
+        "name": "ADMIN_MULTISIG",
+        "chainId": 2787,
+        "addr": "0xa052dbA9E5A69f3F99317F14dcdF12853B12701a",
+        "isContract": true
+    },
+    {
+        "name": "CORE",
+        "chainId": 2787,
+        "addr": "0x4c256f578e599bff9f9bb74fd499b76a1130c008",
+        "isContract": true
+    },
+    {
+        "name": "GLOBAL_REENTRANCY_LOCK",
+        "chainId": 2787,
+        "addr": "0xfba7148d6200fbb769dbcb0413aaf850ec93ab2e",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES",
+        "chainId": 2787,
+        "addr": "0xd3ebd6b64968b7b6fc98a9c5a11002ba65c71427",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_ADMIN_MINTER",
+        "chainId": 2787,
+        "addr": "0xe83c2ec735c7a81ad33d37aadfde50a01e5fabc8",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_BATCH_OPERATOR",
+        "chainId": 2787,
+        "addr": "0xf2fdff2d3e8ff138a5d7cde4ecd99e49d7f58476",
+        "isContract": true
+    },
+    {
+        "name": "ADMIN_TIMELOCK_CONTROLLER",
+        "chainId": 2787,
+        "addr": "0xb0fb857af82a0041e9da37ccae29eacd29ddd433",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES",
+        "chainId": 2787,
+        "addr": "0xdfdeb60e5d3bca322fb5ffcb02f0718744e9d31f",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES",
+        "chainId": 2787,
+        "addr": "0x67e23d3c1353d88ee09a7e0860af59e8e5997577",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES",
+        "chainId": 2787,
+        "addr": "0x6300fcdbf06da84aeef3a8cecd525955757191cc",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_AUTO_GRAPH_MINTER",
+        "chainId": 2787,
+        "addr": "0xe9ab7510420cb2e9d8a01755e0e17c80f0766789",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_AUTO_GRAPH_BATCH_MINTER",
+        "chainId": 2787,
+        "addr": "0x8b83412f24b7927fd1ddf61fee4f90e8a910a873",
+        "isContract": true
+    }
+]

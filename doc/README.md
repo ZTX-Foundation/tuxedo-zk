@@ -28,6 +28,7 @@ The primary components are as follows:
 ### NFTs
 - [ERC1155AdminMinter](contracts/nfts/ERC1155AdminMinter.md)
 - [ERC1155AutoGraphMinter](contracts/nfts/ERC1155AutoGraphMinter.md)
+  - [ERC1155AutoGraphBatchMinter](contracts/nfts/ERC1155AutoGraphBatchMinter.md)
 - [ERC1155MaxSupplyMintable](contracts/nfts/ERC1155MaxSupplyMintable.md)
 - [ActualERC721Staking](contracts/nfts/staking/ActualERC721Staking.md)
   - [IActualERC721Staking](contracts/nfts/staking/IActualERC721Staking.md)

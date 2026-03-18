@@ -43,8 +43,8 @@
     },
     {
         "name": "AUTOGRAPH_SERVICE_KMS_WALLET",
-        "addr": "0x2526550d7c61559df4f55fbce69935c2d536f75e",
         "chainId": 278701,
+        "addr": "0x022FF47BE52B0db63Db8d57e26896cCe532eC1A9",
         "isContract": false
     },
     {
@@ -56,7 +56,7 @@
     {
         "name": "ADMIN_MULTISIG",
         "chainId": 278701,
-        "addr": "0xa052dbA9E5A69f3F99317F14dcdF12853B12701a",
-        "isContract": true
+        "addr": "0x5A54d36521b2EF3D667CD2D6da9Ad363f4792F7D",
+        "isContract": false
     }
 ]

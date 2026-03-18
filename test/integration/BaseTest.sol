@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.18;
+pragma solidity 0.8.28;
 
 import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import {Addresses} from "@forge-proposal-simulator/addresses/Addresses.sol";
@@ -14,8 +14,14 @@ contract BaseTest is Test, ERC1155Holder {
     uint256 arbitrumFork;
 
     function setUp() public virtual {
-        arbitrumFork = vm.createFork(vm.envString("RPC_URL"));
-        vm.selectFork(arbitrumFork);
+        // When run with --fork-url (+ --fork-retries for flaky RPCs),
+        // a fork is already active. Otherwise, create one from the endpoint alias.
+        try vm.activeFork() returns (uint256 forkId) {
+            arbitrumFork = forkId;
+        } catch {
+            arbitrumFork = vm.createFork("testnet");
+            vm.selectFork(arbitrumFork);
+        }
 
         runProposals();
     }

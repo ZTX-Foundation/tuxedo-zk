@@ -1,62 +1,98 @@
 [
     {
-        "name": "WETH",
-        "chainid": 4654,
-        "addr": "0x34AF38Ec07708dBC01C5A814fc418D3840448fce",
-        "isContract": true
-    },
-    {
-        "name": "TREASURY_WALLET_MULTISIG",
-        "chainid": 4654,
-        "addr": "0xAEa46dB13966EF25c3117F14a8f61A4ec201A7CC",
-        "isContract": false
-    },
-    {
         "name": "GUARDIAN_MULTISIG",
-        "chainid": 4654,
-        "addr": "0xCD6ee7a8A52Be203Bc702Adb9F10F91E19FbD10D",
-        "isContract": false
-    },
-    {
-        "name": "GAME_CONSUMER_PAYMENT_RECIPIENT",
-        "chainid": 4654,
-        "addr": "0xec2723715Eee2B27Ca7166d2efA5aCDb1887288E",
-        "isContract": false
-    },
-    {
-        "name": "REVENUE_WALLET_MULTISIG01",
-        "chainid": 4654,
-        "addr": "0x7339dcbB830d21dd494120aBA4f3aBcEe47fe4C8",
-        "isContract": false
-    },
-    {
-        "name": "REVENUE_WALLET_MULTISIG02",
-        "chainid": 4654,
-        "addr": "0x7c83C1e51ef855C4634D69aeB7b1475250173244",
+        "chainId": 278701,
+        "addr": "0xc3c1D74048115316dCbD66baeDA8214D2CA83C35",
         "isContract": false
     },
     {
         "name": "AUTOGRAPH_MINTER_PAYMENT_RECIPIENT",
-        "chainid": 4654,
-        "addr": "0xf1B19eC40C9FdCA579699B61eA1037D6c05C404D",
+        "chainId": 278701,
+        "addr": "0xA6363759eD11a8b3BC1C7e068AA416a66A816DEf",
         "isContract": false
     },
     {
         "name": "AUTOGRAPH_SERVICE_KMS_WALLET",
-        "addr": "0x2526550d7c61559df4f55fbce69935c2d536f75e",
-        "chainid": 4654,
+        "chainId": 278701,
+        "addr": "0x022FF47BE52B0db63Db8d57e26896cCe532eC1A9",
         "isContract": false
     },
     {
         "name": "DEPLOYER_EOA",
-        "chainid": 4654,
-        "addr": "0x73bBdE7e45E26546f2ef0202865917E4D6CE2A01",
+        "chainId": 278701,
+        "addr": "0x327528709c2c2ea98d522e83a996247cfbde788c",
         "isContract": false
     },
     {
         "name": "ADMIN_MULTISIG",
-        "chainid": 4654,
-        "addr": "0xb31865DBd173549c6BdA0FEBfCCC4cB02B0E41B3",
-        "isContract": false
+        "chainId": 278701,
+        "addr": "0xa052dbA9E5A69f3F99317F14dcdF12853B12701a",
+        "isContract": true
+    },
+    {
+        "name": "CORE",
+        "chainId": 278701,
+        "addr": "0x0b3fef37f518d0ef865b66889ea66188353b1f09",
+        "isContract": true
+    },
+    {
+        "name": "GLOBAL_REENTRANCY_LOCK",
+        "chainId": 278701,
+        "addr": "0xb68fd27ae67edd4da88ea9afd4333b66f62bdaa6",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_WEARABLES",
+        "chainId": 278701,
+        "addr": "0x84337af8f9f31340401ce273509b797a1f53e9f6",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_ADMIN_MINTER",
+        "chainId": 278701,
+        "addr": "0x6bad13dc8226a0fd0888844fed0f939ea764b512",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_BATCH_OPERATOR",
+        "chainId": 278701,
+        "addr": "0xa312378f31fc261456e8edc7021229317bbd0a12",
+        "isContract": true
+    },
+    {
+        "name": "ADMIN_TIMELOCK_CONTROLLER",
+        "chainId": 278701,
+        "addr": "0xdd8c9bfc476a76d42c4643a7bc706464a8d950f6",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_CONSUMABLES",
+        "chainId": 278701,
+        "addr": "0x8aa808dea086dd7b6fbbcc87632915a309078fa9",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_PLACEABLES",
+        "chainId": 278701,
+        "addr": "0x6a4674c20d67bde3c2f193390a83bcc6c3d667b9",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_MAX_SUPPLY_MINTABLE_ENHANCEABLES",
+        "chainId": 278701,
+        "addr": "0xb8f6c8e23c94f2addde7284130fd8edc70a3139d",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_AUTO_GRAPH_MINTER",
+        "chainId": 278701,
+        "addr": "0x882ce526a2598cfbdb0d917f7866c30520a366ca",
+        "isContract": true
+    },
+    {
+        "name": "ERC1155_AUTO_GRAPH_BATCH_MINTER",
+        "chainId": 278701,
+        "addr": "0x597732c3c30c35d61a21a56ebf75bac81ea8106e",
+        "isContract": true
     }
 ]
